@@ -334,6 +334,570 @@
             }
         ];
 
+        // ============================================================
+        //  NEW: Storage helpers (localStorage-based persistence layer)
+        // ============================================================
+        const LS = {
+            get(key, fallback) {
+                try {
+                    const raw = localStorage.getItem(key);
+                    return raw ? JSON.parse(raw) : fallback;
+                } catch (e) { return fallback; }
+            },
+            set(key, value) {
+                try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+            }
+        };
+
+        // Default stock quantities for the 8 base products (id -> units).
+        // Two products (3, 6) start out of stock to demo the "request" flow.
+        const STOCK_DEFAULTS = { "1": 5, "2": 3, "3": 0, "4": 12, "5": 8, "6": 0, "7": 2, "8": 15 };
+
+        // ============================================================
+        //  NEW: Brevo config for password-reset emails.
+        //  The API key is a SECRET and must live on a backend, never here.
+        //  Set `endpoint` to your serverless URL (see brevo-reset-password.js).
+        //  While empty, the app simulates the reset and shows the token on screen.
+        // ============================================================
+        const BREVO_CONFIG = {
+            endpoint: "",                       // e.g. "https://your-site.vercel.app/api/reset-password"
+            fromName: "NotKSP",
+            fromEmail: "no-reply@notksp.co.il"
+        };
+
+        // ============================================================
+        //  NEW: Lightweight (NON-secure, prototype only) password hashing.
+        //  Real auth must hash+salt on a server. This only avoids storing
+        //  plaintext in localStorage for the demo.
+        // ============================================================
+        const pseudoHash = (str) => {
+            let h = 5381;
+            for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) >>> 0;
+            return "h" + h.toString(16);
+        };
+
+        const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        // Validation for the registration form (mandatory fields + criteria)
+        const validateRegister = ({ name, email, password, confirm }) => {
+            const errors = {};
+            if (!name || !name.trim()) errors.name = "נא להזין שם מלא";
+            if (!email || !email.trim()) errors.email = "נא להזין כתובת אימייל";
+            else if (!EMAIL_RE.test(email.trim())) errors.email = "כתובת אימייל אינה תקינה";
+            if (!password) errors.password = "נא להזין סיסמה";
+            else if (password.length < 6) errors.password = "הסיסמה חייבת להכיל לפחות 6 תווים";
+            else if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) errors.password = "הסיסמה חייבת לכלול אות וספרה";
+            if (confirm !== undefined && password !== confirm) errors.confirm = "הסיסמאות אינן תואמות";
+            return errors;
+        };
+
+        // ============================================================
+        //  NEW: Presentational helpers for the admin dashboard
+        // ============================================================
+        const StatCard = ({ label, value, sub, icon, tone = "primary" }) => {
+            const tones = {
+                primary: "from-primary to-primary-light text-white",
+                cta: "from-cta to-cta-hover text-primary",
+                amber: "from-amber-400 to-amber-500 text-white",
+                slate: "from-slate-600 to-slate-700 text-white"
+            };
+            return (
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-5 flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${tones[tone]} flex items-center justify-center shrink-0`}>
+                        <i data-lucide={icon} className="w-6 h-6"></i>
+                    </div>
+                    <div className="min-w-0">
+                        <div className="text-[11px] text-slate-500 font-semibold truncate">{label}</div>
+                        <div className="text-xl font-heebo font-black text-slate-900 leading-tight">{value}</div>
+                        {sub && <div className="text-[10px] text-slate-400 truncate">{sub}</div>}
+                    </div>
+                </div>
+            );
+        };
+
+        // Simple dependency-free horizontal bar chart
+        const BarChart = ({ data, unit = "", color = "#1B3A5C" }) => {
+            const max = Math.max(1, ...data.map(d => d.value));
+            return (
+                <div className="space-y-2.5">
+                    {data.length === 0 && <p className="text-xs text-slate-400 text-center py-4">אין נתונים להצגה עדיין.</p>}
+                    {data.map((d) => (
+                        <div key={d.label} className="space-y-1">
+                            <div className="flex justify-between text-[11px] text-slate-600">
+                                <span className="truncate ml-2 font-semibold">{d.label}</span>
+                                <span className="font-heebo font-bold text-slate-800 shrink-0">{d.value.toLocaleString('he-IL')}{unit}</span>
+                            </div>
+                            <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${(d.value / max) * 100}%`, backgroundColor: color }}></div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            );
+        };
+
+        const stockMeta = (qty) => {
+            if (qty <= 0) return { label: "אזל מהמלאי", cls: "bg-red-100 text-red-700 border-red-200", dot: "bg-red-500" };
+            if (qty <= 3) return { label: `מלאי נמוך · נותרו ${qty}`, cls: "bg-amber-100 text-amber-700 border-amber-200", dot: "bg-amber-500" };
+            return { label: `במלאי · ${qty} יח׳`, cls: "bg-cta-light text-cta-hover border-cta/30", dot: "bg-cta" };
+        };
+
+        // ============================================================
+        //  NEW: Admin components (statistical dashboard, inventory, etc.)
+        // ============================================================
+        const catName = (id) => (CATEGORIES.find(c => c.id === id) || {}).name || id;
+
+        const AdminDashboard = ({ catalog, orders, requests, users, wishlistMap }) => {
+            const totalUnits = catalog.reduce((s, p) => s + p.stock_quantity, 0);
+            const inventoryValue = catalog.reduce((s, p) => s + p.stock_quantity * p.price, 0);
+            const outOfStock = catalog.filter(p => p.stock_quantity <= 0).length;
+            const lowStock = catalog.filter(p => p.stock_quantity > 0 && p.stock_quantity <= 3).length;
+            const revenue = orders.reduce((s, o) => s + o.total, 0);
+            const openReq = requests.filter(r => r.status === 'open').length;
+            const customerCount = users.filter(u => u.role === 'customer').length;
+
+            // Wishlist popularity across all users
+            const wishCounts = {};
+            Object.values(wishlistMap || {}).forEach(list => (list || []).forEach(id => { wishCounts[id] = (wishCounts[id] || 0) + 1; }));
+            const topWishlist = Object.entries(wishCounts)
+                .map(([id, count]) => ({ label: (catalog.find(p => p.id === id) || {}).name || id, value: count }))
+                .sort((a, b) => b.value - a.value).slice(0, 5);
+
+            // Units sold per product (from orders)
+            const soldCounts = {};
+            orders.forEach(o => o.items.forEach(it => { soldCounts[it.name] = (soldCounts[it.name] || 0) + it.quantity; }));
+            const topSold = Object.entries(soldCounts)
+                .map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value).slice(0, 5);
+
+            // Revenue by category
+            const catRev = {};
+            orders.forEach(o => o.items.forEach(it => { const c = catName(it.category); catRev[c] = (catRev[c] || 0) + it.price * it.quantity; }));
+            const revByCat = Object.entries(catRev).map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value);
+
+            const stockByProduct = [...catalog].sort((a, b) => a.stock_quantity - b.stock_quantity).slice(0, 8)
+                .map(p => ({ label: p.name, value: p.stock_quantity }));
+
+            return (
+                <div className="space-y-6">
+                    <div>
+                        <h2 className="text-2xl font-heebo font-black text-slate-900">דשבורד ניהול</h2>
+                        <p className="text-xs text-slate-500 mt-1">מבט־על על המלאי, ההזמנות והביקוש בחנות.</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <StatCard label="הכנסות (מדומה)" value={`${revenue.toLocaleString('he-IL')} ₪`} sub={`${orders.length} הזמנות`} icon="trending-up" tone="cta" />
+                        <StatCard label="שווי מלאי" value={`${inventoryValue.toLocaleString('he-IL')} ₪`} sub={`${totalUnits.toLocaleString('he-IL')} יחידות`} icon="wallet" tone="primary" />
+                        <StatCard label="מוצרים בקטלוג" value={catalog.length} sub={`${outOfStock} אזלו · ${lowStock} מלאי נמוך`} icon="package" tone="slate" />
+                        <StatCard label="בקשות מוצרים" value={openReq} sub="ממתינות לטיפול" icon="inbox" tone="amber" />
+                    </div>
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <StatCard label="לקוחות רשומים" value={customerCount} icon="users" tone="primary" />
+                        <StatCard label="פריטים שנמכרו" value={Object.values(soldCounts).reduce((a, b) => a + b, 0)} icon="shopping-cart" tone="slate" />
+                        <StatCard label="שמירות ברשימת משאלות" value={Object.values(wishCounts).reduce((a, b) => a + b, 0)} icon="heart" tone="cta" />
+                        <StatCard label="מוצרים אזלו" value={outOfStock} icon="alert-triangle" tone="amber" />
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-5 space-y-4">
+                            <h3 className="font-heebo font-black text-slate-800 text-sm flex items-center gap-2"><i data-lucide="boxes" className="w-4 h-4 text-primary"></i> מלאי לפי מוצר (הנמוכים ביותר)</h3>
+                            <BarChart data={stockByProduct} unit=" יח׳" color="#1B3A5C" />
+                        </div>
+                        <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-5 space-y-4">
+                            <h3 className="font-heebo font-black text-slate-800 text-sm flex items-center gap-2"><i data-lucide="flame" className="w-4 h-4 text-cta-hover"></i> המוצרים הנמכרים ביותר</h3>
+                            <BarChart data={topSold} unit=" נמכרו" color="#00C48C" />
+                        </div>
+                        <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-5 space-y-4">
+                            <h3 className="font-heebo font-black text-slate-800 text-sm flex items-center gap-2"><i data-lucide="heart" className="w-4 h-4 text-red-500"></i> מבוקשים ברשימת המשאלות</h3>
+                            <BarChart data={topWishlist} unit=" שמירות" color="#ef4444" />
+                        </div>
+                        <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-5 space-y-4">
+                            <h3 className="font-heebo font-black text-slate-800 text-sm flex items-center gap-2"><i data-lucide="pie-chart" className="w-4 h-4 text-primary"></i> הכנסות לפי קטגוריה</h3>
+                            <BarChart data={revByCat} unit=" ₪" color="#2C527C" />
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const AdminInventory = ({ catalog, customProducts, onSetStock, onAdjust, onDelete }) => {
+            const customIds = new Set(customProducts.map(p => p.id));
+            return (
+                <div className="space-y-5">
+                    <div className="flex items-end justify-between flex-wrap gap-2">
+                        <div>
+                            <h2 className="text-2xl font-heebo font-black text-slate-900">ניהול מלאי</h2>
+                            <p className="text-xs text-slate-500 mt-1">עדכון כמויות המלאי מתעדכן מיידית בחנות ואצל הלקוח.</p>
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-slate-100 shadow-premium overflow-hidden">
+                        <div className="overflow-x-auto custom-scrollbar">
+                            <table className="w-full text-right text-xs">
+                                <thead>
+                                    <tr className="bg-slate-50 text-slate-500 border-b border-slate-100">
+                                        <th className="py-3 px-4 font-bold">מוצר</th>
+                                        <th className="py-3 px-4 font-bold hidden sm:table-cell">קטגוריה</th>
+                                        <th className="py-3 px-4 font-bold">מחיר</th>
+                                        <th className="py-3 px-4 font-bold text-center">מלאי (כמות)</th>
+                                        <th className="py-3 px-4 font-bold text-center">סטטוס</th>
+                                        <th className="py-3 px-4 font-bold text-center"></th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-50">
+                                    {catalog.map(p => { const m = stockMeta(p.stock_quantity); return (
+                                        <tr key={p.id} className="hover:bg-slate-50/50">
+                                            <td className="py-2.5 px-4">
+                                                <div className="flex items-center gap-2.5">
+                                                    <img src={`${p.image_url}?auto=format&fit=crop&w=80&q=70`} alt={p.name} className="w-9 h-9 rounded-lg object-cover border border-slate-100 shrink-0" />
+                                                    <span className="font-bold text-slate-800 line-clamp-2 max-w-[220px] leading-tight">{p.name}</span>
+                                                </div>
+                                            </td>
+                                            <td className="py-2.5 px-4 text-slate-500 hidden sm:table-cell">{catName(p.category)}</td>
+                                            <td className="py-2.5 px-4 font-heebo font-bold text-primary whitespace-nowrap">{p.price.toLocaleString('he-IL')} ₪</td>
+                                            <td className="py-2.5 px-4">
+                                                <div className="flex items-center justify-center gap-1.5">
+                                                    <button onClick={() => onAdjust(p.id, -1)} className="w-7 h-7 rounded-full border border-slate-300 hover:bg-slate-100 flex items-center justify-center font-bold">−</button>
+                                                    <input
+                                                        type="number" min="0" value={p.stock_quantity}
+                                                        onChange={(e) => onSetStock(p.id, e.target.value)}
+                                                        className="w-14 text-center border border-slate-300 rounded-lg py-1 font-bold focus:outline-none focus:border-primary"
+                                                    />
+                                                    <button onClick={() => onAdjust(p.id, 1)} className="w-7 h-7 rounded-full border border-slate-300 hover:bg-slate-100 flex items-center justify-center font-bold">+</button>
+                                                </div>
+                                            </td>
+                                            <td className="py-2.5 px-4 text-center">
+                                                <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${m.cls}`}><span className={`w-1.5 h-1.5 rounded-full ${m.dot}`}></span>{m.label}</span>
+                                            </td>
+                                            <td className="py-2.5 px-4 text-center">
+                                                {customIds.has(p.id) ? (
+                                                    <button onClick={() => onDelete(p.id)} className="text-slate-400 hover:text-red-500 p-1" aria-label="מחק מוצר">
+                                                        <i data-lucide="trash-2" className="w-4 h-4"></i>
+                                                    </button>
+                                                ) : <span className="text-[10px] text-slate-300">בסיס</span>}
+                                            </td>
+                                        </tr>
+                                    ); })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const AdminAddProduct = ({ categories, onAdd, showToast, goToInventory }) => {
+            const [name, setName] = useState('');
+            const [price, setPrice] = useState('');
+            const [category, setCategory] = useState(categories[1] ? categories[1].id : 'computers');
+            const [image, setImage] = useState('');
+            const [description, setDescription] = useState('');
+            const [stock, setStock] = useState('');
+            const [specs, setSpecs] = useState([{ k: '', v: '' }]);
+            const [errors, setErrors] = useState({});
+
+            const setSpec = (i, field, val) => setSpecs(specs.map((s, idx) => idx === i ? { ...s, [field]: val } : s));
+            const addSpecRow = () => setSpecs([...specs, { k: '', v: '' }]);
+            const removeSpecRow = (i) => setSpecs(specs.filter((_, idx) => idx !== i));
+
+            const submit = () => {
+                const e = {};
+                if (!name.trim()) e.name = "נא להזין שם מוצר";
+                if (!price || parseInt(price, 10) <= 0) e.price = "נא להזין מחיר תקין";
+                if (stock === '' || parseInt(stock, 10) < 0) e.stock = "נא להזין כמות מלאי";
+                if (!description.trim()) e.description = "נא להזין תיאור";
+                setErrors(e);
+                if (Object.keys(e).length) return;
+                const specObj = {};
+                specs.forEach(s => { if (s.k.trim() && s.v.trim()) specObj[s.k.trim()] = s.v.trim(); });
+                onAdd({ name, price, category, image_url: image, description, stock_quantity: stock, specifications: specObj });
+                showToast('המוצר נוסף לקטלוג בהצלחה ✓');
+                setName(''); setPrice(''); setImage(''); setDescription(''); setStock(''); setSpecs([{ k: '', v: '' }]); setErrors({});
+                goToInventory();
+            };
+
+            const field = (label, node, err) => (
+                <div className="space-y-1">
+                    <label className="block text-xs font-bold text-slate-700">{label}</label>
+                    {node}
+                    {err && <p className="text-red-500 text-xs font-semibold">{err}</p>}
+                </div>
+            );
+            const inputCls = (err) => `w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 ${err ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'}`;
+
+            return (
+                <div className="max-w-3xl space-y-5">
+                    <div>
+                        <h2 className="text-2xl font-heebo font-black text-slate-900">הוספת מוצר חדש</h2>
+                        <p className="text-xs text-slate-500 mt-1">מוסיפים מוצר פעם אחת — הוא מופיע מיד בחנות עם ניהול מלאי מלא. (Scalability)</p>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-6 space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {field("שם המוצר *", <input value={name} onChange={e => setName(e.target.value)} placeholder="לדוגמה: אוזניות גיימינג RGB" className={inputCls(errors.name)} />, errors.name)}
+                            {field("מחיר (₪) *", <input type="number" min="0" value={price} onChange={e => setPrice(e.target.value)} placeholder="349" dir="ltr" className={inputCls(errors.price) + ' text-left'} />, errors.price)}
+                            {field("קטגוריה *", (
+                                <select value={category} onChange={e => setCategory(e.target.value)} className={inputCls() + ' bg-white'}>
+                                    {categories.filter(c => c.id !== 'all').map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                </select>
+                            ))}
+                            {field("כמות במלאי *", <input type="number" min="0" value={stock} onChange={e => setStock(e.target.value)} placeholder="10" dir="ltr" className={inputCls(errors.stock) + ' text-left'} />, errors.stock)}
+                        </div>
+                        {field("קישור לתמונה (URL)", <input value={image} onChange={e => setImage(e.target.value)} placeholder="https://images.unsplash.com/..." dir="ltr" className={inputCls() + ' text-left'} />)}
+                        {field("תיאור המוצר *", <textarea value={description} onChange={e => setDescription(e.target.value)} rows="3" placeholder="תיאור שיווקי קצר של המוצר..." className={inputCls(errors.description)} />, errors.description)}
+
+                        <div className="space-y-2">
+                            <label className="block text-xs font-bold text-slate-700">מפרט טכני (אופציונלי)</label>
+                            {specs.map((s, i) => (
+                                <div key={i} className="flex items-center gap-2">
+                                    <input value={s.k} onChange={e => setSpec(i, 'k', e.target.value)} placeholder="מאפיין (למשל: מעבד)" className="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary" />
+                                    <input value={s.v} onChange={e => setSpec(i, 'v', e.target.value)} placeholder="ערך (למשל: Intel i7)" className="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary" />
+                                    <button onClick={() => removeSpecRow(i)} className="text-slate-400 hover:text-red-500 p-1.5 shrink-0"><i data-lucide="x" className="w-4 h-4"></i></button>
+                                </div>
+                            ))}
+                            <button onClick={addSpecRow} className="text-xs font-bold text-primary hover:underline flex items-center gap-1"><i data-lucide="plus" className="w-3.5 h-3.5"></i> הוסף שורת מפרט</button>
+                        </div>
+
+                        <div className="pt-2 flex items-center gap-3">
+                            <button onClick={submit} className="bg-cta hover:bg-cta-hover text-primary font-bold px-6 py-3 rounded-xl text-sm shadow-md transition-all flex items-center gap-2">
+                                <i data-lucide="check" className="w-5 h-5"></i> הוספת המוצר לחנות
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const AdminRequests = ({ requests, onStatus }) => (
+            <div className="space-y-5">
+                <div>
+                    <h2 className="text-2xl font-heebo font-black text-slate-900">בקשות מוצרים מלקוחות</h2>
+                    <p className="text-xs text-slate-500 mt-1">מוצרים שלקוחות ביקשו — כולל מוצרים שאזלו מהמלאי.</p>
+                </div>
+                {requests.length === 0 ? (
+                    <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-10 text-center text-slate-400 text-sm">
+                        <i data-lucide="inbox" className="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                        עדיין אין בקשות מלקוחות.
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {requests.map(r => (
+                            <div key={r.id} className={`bg-white rounded-2xl border shadow-premium p-4 space-y-2 ${r.status === 'open' ? 'border-cta/40' : 'border-slate-100 opacity-70'}`}>
+                                <div className="flex items-start justify-between gap-2">
+                                    <div>
+                                        <h4 className="font-heebo font-black text-slate-800 text-sm">{r.productName || '(ללא שם מוצר)'}</h4>
+                                        <p className="text-[10px] text-slate-400">{r.id} · {r.date}</p>
+                                    </div>
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${r.status === 'open' ? 'bg-cta-light text-cta-hover' : 'bg-slate-100 text-slate-500'}`}>
+                                        {r.status === 'open' ? 'ממתין' : 'טופל'}
+                                    </span>
+                                </div>
+                                {r.note && <p className="text-xs text-slate-600 bg-slate-50 rounded-lg p-2">{r.note}</p>}
+                                {r.email && <p className="text-[11px] text-slate-500" dir="ltr">✉ {r.email}</p>}
+                                <div className="pt-1">
+                                    {r.status === 'open' ? (
+                                        <button onClick={() => onStatus(r.id, 'handled')} className="text-xs font-bold text-primary hover:underline flex items-center gap-1"><i data-lucide="check" className="w-3.5 h-3.5"></i> סמן כטופל</button>
+                                    ) : (
+                                        <button onClick={() => onStatus(r.id, 'open')} className="text-xs font-bold text-slate-400 hover:underline">החזר לממתין</button>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+
+        const AdminOrders = ({ orders }) => (
+            <div className="space-y-5">
+                <div>
+                    <h2 className="text-2xl font-heebo font-black text-slate-900">הזמנות</h2>
+                    <p className="text-xs text-slate-500 mt-1">כל ההזמנות שבוצעו בחנות (כולל רכישות אורח).</p>
+                </div>
+                {orders.length === 0 ? (
+                    <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-10 text-center text-slate-400 text-sm">
+                        <i data-lucide="receipt" className="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                        עדיין לא בוצעו הזמנות.
+                    </div>
+                ) : (
+                    <div className="space-y-3">
+                        {orders.map(o => (
+                            <div key={o.id} className="bg-white rounded-2xl border border-slate-100 shadow-premium p-4">
+                                <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-100 pb-2 mb-2">
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-heebo font-extrabold text-primary bg-slate-100 px-2 py-0.5 rounded text-xs">{o.id}</span>
+                                        <span className="text-xs text-slate-500">{o.date}</span>
+                                        {o.isGuest && <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">אורח</span>}
+                                    </div>
+                                    <span className="font-heebo font-black text-primary text-sm">{o.total.toLocaleString('he-IL')} ₪</span>
+                                </div>
+                                <div className="flex items-center justify-between text-xs text-slate-600 flex-wrap gap-1">
+                                    <span className="font-bold">{o.customerName} · <span dir="ltr">{o.customerPhone}</span></span>
+                                    <span className="text-slate-400">{o.items.reduce((s, i) => s + i.quantity, 0)} פריטים</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+
+        // ============================================================
+        //  NEW: Auth modal — login / register / forgot password
+        // ============================================================
+        const AuthModal = ({ tab, setTab, onClose, onLogin, onRegister, onReset }) => {
+            const [name, setName] = useState('');
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+            const [confirm, setConfirm] = useState('');
+            const [errors, setErrors] = useState({});
+            const [formError, setFormError] = useState('');
+            const [resetInfo, setResetInfo] = useState(null);
+            const [loading, setLoading] = useState(false);
+
+            const reset = () => { setErrors({}); setFormError(''); setResetInfo(null); };
+            const switchTab = (t) => { reset(); setTab(t); };
+
+            const submitLogin = () => {
+                reset();
+                const e = {};
+                if (!email.trim()) e.email = "נא להזין אימייל";
+                if (!password) e.password = "נא להזין סיסמה";
+                setErrors(e);
+                if (Object.keys(e).length) return;
+                const res = onLogin({ email, password });
+                if (!res.ok) setFormError(res.error);
+                else onClose();
+            };
+            const submitRegister = () => {
+                reset();
+                const e = validateRegister({ name, email, password, confirm });
+                setErrors(e);
+                if (Object.keys(e).length) return;
+                const res = onRegister({ name, email, password });
+                if (!res.ok) setFormError(res.error);
+                else onClose();
+            };
+            const submitReset = async () => {
+                reset(); setLoading(true);
+                const res = await onReset(email);
+                setLoading(false);
+                if (!res.ok) { setFormError(res.error); return; }
+                if (res.sent) setResetInfo({ sent: true });
+                else setResetInfo({ token: res.token, link: res.resetLink });
+            };
+
+            const inputCls = (err) => `w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 ${err ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'}`;
+            const Field = ({ label, err, children }) => (
+                <div className="space-y-1">
+                    <label className="block text-xs font-bold text-slate-700">{label}</label>
+                    {children}
+                    {err && <p className="text-red-500 text-xs font-semibold">{err}</p>}
+                </div>
+            );
+
+            return (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                    <div onClick={onClose} className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+                    <div className="relative bg-white w-full max-w-md rounded-2xl shadow-premium-hover border border-slate-100 overflow-hidden fade-in z-10">
+                        <button onClick={onClose} className="absolute top-4 left-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full p-2 z-20" aria-label="סגירה">
+                            <i data-lucide="x" className="w-4 h-4"></i>
+                        </button>
+                        <div className="bg-primary text-white px-6 pt-6 pb-4 text-right">
+                            <div className="flex items-center gap-2 mb-1">
+                                <div className="bg-cta p-1.5 rounded-lg text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg></div>
+                                <span className="font-heebo font-black text-lg">Not<span className="text-cta">KSP</span></span>
+                            </div>
+                            <p className="text-xs text-slate-300">
+                                {tab === 'login' && 'התחברות לחשבון שלך'}
+                                {tab === 'register' && 'הרשמה — פתיחת חשבון חדש'}
+                                {tab === 'forgot' && 'שחזור סיסמה'}
+                            </p>
+                        </div>
+
+                        {tab !== 'forgot' && (
+                            <div className="flex border-b border-slate-100">
+                                <button onClick={() => switchTab('login')} className={`flex-1 py-3 text-xs font-bold transition-colors ${tab === 'login' ? 'text-primary border-b-2 border-cta' : 'text-slate-400'}`}>התחברות</button>
+                                <button onClick={() => switchTab('register')} className={`flex-1 py-3 text-xs font-bold transition-colors ${tab === 'register' ? 'text-primary border-b-2 border-cta' : 'text-slate-400'}`}>הרשמה</button>
+                            </div>
+                        )}
+
+                        <div className="p-6 space-y-4">
+                            {formError && <div className="bg-red-50 border border-red-200 text-red-600 text-xs font-semibold rounded-lg p-3 flex items-center gap-2"><i data-lucide="alert-circle" className="w-4 h-4 shrink-0"></i>{formError}</div>}
+
+                            {tab === 'register' && (
+                                <Field label="שם מלא *" err={errors.name}>
+                                    <input value={name} onChange={e => setName(e.target.value)} placeholder="ישראל ישראלי" className={inputCls(errors.name)} />
+                                </Field>
+                            )}
+
+                            {(tab === 'login' || tab === 'register' || tab === 'forgot') && (
+                                <Field label="אימייל *" err={errors.email}>
+                                    <input value={email} onChange={e => setEmail(e.target.value)} placeholder="name@example.com" dir="ltr" className={inputCls(errors.email) + ' text-left'} />
+                                </Field>
+                            )}
+
+                            {(tab === 'login' || tab === 'register') && (
+                                <Field label="סיסמה *" err={errors.password}>
+                                    <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="לפחות 6 תווים, אות וספרה" dir="ltr" className={inputCls(errors.password) + ' text-left'} />
+                                </Field>
+                            )}
+
+                            {tab === 'register' && (
+                                <Field label="אימות סיסמה *" err={errors.confirm}>
+                                    <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} dir="ltr" className={inputCls(errors.confirm) + ' text-left'} />
+                                </Field>
+                            )}
+
+                            {tab === 'login' && (
+                                <>
+                                    <button onClick={submitLogin} className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-sm shadow-md transition-all">התחברות</button>
+                                    <div className="flex items-center justify-between text-xs">
+                                        <button onClick={() => switchTab('forgot')} className="text-primary font-semibold hover:underline">שכחת סיסמה?</button>
+                                        <button onClick={() => switchTab('register')} className="text-slate-500 hover:text-primary">אין לך חשבון? הרשמה</button>
+                                    </div>
+                                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-[11px] text-slate-500 leading-relaxed">
+                                        <strong className="text-slate-700">חשבון מנהל לדוגמה:</strong> <span dir="ltr">admin@notksp.co.il</span> / <span dir="ltr">Admin#2026</span>
+                                    </div>
+                                </>
+                            )}
+
+                            {tab === 'register' && (
+                                <button onClick={submitRegister} className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-sm shadow-md transition-all">יצירת חשבון</button>
+                            )}
+
+                            {tab === 'forgot' && (
+                                <>
+                                    {!resetInfo ? (
+                                        <>
+                                            <p className="text-xs text-slate-500 leading-relaxed">נשלח קישור לאיפוס סיסמה לכתובת האימייל שלך (באמצעות Brevo).</p>
+                                            <button onClick={submitReset} disabled={loading} className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-sm shadow-md transition-all disabled:opacity-60">
+                                                {loading ? 'שולח...' : 'שליחת קישור איפוס'}
+                                            </button>
+                                            <button onClick={() => switchTab('login')} className="w-full text-slate-500 hover:text-primary text-xs">חזרה להתחברות</button>
+                                        </>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            {resetInfo.sent ? (
+                                                <div className="bg-cta-light border border-cta/30 rounded-lg p-4 text-xs text-slate-700 flex items-start gap-2">
+                                                    <i data-lucide="mail-check" className="w-5 h-5 text-cta-hover shrink-0"></i>
+                                                    <span>מייל איפוס נשלח דרך Brevo לכתובת <strong dir="ltr">{email}</strong>. בדוק/בדקי את תיבת הדואר.</span>
+                                                </div>
+                                            ) : (
+                                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-xs text-slate-700 space-y-2">
+                                                    <div className="flex items-center gap-2 font-bold text-amber-700"><i data-lucide="info" className="w-4 h-4"></i> מצב הדגמה (Backend של Brevo לא מחובר עדיין)</div>
+                                                    <p>לאחר חיבור ה-Backend, מייל אמיתי יישלח דרך Brevo. בינתיים, קוד האיפוס שלך:</p>
+                                                    <div className="bg-white border border-amber-200 rounded px-3 py-2 font-heebo font-black text-center text-lg tracking-widest text-primary">{resetInfo.token}</div>
+                                                </div>
+                                            )}
+                                            <button onClick={() => switchTab('login')} className="w-full bg-primary hover:bg-primary-light text-white font-bold py-2.5 rounded-xl text-xs transition-all">חזרה להתחברות</button>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         // Main App Component
         function App() {
             // State
@@ -350,7 +914,39 @@
             const [formName, setFormName] = useState('');
             const [formPhone, setFormPhone] = useState('');
             const [formAddress, setFormAddress] = useState('');
+            const [formEmail, setFormEmail] = useState('');
             const [formErrors, setFormErrors] = useState({});
+
+            // ===== NEW: persistent data (inventory, users, wishlist, orders, requests) =====
+            const [customProducts, setCustomProducts] = useState([]);   // admin-added products
+            const [stockMap, setStockMap] = useState({});               // { productId: qty } overrides
+            const [users, setUsers] = useState([]);                     // registered users
+            const [currentUser, setCurrentUser] = useState(null);       // logged-in user or null (guest)
+            const [orders, setOrders] = useState([]);                   // all placed orders
+            const [requests, setRequests] = useState([]);               // out-of-stock product requests
+            const [wishlistMap, setWishlistMap] = useState({});         // { userKey: [productId,...] }
+
+            // ===== NEW: UI state =====
+            const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+            const [authOpen, setAuthOpen] = useState(false);            // login/register modal
+            const [authTab, setAuthTab] = useState('login');            // 'login' | 'register' | 'forgot'
+            const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+            const [adminTab, setAdminTab] = useState('dashboard');
+            const [requestProduct, setRequestProduct] = useState(null); // null = closed; string = open (prefilled name)
+            const [toast, setToast] = useState(null);                   // { text, tone }
+            const [reqName, setReqName] = useState('');
+            const [reqNote, setReqNote] = useState('');
+            const [reqEmail, setReqEmail] = useState('');
+            const [reqError, setReqError] = useState('');
+
+            // The key under which the current person's wishlist is stored
+            const wishlistKey = currentUser ? ('u:' + currentUser.email) : 'guest';
+            const wishlist = wishlistMap[wishlistKey] || [];
+
+            const showToast = (text, tone = 'cta') => {
+                setToast({ text, tone });
+                setTimeout(() => setToast(null), 2600);
+            };
 
             // Load cart and recently viewed from localStorage on initial load
             useEffect(() => {
@@ -372,6 +968,59 @@
                     }
                 }
             }, []);
+
+            // ===== NEW: load persistent data + seed default admin account =====
+            useEffect(() => {
+                setCustomProducts(LS.get('notksp_custom_products', []));
+                setStockMap(LS.get('notksp_stock', {}));
+                setOrders(LS.get('notksp_orders', []));
+                setRequests(LS.get('notksp_requests', []));
+                setWishlistMap(LS.get('notksp_wishlist', {}));
+
+                let loadedUsers = LS.get('notksp_users', null);
+                if (!loadedUsers) {
+                    // First run: seed a demo admin account (credentials shown in the UI)
+                    loadedUsers = [{
+                        id: 'admin',
+                        name: 'מנהל החנות',
+                        email: 'admin@notksp.co.il',
+                        passwordHash: pseudoHash('Admin#2026'),
+                        role: 'admin',
+                        createdAt: Date.now()
+                    }];
+                    LS.set('notksp_users', loadedUsers);
+                }
+                setUsers(loadedUsers);
+
+                const sessionEmail = LS.get('notksp_session', null);
+                if (sessionEmail) {
+                    const u = loadedUsers.find(x => x.email === sessionEmail);
+                    if (u) setCurrentUser(u);
+                }
+            }, []);
+
+            // Keep Lucide icons refreshed as new UI mounts
+            useEffect(() => {
+                if (window.lucide) window.lucide.createIcons();
+            }, [isWishlistOpen, authOpen, authTab, accountMenuOpen, adminTab, requestProduct, toast, currentUser, customProducts, stockMap, requests, orders]);
+
+            // Prefill checkout fields for logged-in users
+            useEffect(() => {
+                if (view === 'checkout' && currentUser) {
+                    setFormName(prev => prev || currentUser.name);
+                    setFormEmail(prev => prev || currentUser.email);
+                }
+            }, [view, currentUser]);
+
+            // Sync the product-request form when it opens
+            useEffect(() => {
+                if (requestProduct !== null) {
+                    setReqName(requestProduct);
+                    setReqNote('');
+                    setReqEmail(currentUser ? currentUser.email : '');
+                    setReqError('');
+                }
+            }, [requestProduct]);
 
             // Save cart to localStorage when it changes
             const saveCart = (newCart) => {
@@ -402,9 +1051,18 @@
 
             // Cart Functions
             const addToCart = (product) => {
+                const available = stockOf(product.id);
+                if (available <= 0) {
+                    setRequestProduct(product.name);
+                    return;
+                }
                 const existing = cart.find(item => item.id === product.id);
                 if (existing) {
-                    const updated = cart.map(item => 
+                    if (existing.quantity >= available) {
+                        showToast(`נותרו רק ${available} יחידות במלאי`, 'amber');
+                        return;
+                    }
+                    const updated = cart.map(item =>
                         item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
                     );
                     saveCart(updated);
@@ -412,15 +1070,18 @@
                     const updated = [...cart, { ...product, quantity: 1 }];
                     saveCart(updated);
                 }
-                
-                // Show floating small notification or just open cart drawer
                 setIsCartOpen(true);
             };
 
             const updateCartQuantity = (productId, change) => {
+                const available = stockOf(productId);
                 const updated = cart.map(item => {
                     if (item.id === productId) {
-                        const newQty = item.quantity + change;
+                        let newQty = item.quantity + change;
+                        if (change > 0 && newQty > available) {
+                            showToast(`נותרו רק ${available} יחידות במלאי`, 'amber');
+                            newQty = available;
+                        }
                         return newQty > 0 ? { ...item, quantity: newQty } : null;
                     }
                     return item;
@@ -446,9 +1107,155 @@
                 return cart.reduce((count, item) => count + item.quantity, 0);
             }, [cart]);
 
+            // ===== NEW: merged catalog (base + admin products) with effective stock =====
+            const catalog = useMemo(() => {
+                const base = PRODUCTS.map(p => ({
+                    ...p,
+                    stock_quantity: stockMap[p.id] !== undefined ? stockMap[p.id] : (STOCK_DEFAULTS[p.id] ?? 0)
+                }));
+                const custom = customProducts.map(p => ({
+                    ...p,
+                    stock_quantity: stockMap[p.id] !== undefined ? stockMap[p.id] : (p.stock_quantity ?? 0)
+                }));
+                return [...base, ...custom];
+            }, [customProducts, stockMap]);
+
+            const getProduct = (id) => catalog.find(p => p.id === id);
+            const stockOf = (id) => { const p = getProduct(id); return p ? p.stock_quantity : 0; };
+
+            // ---- Persistence savers ----
+            const persistStock = (map) => { setStockMap(map); LS.set('notksp_stock', map); };
+            const persistCustom = (list) => { setCustomProducts(list); LS.set('notksp_custom_products', list); };
+            const persistUsers = (list) => { setUsers(list); LS.set('notksp_users', list); };
+            const persistOrders = (list) => { setOrders(list); LS.set('notksp_orders', list); };
+            const persistRequests = (list) => { setRequests(list); LS.set('notksp_requests', list); };
+            const persistWishlist = (map) => { setWishlistMap(map); LS.set('notksp_wishlist', map); };
+
+            // ---- Inventory management (admin) ----
+            const setStock = (id, qty) => {
+                const q = Math.max(0, parseInt(qty, 10) || 0);
+                persistStock({ ...stockMap, [id]: q });
+            };
+            const adjustStock = (id, delta) => setStock(id, stockOf(id) + delta);
+
+            const addProduct = (data) => {
+                const id = 'c' + Date.now().toString().slice(-7);
+                const product = {
+                    id,
+                    name: data.name.trim(),
+                    price: Math.max(0, parseInt(data.price, 10) || 0),
+                    category: data.category,
+                    image_url: data.image_url.trim() || 'https://images.unsplash.com/photo-1518770660439-4636190af475',
+                    description: data.description.trim(),
+                    in_stock: (parseInt(data.stock_quantity, 10) || 0) > 0,
+                    stock_quantity: Math.max(0, parseInt(data.stock_quantity, 10) || 0),
+                    specifications: data.specifications || {}
+                };
+                persistCustom([...customProducts, product]);
+                persistStock({ ...stockMap, [id]: product.stock_quantity });
+                return product;
+            };
+
+            const deleteCustomProduct = (id) => {
+                persistCustom(customProducts.filter(p => p.id !== id));
+                const m = { ...stockMap }; delete m[id]; persistStock(m);
+            };
+
+            // ---- Auth ----
+            const registerUser = ({ name, email, password }) => {
+                email = email.trim().toLowerCase();
+                if (users.some(u => u.email === email)) {
+                    return { ok: false, error: "כתובת האימייל כבר רשומה במערכת" };
+                }
+                const user = { id: 'u' + Date.now(), name: name.trim(), email, passwordHash: pseudoHash(password), role: 'customer', createdAt: Date.now() };
+                const updated = [...users, user];
+                persistUsers(updated);
+                setCurrentUser(user);
+                LS.set('notksp_session', user.email);
+                return { ok: true, user };
+            };
+
+            const loginUser = ({ email, password }) => {
+                email = email.trim().toLowerCase();
+                const user = users.find(u => u.email === email);
+                if (!user || user.passwordHash !== pseudoHash(password)) {
+                    return { ok: false, error: "אימייל או סיסמה שגויים" };
+                }
+                setCurrentUser(user);
+                LS.set('notksp_session', user.email);
+                return { ok: true, user };
+            };
+
+            const logoutUser = () => {
+                setCurrentUser(null);
+                setAccountMenuOpen(false);
+                LS.set('notksp_session', null);
+                if (view === 'admin') setView('home');
+                showToast('התנתקת מהחשבון', 'slate');
+            };
+
+            // Password reset via Brevo. Returns a dev token if no backend is wired yet.
+            const requestPasswordReset = async (email) => {
+                email = email.trim().toLowerCase();
+                if (!EMAIL_RE.test(email)) return { ok: false, error: "כתובת אימייל אינה תקינה" };
+                const token = Math.random().toString(36).slice(2, 8).toUpperCase();
+                const tokens = LS.get('notksp_reset_tokens', {});
+                tokens[email] = { token, expires: Date.now() + 1000 * 60 * 30 };
+                LS.set('notksp_reset_tokens', tokens);
+
+                const resetLink = `${location.origin}${location.pathname}?reset=${token}&email=${encodeURIComponent(email)}`;
+
+                if (BREVO_CONFIG.endpoint) {
+                    try {
+                        const res = await fetch(BREVO_CONFIG.endpoint, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, token, resetLink })
+                        });
+                        if (!res.ok) throw new Error('bad status');
+                        return { ok: true, sent: true };
+                    } catch (e) {
+                        return { ok: false, error: "שליחת המייל נכשלה. בדוק את הגדרות ה-Backend של Brevo." };
+                    }
+                }
+                // No backend configured yet -> simulate and surface the token for the demo
+                return { ok: true, sent: false, token, resetLink };
+            };
+
+            // ---- Wishlist ----
+            const isWishlisted = (id) => wishlist.includes(id);
+            const toggleWishlist = (id) => {
+                const current = wishlistMap[wishlistKey] || [];
+                const next = current.includes(id) ? current.filter(x => x !== id) : [...current, id];
+                persistWishlist({ ...wishlistMap, [wishlistKey]: next });
+                showToast(current.includes(id) ? 'הוסר מרשימת המשאלות' : 'נוסף לרשימת המשאלות ❤');
+            };
+            const wishlistProducts = useMemo(
+                () => wishlist.map(id => getProduct(id)).filter(Boolean),
+                [wishlist, catalog]
+            );
+
+            // ---- Out-of-stock / unavailable product requests ----
+            const submitRequest = ({ productName, note, email }) => {
+                const req = {
+                    id: 'REQ-' + Date.now().toString().slice(-6),
+                    productName: productName.trim(),
+                    note: (note || '').trim(),
+                    email: (email || (currentUser && currentUser.email) || '').trim(),
+                    date: new Date().toLocaleDateString('he-IL', { year: 'numeric', month: 'long', day: 'numeric' }),
+                    ts: Date.now(),
+                    status: 'open'
+                };
+                persistRequests([req, ...requests]);
+                showToast('הבקשה נשלחה! נעדכן אותך כשהמוצר יהיה זמין.');
+            };
+            const setRequestStatus = (id, status) => {
+                persistRequests(requests.map(r => r.id === id ? { ...r, status } : r));
+            };
+
             // Filtered Products
             const filteredProducts = useMemo(() => {
-                return PRODUCTS.filter(product => {
+                return catalog.filter(product => {
                     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
                     
                     const query = searchQuery.trim().toLowerCase();
@@ -464,21 +1271,21 @@
             const similarProducts = useMemo(() => {
                 if (!activeProduct) return [];
                 // Find products in same category (excluding active one)
-                let list = PRODUCTS.filter(p => p.id !== activeProduct.id && p.category === activeProduct.category);
+                let list = catalog.filter(p => p.id !== activeProduct.id && p.category === activeProduct.category);
                 if (list.length === 0) {
                     // Fallback to any other products
-                    list = PRODUCTS.filter(p => p.id !== activeProduct.id);
+                    list = catalog.filter(p => p.id !== activeProduct.id);
                 }
                 // Return up to 3 random ones from the list
                 return list.slice(0, 3);
-            }, [activeProduct]);
+            }, [activeProduct, catalog]);
 
             // Map product IDs in recentlyViewed back to actual products
             const recentlyViewedProducts = useMemo(() => {
                 return recentlyViewed
-                    .map(id => PRODUCTS.find(p => p.id === id))
+                    .map(id => catalog.find(p => p.id === id))
                     .filter(Boolean);
-            }, [recentlyViewed]);
+            }, [recentlyViewed, catalog]);
 
             // Handle Checkout Submit
             const handlePlaceOrder = (e) => {
@@ -505,17 +1312,30 @@
                     id: orderId,
                     customerName: formName,
                     customerPhone: formPhone,
+                    customerEmail: formEmail || (currentUser && currentUser.email) || '',
                     customerAddress: formAddress,
+                    isGuest: !currentUser,
                     items: [...cart],
                     total: cartTotal,
+                    ts: Date.now(),
                     date: new Date().toLocaleDateString('he-IL', { year: 'numeric', month: 'long', day: 'numeric' })
                 };
+
+                // Persist the order + decrement inventory for each purchased item
+                persistOrders([orderData, ...orders]);
+                const newStock = { ...stockMap };
+                cart.forEach(item => {
+                    const current = newStock[item.id] !== undefined ? newStock[item.id] : (STOCK_DEFAULTS[item.id] ?? (getProduct(item.id)?.stock_quantity ?? 0));
+                    newStock[item.id] = Math.max(0, current - item.quantity);
+                });
+                persistStock(newStock);
 
                 setCompletedOrder(orderData);
                 clearCart();
                 setFormName('');
                 setFormPhone('');
                 setFormAddress('');
+                setFormEmail('');
                 setFormErrors({});
                 setView('thank-you');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -580,7 +1400,42 @@
                             )}
 
                             {/* Actions */}
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                                {/* Admin area link (managers only) */}
+                                {currentUser && currentUser.role === 'admin' && view !== 'admin' && (
+                                    <button
+                                        onClick={() => { setView('admin'); setAdminTab('dashboard'); window.scrollTo({ top: 0 }); }}
+                                        className="hidden sm:flex items-center gap-1.5 bg-cta hover:bg-cta-hover text-primary font-bold text-xs px-3 py-2 rounded-full transition-all"
+                                    >
+                                        <i data-lucide="layout-dashboard" className="w-4 h-4"></i>
+                                        אזור ניהול
+                                    </button>
+                                )}
+                                {currentUser && currentUser.role === 'admin' && view === 'admin' && (
+                                    <button
+                                        onClick={() => setView('home')}
+                                        className="hidden sm:flex items-center gap-1.5 bg-primary-light hover:bg-primary-dark border border-slate-600 text-white font-bold text-xs px-3 py-2 rounded-full transition-all"
+                                    >
+                                        <i data-lucide="store" className="w-4 h-4"></i>
+                                        לחנות
+                                    </button>
+                                )}
+
+                                {/* Wishlist */}
+                                <button
+                                    onClick={() => setIsWishlistOpen(true)}
+                                    className="relative bg-primary-light hover:bg-primary-dark border border-slate-600 hover:border-slate-500 rounded-full p-2.5 flex items-center justify-center transition-all group"
+                                    aria-label="רשימת משאלות"
+                                >
+                                    <i data-lucide="heart" className="w-5 h-5 text-slate-100 group-hover:text-cta transition-colors"></i>
+                                    {wishlist.length > 0 && (
+                                        <span className="absolute -top-1 -left-1.5 bg-cta text-primary font-bold text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+                                            {wishlist.length}
+                                        </span>
+                                    )}
+                                </button>
+
+                                {/* Cart */}
                                 <button 
                                     onClick={() => setIsCartOpen(true)}
                                     className="relative bg-primary-light hover:bg-primary-dark border border-slate-600 hover:border-slate-500 rounded-full p-2.5 flex items-center justify-center transition-all group"
@@ -593,6 +1448,53 @@
                                         </span>
                                     )}
                                 </button>
+
+                                {/* Account */}
+                                {currentUser ? (
+                                    <div className="relative">
+                                        <button
+                                            onClick={() => setAccountMenuOpen(o => !o)}
+                                            className="flex items-center gap-2 bg-primary-light hover:bg-primary-dark border border-slate-600 rounded-full pr-2 pl-3 py-1.5 transition-all"
+                                        >
+                                            <span className="w-7 h-7 rounded-full bg-cta text-primary font-black text-xs flex items-center justify-center">
+                                                {currentUser.name.trim().charAt(0)}
+                                            </span>
+                                            <span className="hidden sm:block text-xs font-bold text-white max-w-[90px] truncate">{currentUser.name}</span>
+                                            <i data-lucide="chevron-down" className="w-3.5 h-3.5 text-slate-300 hidden sm:block"></i>
+                                        </button>
+                                        {accountMenuOpen && (
+                                            <>
+                                                <div className="fixed inset-0 z-40" onClick={() => setAccountMenuOpen(false)}></div>
+                                                <div className="absolute left-0 mt-2 w-52 bg-white rounded-xl shadow-premium-hover border border-slate-100 py-1.5 z-50 fade-in text-right">
+                                                    <div className="px-4 py-2 border-b border-slate-100">
+                                                        <div className="text-xs font-bold text-slate-800 truncate">{currentUser.name}</div>
+                                                        <div className="text-[10px] text-slate-400 truncate" dir="ltr">{currentUser.email}</div>
+                                                    </div>
+                                                    <button onClick={() => { setAccountMenuOpen(false); setIsWishlistOpen(true); }} className="w-full text-right px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 justify-end">
+                                                        רשימת המשאלות שלי <i data-lucide="heart" className="w-4 h-4 text-slate-400"></i>
+                                                    </button>
+                                                    {currentUser.role === 'admin' && (
+                                                        <button onClick={() => { setAccountMenuOpen(false); setView('admin'); setAdminTab('dashboard'); }} className="w-full text-right px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 justify-end">
+                                                            אזור ניהול <i data-lucide="layout-dashboard" className="w-4 h-4 text-slate-400"></i>
+                                                        </button>
+                                                    )}
+                                                    <button onClick={logoutUser} className="w-full text-right px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2 justify-end">
+                                                        התנתקות <i data-lucide="log-out" className="w-4 h-4"></i>
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={() => { setAuthTab('login'); setAuthOpen(true); }}
+                                        className="flex items-center gap-1.5 bg-primary-light hover:bg-primary-dark border border-slate-600 hover:border-slate-500 rounded-full px-3 py-2.5 transition-all text-white"
+                                        aria-label="התחברות"
+                                    >
+                                        <i data-lucide="user" className="w-5 h-5"></i>
+                                        <span className="hidden sm:block text-xs font-bold">התחברות</span>
+                                    </button>
+                                )}
                             </div>
                         </div>
 
@@ -696,7 +1598,7 @@
                                                     <img 
                                                         src={`${product.image_url}?auto=format&fit=crop&w=400&q=80`} 
                                                         alt={product.name} 
-                                                        className="w-full h-full object-cover img-hover-zoom"
+                                                        className={`w-full h-full object-cover img-hover-zoom ${product.stock_quantity <= 0 ? 'grayscale opacity-70' : ''}`}
                                                         loading="lazy"
                                                     />
                                                     <div className="absolute top-3 right-3">
@@ -704,6 +1606,19 @@
                                                             {CATEGORIES.find(c => c.id === product.category)?.name}
                                                         </span>
                                                     </div>
+                                                    {/* Wishlist heart */}
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }}
+                                                        className={`absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm transition-all active:scale-90 ${isWishlisted(product.id) ? 'bg-red-500 text-white' : 'bg-white/85 text-slate-600 hover:text-red-500'}`}
+                                                        aria-label="רשימת משאלות"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill={isWishlisted(product.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4.5 h-4.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg>
+                                                    </button>
+                                                    {product.stock_quantity <= 0 && (
+                                                        <div className="absolute inset-0 flex items-center justify-center">
+                                                            <span className="bg-slate-900/80 text-white text-xs font-heebo font-black px-4 py-1.5 rounded-full">אזל מהמלאי</span>
+                                                        </div>
+                                                    )}
                                                 </div>
 
                                                 {/* Details */}
@@ -720,6 +1635,13 @@
                                                         </p>
                                                     </div>
 
+                                                    {/* Quantitative stock indicator (shown to customers) */}
+                                                    {(() => { const m = stockMeta(product.stock_quantity); return (
+                                                        <div className={`inline-flex items-center gap-1.5 self-start text-[10px] font-bold px-2 py-0.5 rounded-full border ${m.cls}`}>
+                                                            <span className={`w-1.5 h-1.5 rounded-full ${m.dot}`}></span>{m.label}
+                                                        </div>
+                                                    ); })()}
+
                                                     <div className="flex items-center justify-between pt-2 border-t border-slate-100">
                                                         <div className="text-right">
                                                             <div className="text-xs text-slate-400 font-light leading-none">מחיר</div>
@@ -727,13 +1649,23 @@
                                                                 {product.price.toLocaleString('he-IL')} ₪
                                                             </div>
                                                         </div>
-                                                        <button 
-                                                            onClick={() => addToCart(product)}
-                                                            className="bg-cta hover:bg-cta-hover text-primary font-bold text-xs px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-all transform active:scale-95 shadow-md shadow-cta/10"
-                                                        >
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-                                                            הוסף לסל
-                                                        </button>
+                                                        {product.stock_quantity > 0 ? (
+                                                            <button 
+                                                                onClick={() => addToCart(product)}
+                                                                className="bg-cta hover:bg-cta-hover text-primary font-bold text-xs px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-all transform active:scale-95 shadow-md shadow-cta/10"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                                                                הוסף לסל
+                                                            </button>
+                                                        ) : (
+                                                            <button 
+                                                                onClick={() => setRequestProduct(product.name)}
+                                                                className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-all transform active:scale-95 border border-slate-200"
+                                                            >
+                                                                <i data-lucide="bell" className="w-4 h-4"></i>
+                                                                עדכנו אותי
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
@@ -782,6 +1714,63 @@
                                         </div>
                                     </div>
                                 )}
+                                {/* Request an unavailable product */}
+                                <div className="pt-6 border-t border-slate-200">
+                                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-primary-dark via-primary to-primary-light border border-slate-700 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-5 text-white">
+                                        <div className="w-56 h-40 bg-cta/10 blur-3xl absolute -left-10 -top-10 rounded-full"></div>
+                                        <div className="space-y-2 text-right z-10 max-w-xl">
+                                            <div className="inline-flex items-center gap-1.5 bg-primary-light/50 border border-slate-600/50 px-3 py-1 rounded-full text-xs text-cta font-bold">
+                                                <i data-lucide="search-x" className="w-3.5 h-3.5"></i>
+                                                לא מצאת מה שחיפשת?
+                                            </div>
+                                            <h3 className="text-xl sm:text-2xl font-heebo font-black leading-tight">חסר לנו מוצר שרצית? <span className="text-cta">ספר/י לנו.</span></h3>
+                                            <p className="text-slate-300 text-sm font-light">
+                                                כתוב/כתבי איזה מוצר תרצה/י שנביא — נעביר את הבקשה לצוות הרכש ונעדכן אותך כשהוא זמין במלאי.
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={() => setRequestProduct('')}
+                                            className="z-10 bg-cta hover:bg-cta-hover text-primary font-bold px-6 py-3 rounded-full text-sm shadow-glow transition-all transform hover:scale-105 flex items-center gap-2 shrink-0"
+                                        >
+                                            <i data-lucide="plus-circle" className="w-5 h-5"></i>
+                                            שליחת בקשת מוצר
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 6. Admin Area */}
+                        {view === 'admin' && currentUser && currentUser.role === 'admin' && (
+                            <div className="fade-in space-y-6">
+                                {/* Admin tabs */}
+                                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                                    {[
+                                        { id: 'dashboard', name: 'דשבורד', icon: 'layout-dashboard' },
+                                        { id: 'inventory', name: 'ניהול מלאי', icon: 'boxes' },
+                                        { id: 'add', name: 'הוספת מוצר', icon: 'plus-square' },
+                                        { id: 'requests', name: 'בקשות מוצרים', icon: 'inbox' },
+                                        { id: 'orders', name: 'הזמנות', icon: 'receipt' }
+                                    ].map(t => (
+                                        <button
+                                            key={t.id}
+                                            onClick={() => setAdminTab(t.id)}
+                                            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${adminTab === t.id ? 'bg-primary text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'}`}
+                                        >
+                                            <i data-lucide={t.icon} className="w-4 h-4"></i>
+                                            {t.name}
+                                            {t.id === 'requests' && requests.filter(r => r.status === 'open').length > 0 && (
+                                                <span className="bg-cta text-primary rounded-full text-[10px] font-black px-1.5">{requests.filter(r => r.status === 'open').length}</span>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {adminTab === 'dashboard' && <AdminDashboard catalog={catalog} orders={orders} requests={requests} users={users} wishlistMap={wishlistMap} />}
+                                {adminTab === 'inventory' && <AdminInventory catalog={catalog} customProducts={customProducts} onSetStock={setStock} onAdjust={adjustStock} onDelete={deleteCustomProduct} />}
+                                {adminTab === 'add' && <AdminAddProduct categories={CATEGORIES} onAdd={addProduct} showToast={showToast} goToInventory={() => setAdminTab('inventory')} />}
+                                {adminTab === 'requests' && <AdminRequests requests={requests} onStatus={setRequestStatus} />}
+                                {adminTab === 'orders' && <AdminOrders orders={orders} />}
                             </div>
                         )}
 
@@ -805,6 +1794,24 @@
                                             <h2 className="text-xl font-heebo font-black text-slate-900">פרטי משלוח והזמנה</h2>
                                             <p className="text-xs text-slate-500 mt-1">השלימו את הפרטים מטה כדי לאשר את ההזמנה המדומה שלכם.</p>
                                         </div>
+
+                                        {/* Guest / account banner (KSP / Ivory style — buy without an account) */}
+                                        {currentUser ? (
+                                            <div className="bg-cta-light border border-cta/30 rounded-xl p-3 flex items-center gap-2.5 text-xs text-slate-700">
+                                                <i data-lucide="user-check" className="w-4 h-4 text-cta-hover shrink-0"></i>
+                                                מחובר/ת כ־<strong className="text-primary">{currentUser.name}</strong>. הפרטים מולאו עבורך אוטומטית.
+                                            </div>
+                                        ) : (
+                                            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                                                <div className="flex items-center gap-2 text-slate-600">
+                                                    <i data-lucide="user-round" className="w-4 h-4 text-slate-400 shrink-0"></i>
+                                                    ממשיכים כאורח — אפשר לסיים את הרכישה גם בלי חשבון.
+                                                </div>
+                                                <button type="button" onClick={() => { setAuthTab('login'); setAuthOpen(true); }} className="text-primary font-bold hover:underline whitespace-nowrap self-start sm:self-auto">
+                                                    יש לך חשבון? להתחברות ←
+                                                </button>
+                                            </div>
+                                        )}
 
                                         <form onSubmit={handlePlaceOrder} className="space-y-4">
                                             {/* Name */}
@@ -836,6 +1843,22 @@
                                                     dir="ltr"
                                                 />
                                                 {formErrors.phone && <p className="text-red-500 text-xs font-semibold">{formErrors.phone}</p>}
+                                            </div>
+
+                                            {/* Email (for order confirmation) */}
+                                            <div className="space-y-1">
+                                                <label className="block text-xs font-bold text-slate-700">אימייל לאישור הזמנה</label>
+                                                <input 
+                                                    type="email"
+                                                    value={formEmail}
+                                                    onChange={(e) => setFormEmail(e.target.value)}
+                                                    placeholder="name@example.com"
+                                                    dir="ltr"
+                                                    className={`w-full px-4 py-2.5 rounded-lg border text-sm text-left focus:outline-none focus:ring-2 ${
+                                                        formErrors.email ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'
+                                                    }`}
+                                                />
+                                                {formErrors.email && <p className="text-red-500 text-xs font-semibold">{formErrors.email}</p>}
                                             </div>
 
                                             {/* Address */}
@@ -983,7 +2006,7 @@
                             <div className="flex items-center gap-4 text-slate-500">
                                 <span>נבנה למטרות הדגמה ופיתוח</span>
                                 <span>•</span>
-                                <a href="https://github.com" target="_blank" className="hover:text-white transition-colors">GitHub Repository</a>
+                                <a href="https://github.com/YanivLegin/NotKSP" target="_blank" className="hover:text-white transition-colors">GitHub Repository</a>
                             </div>
                         </div>
                     </footer>
@@ -1090,18 +2113,41 @@
                                     </div>
 
                                     {/* Action button */}
-                                    <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
-                                        <div className="text-right">
-                                            <span className="block text-[10px] text-slate-400">אחריות רשמית</span>
-                                            <span className="text-xs font-semibold text-cta-hover">במלאי למשלוח מיידי</span>
+                                    <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                                        <div className="text-right space-y-1">
+                                            <span className="block text-[10px] text-slate-400">אחריות יבואן רשמי</span>
+                                            {(() => { const q = stockOf(activeProduct.id); const m = stockMeta(q); return (
+                                                <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2 py-0.5 rounded-full border ${m.cls}`}>
+                                                    <span className={`w-1.5 h-1.5 rounded-full ${m.dot}`}></span>{m.label}
+                                                </span>
+                                            ); })()}
                                         </div>
-                                        <button 
-                                            onClick={() => { addToCart(activeProduct); setActiveProduct(null); }}
-                                            className="bg-cta hover:bg-cta-hover text-primary font-bold text-sm px-6 py-2.5 rounded-full flex items-center gap-2 transition-all transform active:scale-95 shadow-md shadow-cta/15"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-                                            הוסף לסל הקניות
-                                        </button>
+                                        <div className="flex items-center gap-2 shrink-0">
+                                            <button
+                                                onClick={() => toggleWishlist(activeProduct.id)}
+                                                className={`w-11 h-11 rounded-full flex items-center justify-center border transition-all active:scale-90 ${isWishlisted(activeProduct.id) ? 'bg-red-500 border-red-500 text-white' : 'border-slate-200 text-slate-500 hover:text-red-500 hover:border-red-200'}`}
+                                                aria-label="רשימת משאלות"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill={isWishlisted(activeProduct.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg>
+                                            </button>
+                                            {stockOf(activeProduct.id) > 0 ? (
+                                                <button 
+                                                    onClick={() => { addToCart(activeProduct); setActiveProduct(null); }}
+                                                    className="bg-cta hover:bg-cta-hover text-primary font-bold text-sm px-6 py-2.5 rounded-full flex items-center gap-2 transition-all transform active:scale-95 shadow-md shadow-cta/15"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                                                    הוסף לסל
+                                                </button>
+                                            ) : (
+                                                <button 
+                                                    onClick={() => { setRequestProduct(activeProduct.name); setActiveProduct(null); }}
+                                                    className="bg-primary hover:bg-primary-light text-white font-bold text-sm px-6 py-2.5 rounded-full flex items-center gap-2 transition-all transform active:scale-95 shadow-md"
+                                                >
+                                                    <i data-lucide="bell" className="w-5 h-5"></i>
+                                                    עדכנו אותי כשחוזר
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1241,6 +2287,125 @@
                                         </div>
                                     )}
                                 </div>
+                            </div>
+                        </div>
+                    )}
+                    {/* 6. Wishlist Drawer */}
+                    {isWishlistOpen && (
+                        <div className="fixed inset-0 z-50 overflow-hidden">
+                            <div onClick={() => setIsWishlistOpen(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs"></div>
+                            <div className="absolute inset-y-0 left-0 max-w-full flex">
+                                <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col h-full fade-in border-r border-slate-100">
+                                    <div className="px-6 py-5 bg-primary text-white flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <i data-lucide="heart" className="w-5 h-5 text-cta"></i>
+                                            <h2 className="font-heebo font-black text-lg">רשימת המשאלות</h2>
+                                            <span className="bg-cta text-primary font-bold text-xs rounded-full px-2 py-0.5">{wishlistProducts.length}</span>
+                                        </div>
+                                        <button onClick={() => setIsWishlistOpen(false)} className="text-slate-300 hover:text-white p-1.5" aria-label="סגור">
+                                            <i data-lucide="x" className="w-5 h-5"></i>
+                                        </button>
+                                    </div>
+                                    <div className="flex-1 overflow-y-auto px-6 py-4 custom-scrollbar divide-y divide-slate-100">
+                                        {wishlistProducts.length > 0 ? (
+                                            wishlistProducts.map(item => { const m = stockMeta(item.stock_quantity); return (
+                                                <div key={item.id} className="py-4 flex gap-4 items-center">
+                                                    <img src={`${item.image_url}?auto=format&fit=crop&w=150&q=80`} alt={item.name} className="w-16 h-16 object-cover rounded-lg border border-slate-100 flex-shrink-0 cursor-pointer" onClick={() => { setIsWishlistOpen(false); openProductDetails(item); }} />
+                                                    <div className="min-w-0 flex-1 space-y-1">
+                                                        <h3 className="font-bold text-xs text-slate-800 line-clamp-2 leading-tight">{item.name}</h3>
+                                                        <div className="font-heebo font-black text-xs text-primary">{item.price.toLocaleString('he-IL')} ₪</div>
+                                                        <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${m.cls}`}><span className={`w-1.5 h-1.5 rounded-full ${m.dot}`}></span>{m.label}</span>
+                                                    </div>
+                                                    <div className="flex flex-col items-end gap-2 shrink-0">
+                                                        <button onClick={() => toggleWishlist(item.id)} className="text-slate-400 hover:text-red-500 p-1" aria-label="הסר">
+                                                            <i data-lucide="trash-2" className="w-4 h-4"></i>
+                                                        </button>
+                                                        {item.stock_quantity > 0 ? (
+                                                            <button onClick={() => addToCart(item)} className="bg-cta hover:bg-cta-hover text-primary font-bold text-[11px] px-3 py-1.5 rounded-full transition-all">הוסף לסל</button>
+                                                        ) : (
+                                                            <button onClick={() => { setIsWishlistOpen(false); setRequestProduct(item.name); }} className="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[11px] px-3 py-1.5 rounded-full transition-all">עדכנו אותי</button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ); })
+                                        ) : (
+                                            <div className="text-center py-20 space-y-4">
+                                                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400">
+                                                    <i data-lucide="heart" className="w-8 h-8"></i>
+                                                </div>
+                                                <h3 className="font-heebo font-bold text-slate-800">רשימת המשאלות ריקה</h3>
+                                                <p className="text-xs text-slate-400 max-w-xs mx-auto">לחצו על הלב שעל מוצר כדי לשמור אותו לכאן לזמן אחר.</p>
+                                                <button onClick={() => setIsWishlistOpen(false)} className="bg-primary hover:bg-primary-light text-white text-xs font-bold px-5 py-2 rounded-full transition-all">חזרה לקטלוג</button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 7. Auth Modal */}
+                    {authOpen && (
+                        <AuthModal
+                            tab={authTab}
+                            setTab={setAuthTab}
+                            onClose={() => setAuthOpen(false)}
+                            onLogin={loginUser}
+                            onRegister={registerUser}
+                            onReset={requestPasswordReset}
+                        />
+                    )}
+
+                    {/* 8. Product Request Modal */}
+                    {requestProduct !== null && (
+                        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                            <div onClick={() => setRequestProduct(null)} className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+                            <div className="relative bg-white w-full max-w-md rounded-2xl shadow-premium-hover border border-slate-100 overflow-hidden fade-in z-10">
+                                <button onClick={() => setRequestProduct(null)} className="absolute top-4 left-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full p-2 z-20" aria-label="סגירה">
+                                    <i data-lucide="x" className="w-4 h-4"></i>
+                                </button>
+                                <div className="bg-primary text-white px-6 pt-6 pb-4 text-right">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <i data-lucide="package-search" className="w-5 h-5 text-cta"></i>
+                                        <span className="font-heebo font-black text-lg">בקשת מוצר</span>
+                                    </div>
+                                    <p className="text-xs text-slate-300">נשמח לדעת איזה מוצר תרצו — נעדכן אתכם כשהוא זמין.</p>
+                                </div>
+                                <div className="p-6 space-y-4">
+                                    <div className="space-y-1">
+                                        <label className="block text-xs font-bold text-slate-700">שם המוצר המבוקש *</label>
+                                        <input value={reqName} onChange={e => { setReqName(e.target.value); setReqError(''); }} placeholder="לדוגמה: מקרן 4K לבית" className={`w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 ${reqError ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'}`} />
+                                        {reqError && <p className="text-red-500 text-xs font-semibold">{reqError}</p>}
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="block text-xs font-bold text-slate-700">פרטים נוספים (אופציונלי)</label>
+                                        <textarea value={reqNote} onChange={e => setReqNote(e.target.value)} rows="2" placeholder="דגם מסוים, טווח מחירים, כמות..." className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"></textarea>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="block text-xs font-bold text-slate-700">אימייל ליצירת קשר (אופציונלי)</label>
+                                        <input value={reqEmail} onChange={e => setReqEmail(e.target.value)} placeholder="name@example.com" dir="ltr" className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm text-left focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10" />
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            if (!reqName.trim()) { setReqError('נא להזין שם מוצר'); return; }
+                                            submitRequest({ productName: reqName, note: reqNote, email: reqEmail });
+                                            setRequestProduct(null);
+                                        }}
+                                        className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-sm shadow-md transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <i data-lucide="send" className="w-4 h-4"></i> שליחת הבקשה
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 9. Toast */}
+                    {toast && (
+                        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] fade-in">
+                            <div className={`px-5 py-3 rounded-full shadow-premium-hover text-xs font-bold flex items-center gap-2 ${toast.tone === 'amber' ? 'bg-amber-500 text-white' : toast.tone === 'slate' ? 'bg-slate-800 text-white' : 'bg-cta text-primary'}`}>
+                                <i data-lucide={toast.tone === 'amber' ? 'alert-triangle' : 'check-circle'} className="w-4 h-4"></i>
+                                {toast.text}
                             </div>
                         </div>
                     )}
