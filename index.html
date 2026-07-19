@@ -177,7 +177,7 @@
         let supabase = null;
         if (SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
             try {
-                supabase = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+                supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
             } catch (e) {
                 console.error("Failed to initialize Supabase:", e);
             }
