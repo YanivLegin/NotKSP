@@ -183,10 +183,10 @@
             anonKey: initialKey
         };
 
-        let supabase = null;
+        let supabaseClient = null;
         if (SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
             try {
-                supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+                supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
             } catch (e) {
                 console.error("Failed to initialize Supabase:", e);
             }
@@ -962,7 +962,7 @@
             // ===== Supabase Connection State =====
             const [supabaseUrl, setSupabaseUrl] = useState(SUPABASE_CONFIG.url);
             const [supabaseKey, setSupabaseKey] = useState(SUPABASE_CONFIG.anonKey);
-            const [isSupabaseConnected, setIsSupabaseConnected] = useState(!!supabase);
+            const [isSupabaseConnected, setIsSupabaseConnected] = useState(!!supabaseClient);
             const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
             const [seedingStatus, setSeedingStatus] = useState('');     // '', 'seeding', 'success', 'error'
             const [dbProducts, setDbProducts] = useState([]);           // Products from Supabase
@@ -1012,10 +1012,10 @@
 
             // Fetch data from Supabase
             const fetchSupabaseData = async () => {
-                if (!supabase) return;
+                if (!supabaseClient) return;
                 try {
                     // Fetch products
-                    const { data: prodData, error: prodErr } = await supabase
+                    const { data: prodData, error: prodErr } = await supabaseClient
                         .from('products')
                         .select('*')
                         .order('created_at', { ascending: true });
@@ -1023,14 +1023,14 @@
                     if (prodData) setDbProducts(prodData);
 
                     // Fetch orders
-                    const { data: ordData, error: ordErr } = await supabase
+                    const { data: ordData, error: ordErr } = await supabaseClient
                         .from('orders')
                         .select('*')
                         .order('created_at', { ascending: false });
                     if (!ordErr && ordData) setOrders(ordData);
 
                     // Fetch requests
-                    const { data: reqData, error: reqErr } = await supabase
+                    const { data: reqData, error: reqErr } = await supabaseClient
                         .from('requests')
                         .select('*')
                         .order('created_at', { ascending: false });
@@ -1048,9 +1048,9 @@
 
             // Sync user session and auth state
             const handleSupabaseUserSession = async (authUser) => {
-                if (!supabase) return;
+                if (!supabaseClient) return;
                 try {
-                    const { data: profile } = await supabase
+                    const { data: profile } = await supabaseClient
                         .from('profiles')
                         .select('*')
                         .eq('id', authUser.id)
@@ -1071,7 +1071,7 @@
                             name: authUser.user_metadata?.name || 'משתמש חדש',
                             role: authUser.email === 'admin@notksp.co.il' ? 'admin' : 'customer'
                         };
-                        await supabase.from('profiles').insert(newProfile);
+                        await supabaseClient.from('profiles').insert(newProfile);
                         setCurrentUser({
                             id: authUser.id,
                             name: newProfile.name,
@@ -1092,9 +1092,9 @@
             };
 
             const fetchWishlistFromSupabase = async (userId) => {
-                if (!supabase) return;
+                if (!supabaseClient) return;
                 try {
-                    const { data, error } = await supabase
+                    const { data, error } = await supabaseClient
                         .from('wishlists')
                         .select('product_ids')
                         .eq('user_id', userId)
@@ -1109,15 +1109,15 @@
             };
 
             useEffect(() => {
-                if (!supabase) return;
+                if (!supabaseClient) return;
 
-                supabase.auth.getSession().then(({ data: { session } }) => {
+                supabaseClient.auth.getSession().then(({ data: { session } }) => {
                     if (session) {
                         handleSupabaseUserSession(session.user);
                     }
                 });
 
-                const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+                const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_event, session) => {
                     if (session) {
                         handleSupabaseUserSession(session.user);
                     } else {
@@ -1298,9 +1298,9 @@
             // ---- Inventory management (admin) ----
             const setStock = async (id, qty) => {
                 const q = Math.max(0, parseInt(qty, 10) || 0);
-                if (isSupabaseConnected && supabase) {
+                if (isSupabaseConnected && supabaseClient) {
                     try {
-                        const { error } = await supabase
+                        const { error } = await supabaseClient
                             .from('products')
                             .update({ stock_quantity: q })
                             .eq('id', id);
@@ -1329,9 +1329,9 @@
                     specifications: data.specifications || {}
                 };
 
-                if (isSupabaseConnected && supabase) {
+                if (isSupabaseConnected && supabaseClient) {
                     try {
-                        const { error } = await supabase.from('products').insert(product);
+                        const { error } = await supabaseClient.from('products').insert(product);
                         if (error) throw error;
                         fetchSupabaseData(); // reload
                         showToast('המוצר נוסף ל-Supabase בהצלחה!');
@@ -1347,9 +1347,9 @@
             };
 
             const deleteCustomProduct = async (id) => {
-                if (isSupabaseConnected && supabase) {
+                if (isSupabaseConnected && supabaseClient) {
                     try {
-                        const { error } = await supabase.from('products').delete().eq('id', id);
+                        const { error } = await supabaseClient.from('products').delete().eq('id', id);
                         if (error) throw error;
                         fetchSupabaseData(); // reload
                         showToast('המוצר נמחק מ-Supabase בהצלחה');
@@ -1365,9 +1365,9 @@
             // ---- Auth ----
             const registerUser = async ({ name, email, password }) => {
                 email = email.trim().toLowerCase();
-                if (isSupabaseConnected && supabase) {
+                if (isSupabaseConnected && supabaseClient) {
                     try {
-                        const { data, error } = await supabase.auth.signUp({
+                        const { data, error } = await supabaseClient.auth.signUp({
                             email,
                             password,
                             options: {
@@ -1395,9 +1395,9 @@
 
             const loginUser = async ({ email, password }) => {
                 email = email.trim().toLowerCase();
-                if (isSupabaseConnected && supabase) {
+                if (isSupabaseConnected && supabaseClient) {
                     try {
-                        const { data, error } = await supabase.auth.signInWithPassword({
+                        const { data, error } = await supabaseClient.auth.signInWithPassword({
                             email,
                             password
                         });
@@ -1419,9 +1419,9 @@
             };
 
             const logoutUser = async () => {
-                if (isSupabaseConnected && supabase) {
+                if (isSupabaseConnected && supabaseClient) {
                     try {
-                        await supabase.auth.signOut();
+                        await supabaseClient.auth.signOut();
                     } catch (e) {
                         console.error("Failed to sign out from Supabase:", e);
                     }
@@ -1467,9 +1467,9 @@
                 const current = wishlistMap[wishlistKey] || [];
                 const next = current.includes(id) ? current.filter(x => x !== id) : [...current, id];
                 
-                if (isSupabaseConnected && supabase && currentUser && currentUser.role !== 'admin') {
+                if (isSupabaseConnected && supabaseClient && currentUser && currentUser.role !== 'admin') {
                     try {
-                        await supabase
+                        await supabaseClient
                             .from('wishlists')
                             .upsert({
                                 user_id: currentUser.id,
@@ -1501,9 +1501,9 @@
                     status: 'open'
                 };
 
-                if (isSupabaseConnected && supabase) {
+                if (isSupabaseConnected && supabaseClient) {
                     try {
-                        const { error } = await supabase.from('requests').insert({
+                        const { error } = await supabaseClient.from('requests').insert({
                             id: req.id,
                             product_name: req.productName,
                             note: req.note,
@@ -1523,9 +1523,9 @@
                 showToast('הבקשה נשלחה! נעדכן אותך כשהמוצר יהיה זמין.');
             };
             const setRequestStatus = async (id, status) => {
-                if (isSupabaseConnected && supabase) {
+                if (isSupabaseConnected && supabaseClient) {
                     try {
-                        const { error } = await supabase.from('requests').update({ status }).eq('id', id);
+                        const { error } = await supabaseClient.from('requests').update({ status }).eq('id', id);
                         if (error) throw error;
                         fetchSupabaseData();
                         showToast('סטטוס הבקשה עודכן ב-Supabase');
@@ -1605,9 +1605,9 @@
                     date: new Date().toLocaleDateString('he-IL', { year: 'numeric', month: 'long', day: 'numeric' })
                 };
 
-                if (isSupabaseConnected && supabase) {
+                if (isSupabaseConnected && supabaseClient) {
                     try {
-                        const { error: ordErr } = await supabase.from('orders').insert({
+                        const { error: ordErr } = await supabaseClient.from('orders').insert({
                             id: orderData.id,
                             customer_name: orderData.customerName,
                             customer_phone: orderData.customerPhone,
@@ -1623,7 +1623,7 @@
                         for (const item of cart) {
                             const currentQty = stockOf(item.id);
                             const newQty = Math.max(0, currentQty - item.quantity);
-                            await supabase
+                            await supabaseClient
                                 .from('products')
                                 .update({ stock_quantity: newQty })
                                 .eq('id', item.id);
@@ -2761,7 +2761,7 @@
                                                     try {
                                                         for (const p of PRODUCTS) {
                                                             const stockVal = STOCK_DEFAULTS[p.id] ?? 0;
-                                                            const { error } = await supabase
+                                                            const { error } = await supabaseClient
                                                                 .from('products')
                                                                 .upsert({
                                                                     id: p.id,
