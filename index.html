@@ -771,6 +771,15 @@
         // ============================================================
         //  NEW: Auth modal — login / register / forgot password
         // ============================================================
+        const inputCls = (err) => `w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 ${err ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'}`;
+        const Field = ({ label, err, children }) => (
+            <div className="space-y-1">
+                <label className="block text-xs font-bold text-slate-700">{label}</label>
+                {children}
+                {err && <p className="text-red-500 text-xs font-semibold">{err}</p>}
+            </div>
+        );
+
         const AuthModal = ({ tab, setTab, onClose, onLogin, onRegister, onReset }) => {
             const [name, setName] = useState('');
             const [email, setEmail] = useState('');
@@ -817,14 +826,7 @@
                 else setResetInfo({ token: res.token, link: res.resetLink });
             };
 
-            const inputCls = (err) => `w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 ${err ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'}`;
-            const Field = ({ label, err, children }) => (
-                <div className="space-y-1">
-                    <label className="block text-xs font-bold text-slate-700">{label}</label>
-                    {children}
-                    {err && <p className="text-red-500 text-xs font-semibold">{err}</p>}
-                </div>
-            );
+
 
             return (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
