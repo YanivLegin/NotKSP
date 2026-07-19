@@ -823,7 +823,8 @@
         // ============================================================
         //  NEW: Auth modal — login / register / forgot password
         // ============================================================
-        const AuthModal = ({ tab, setTab, onClose, onLogin, onRegister, onReset }) => {
+        const AuthModal = ({ initialTab, onClose, onLogin, onRegister, onReset }) => {
+            const [tab, setTab] = useState(initialTab || 'login');
             const [name, setName] = useState('');
             const [email, setEmail] = useState('');
             const [password, setPassword] = useState('');
@@ -1865,18 +1866,20 @@
 
                             {/* Actions */}
                             <div className="flex items-center gap-2 sm:gap-3">
-                                {/* Supabase Status Badge */}
-                                <button
-                                    onClick={() => setIsSupabaseModalOpen(true)}
-                                    className={`flex items-center gap-1 text-[10px] font-bold px-2.5 py-1.5 rounded-full transition-all border ${
-                                        isSupabaseConnected
-                                            ? 'bg-cta/10 text-cta border-cta/30 hover:bg-cta/20'
-                                            : 'bg-amber-500/10 text-amber-500 border-amber-500/30 hover:bg-amber-500/20'
-                                    }`}
-                                >
-                                    <span className={`w-1.5 h-1.5 rounded-full ${isSupabaseConnected ? 'bg-cta' : 'bg-amber-500'} animate-pulse`}></span>
-                                    {isSupabaseConnected ? 'מחובר ל-Supabase' : 'מצב אופליין'}
-                                </button>
+                                {/* Supabase Status Badge — admin only */}
+                                {currentUser?.role === 'admin' && (
+                                    <button
+                                        onClick={() => setIsSupabaseModalOpen(true)}
+                                        className={`flex items-center gap-1 text-[10px] font-bold px-2.5 py-1.5 rounded-full transition-all border ${
+                                            isSupabaseConnected
+                                                ? 'bg-cta/10 text-cta border-cta/30 hover:bg-cta/20'
+                                                : 'bg-amber-500/10 text-amber-500 border-amber-500/30 hover:bg-amber-500/20'
+                                        }`}
+                                    >
+                                        <span className={`w-1.5 h-1.5 rounded-full ${isSupabaseConnected ? 'bg-cta' : 'bg-amber-500'} animate-pulse`}></span>
+                                        {isSupabaseConnected ? 'מחובר ל-Supabase' : 'מצב אופליין'}
+                                    </button>
+                                )}
                                 {/* Admin area link (managers only) */}
                                 {currentUser && currentUser.role === 'admin' && view !== 'admin' && (
                                     <button
@@ -3088,8 +3091,7 @@
                     {/* 7. Auth Modal */}
                     {authOpen && (
                         <AuthModal
-                            tab={authTab}
-                            setTab={setAuthTab}
+                            initialTab={authTab}
                             onClose={() => setAuthOpen(false)}
                             onLogin={loginUser}
                             onRegister={registerUser}
