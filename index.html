@@ -22,7 +22,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -57,70 +56,6 @@
 
     <!-- Custom CSS for transitions, scrollbar, and micro-animations -->
     <style type="text/css">
-        /* Accessibility Overrides (WCAG 2.1 AA / IS 5568) */
-        html.acc-high-contrast body,
-        html.acc-high-contrast #root {
-            background-color: #000000 !important;
-            color: #ffff00 !important;
-        }
-        html.acc-high-contrast .bg-white,
-        html.acc-high-contrast .bg-secondary,
-        html.acc-high-contrast .bg-primary,
-        html.acc-high-contrast .bg-primary-dark,
-        html.acc-high-contrast header,
-        html.acc-high-contrast footer,
-        html.acc-high-contrast div,
-        html.acc-high-contrast section {
-            background-color: #000000 !important;
-            color: #ffff00 !important;
-            border-color: #ffff00 !important;
-        }
-        html.acc-high-contrast text-slate-800,
-        html.acc-high-contrast text-slate-900,
-        html.acc-high-contrast text-slate-700,
-        html.acc-high-contrast text-primary,
-        html.acc-high-contrast text-white,
-        html.acc-high-contrast span,
-        html.acc-high-contrast p,
-        html.acc-high-contrast h1,
-        html.acc-high-contrast h2,
-        html.acc-high-contrast h3,
-        html.acc-high-contrast h4,
-        html.acc-high-contrast a,
-        html.acc-high-contrast button {
-            color: #ffff00 !important;
-        }
-        html.acc-high-contrast input,
-        html.acc-high-contrast select,
-        html.acc-high-contrast textarea {
-            background-color: #000000 !important;
-            color: #ffff00 !important;
-            border-color: #ffff00 !important;
-        }
-        
-        html.acc-grayscale {
-            filter: grayscale(100%) !important;
-        }
-        
-        html.acc-readable-font,
-        html.acc-readable-font body,
-        html.acc-readable-font * {
-            font-family: Arial, Helvetica, sans-serif !important;
-        }
-        
-        html.acc-highlight-links a,
-        html.acc-highlight-links button:not(.bg-cta) {
-            text-decoration: underline !important;
-            outline: 2px solid #00C48C !important;
-            outline-offset: 2px !important;
-        }
-        
-        html.acc-stop-animations * {
-            animation: none !important;
-            transition: none !important;
-            transform: none !important;
-        }
-
         body {
             font-family: 'Assistant', sans-serif;
             background-color: #F4F5F7;
@@ -128,82 +63,6 @@
             scroll-behavior: smooth;
         }
         
-        /* Dark Mode Global Overrides for 100% Readability and Aesthetics */
-        .dark body {
-            background-color: #0b1320 !important;
-            color: #f1f5f9 !important;
-        }
-        
-        .dark .bg-white {
-            background-color: #121e31 !important;
-            border-color: #1e2e46 !important;
-        }
-        
-        .dark .bg-secondary {
-            background-color: #0b1320 !important;
-        }
-        
-        .dark .bg-slate-50,
-        .dark .bg-slate-100,
-        .dark .bg-slate-200 {
-            background-color: #18263a !important;
-            border-color: #24354b !important;
-        }
-        
-        .dark .text-slate-900,
-        .dark .text-slate-800,
-        .dark .text-slate-700,
-        .dark .text-primary {
-            color: #f1f5f9 !important;
-        }
-        
-        .dark .text-slate-600,
-        .dark .text-slate-500,
-        .dark .text-primary-light {
-            color: #cbd5e1 !important;
-        }
-        
-        .dark .text-slate-400 {
-            color: #94a3b8 !important;
-        }
-        
-        .dark .border-slate-100,
-        .dark .border-slate-200,
-        .dark .border-slate-300 {
-            border-color: #1e2e46 !important;
-        }
-        
-        .dark input,
-        .dark select,
-        .dark textarea {
-            background-color: #18263a !important;
-            color: #ffffff !important;
-            border-color: #24354b !important;
-        }
-        
-        .dark input::placeholder,
-        .dark textarea::placeholder {
-            color: #64748b !important;
-        }
-        
-        .dark .shadow-premium {
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-        }
-        
-        .dark .shadow-premium-hover:hover {
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6), 0 1px 5px rgba(0, 0, 0, 0.2) !important;
-        }
-        
-        .dark .bg-white.rounded-2xl {
-            background-color: #121e31 !important;
-            border-color: #1e2e46 !important;
-        }
-
-        .dark .hover\:bg-slate-200:hover,
-        .dark .hover\:bg-slate-100:hover {
-            background-color: #1f3047 !important;
-        }
-
         /* Hide scrollbars but keep functionality */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
@@ -294,6 +153,58 @@
         .product-card-hover:hover .img-hover-zoom {
             transform: scale(1.05);
         }
+    
+        /* Accessibility Overrides */
+        html.acc-readable-font * {
+            font-family: Arial, Helvetica, sans-serif !important;
+        }
+        html.acc-highlight-links a, 
+        html.acc-highlight-links button {
+            outline: 3px solid #ffaa00 !important;
+            outline-offset: 2px !important;
+            background-color: rgba(255, 170, 0, 0.15) !important;
+        }
+        html.acc-highlight-links a:hover, 
+        html.acc-highlight-links button:hover {
+            background-color: rgba(255, 170, 0, 0.3) !important;
+        }
+        html.acc-stop-animations * {
+            transition: none !important;
+            animation: none !important;
+            scroll-behavior: auto !important;
+        }
+        html.acc-contrast-high {
+            filter: contrast(1.4) !important;
+        }
+        html.acc-contrast-high body {
+            background-color: #000000 !important;
+            color: #ffff00 !important;
+        }
+        html.acc-contrast-high .bg-white,
+        html.acc-contrast-high .bg-slate-50,
+        html.acc-contrast-high .bg-slate-100 {
+            background-color: #000000 !important;
+            border-color: #ffff00 !important;
+        }
+        html.acc-contrast-high p,
+        html.acc-contrast-high h1,
+        html.acc-contrast-high h2,
+        html.acc-contrast-high h3,
+        html.acc-contrast-high h4,
+        html.acc-contrast-high span,
+        html.acc-contrast-high strong,
+        html.acc-contrast-high label {
+            color: #ffff00 !important;
+        }
+        html.acc-contrast-high button:not(.bg-cta) {
+            border: 2px solid #ffff00 !important;
+            background-color: #000000 !important;
+            color: #ffff00 !important;
+        }
+        html.acc-contrast-grayscale {
+            filter: grayscale(1) !important;
+        }
+    
     </style>
 
     <!-- React 18, ReactDOM & Babel for modern ES6 JSX UMD -->
@@ -498,223 +409,6 @@
                     "חיבורים": "1x DisplayPort 1.2, 2x HDMI 2.0, יציאת אוזניות 3.5 מ\"מ",
                     "ארגונומיה": "אפשרות להטיית זווית המסך (-5° עד 20°), הכנה לתלייה VESA"
                 }
-            },
-            { 
-                id: "9", 
-                name: "מחשב גיימינג נייח NotKSP Cobra i7/32GB/1TB SSD/RTX 4070", 
-                price: 6890, 
-                category: "computers", 
-                image_url: "https://images.unsplash.com/photo-1587831990711-23ca6441447b", 
-                description: "מחשב גיימינג מורכב ועוצמתי מבית NotKSP. מיועד לגיימרים מקצועיים ויוצרי תוכן הדורשים את הביצועים הגבוהים ביותר במשחקים החדשים ביותר ובתוכנות עריכה כבדות.", 
-                in_stock: true,
-                specifications: {
-                    "מעבד": "Intel Core i7-14700F (20 ליבות, עד 5.4GHz)",
-                    "זיכרון RAM": "32GB DDR5 5600MHz Dual Channel",
-                    "כרטיס מסך": "Nvidia GeForce RTX 4070 12GB GDDR6X",
-                    "אחסון": "1TB M.2 NVMe Gen4 PCIe SSD",
-                    "לוח אם": "Gigabyte B760M DS3H AX (כולל Wi-Fi ו-Bluetooth)",
-                    "מארז": "Antec AX61 RGB עם חלון זכוכית מאוורר",
-                    "ספק כוח": "Cooler Master 750W 80+ Bronze",
-                    "מערכת הפעלה": "ללא מערכת הפעלה (ניתן להוסיף בנפרד)"
-                }
-            },
-            { 
-                id: "10", 
-                name: "טאבלט Apple iPad 10.9\" (10th Gen) Wi-Fi 64GB", 
-                price: 1649, 
-                category: "computers", 
-                image_url: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0", 
-                description: "האייפד האהוב בעיצוב מודרני עם מסך Liquid Retina מקצה לקצה בגודל 10.9 אינץ'. מופעל על ידי שבב A14 Bionic העוצמתי ומגיע במגוון צבעים מרהיבים לעבודה, לימודים ויצירה.", 
-                in_stock: true,
-                specifications: {
-                    "מסך": "10.9 אינץ' Liquid Retina ברזולוציה 2360x1640, True Tone",
-                    "מעבד": "Apple A14 Bionic (6 ליבות)",
-                    "נפח אחסון": "64GB",
-                    "מצלמה אחורית": "12MP רחבה, צילום וידאו 4K",
-                    "מצלמה קדמית": "12MP אולטרה רחבה עם Center Stage",
-                    "חיבור טעינה": "USB-C (תמיכה באביזרים נלווים)",
-                    "אבטחה": "Touch ID מובנה בכפתור ההפעלה העליון",
-                    "קישוריות": "Wi-Fi 6 (802.11ax), Bluetooth 5.2",
-                    "תאימות עט": "Apple Pencil (1st Gen) או Apple Pencil USB-C"
-                }
-            },
-            { 
-                id: "11", 
-                name: "מקרן קול איכותי 2.1 ערוצים JBL Bar 2.1 Deep Bass", 
-                price: 1149, 
-                category: "tv_audio", 
-                image_url: "https://images.unsplash.com/photo-1545454675-3531b543be5d", 
-                description: "הביאו את הקולנוע לביתכם. מקרן קול עוצמתי מבית JBL עם סאב-וופר אלחוטי בגודל 6.5 אינץ' המציע באסים עמוקים ועשירים לחוויית שמע סוחפת בסרטים, משחקים ומוזיקה.", 
-                in_stock: true,
-                specifications: {
-                    "הספק כולל": "300W RMS",
-                    "סאב-וופר": "אלחוטי 6.5 אינץ'",
-                    "חיבורים": "HDMI Out (ARC), HDMI In, אופטי (Optical), USB",
-                    "קישוריות אלחוטית": "Bluetooth 4.2 להזרמת מוזיקה מהנייד",
-                    "תקני שמע": "Dolby Digital מובנה",
-                    "מידות מקרן קול": "96.5 x 5.8 x 6.8 ס\"מ",
-                    "משקל כולל": "7.5 ק\"ג (מקרן קול + סאב-וופר)"
-                }
-            },
-            { 
-                id: "12", 
-                name: "מצלמת אבטחה חיצונית חכמה Xiaomi Outdoor Camera AW300", 
-                price: 249, 
-                category: "smart_home", 
-                image_url: "https://images.unsplash.com/photo-1557597774-9d273605dfa9", 
-                description: "מצלמת אבטחה חיצונית עמידה למים ואבק (תקן IP66) ברזולוציית 2K צלולה. כוללת ראיית לילה בצבע מלא, זיהוי אנושי מבוסס AI, אזעקה קולית וויזואלית אקטיבית, ודו-שיח בזמן אמת.", 
-                in_stock: true,
-                specifications: {
-                    "רזולוציה": "2K (2304x1296), צמצם רחב f/2.0",
-                    "ראיית לילה": "חכמה בצבע מלא (Full-Color Night Vision) באמצעות לדים מובנים",
-                    "עמידות": "תקן IP66 נגד גשם, אבק וחום קיצוני (-20°C עד 60°C)",
-                    "זיהוי תנועה": "זיהוי דמויות אדם מבוסס בינה מלאכותית (AI Human Detection)",
-                    "שמע": "מיקרופון ורמקול מובנים לשיחה דו-כיוונית והפעלת סירנה",
-                    "אחסון": "תמיכה בכרטיס MicroSD עד 256GB או אחסון בענן של Xiaomi",
-                    "קישוריות": "Wi-Fi 2.4GHz עם אנטנות חיצוניות כפולות לקליטה משופרת"
-                }
-            },
-            { 
-                id: "13", 
-                name: "רמקול נייד אלחוטי עמיד במים JBL Flip 6", 
-                price: 429, 
-                category: "audio_accessories", 
-                image_url: "https://images.unsplash.com/photo-1612444530582-fc66183b16f7", 
-                description: "הרמקול הנייד האהוב עכשיו בעיצוב חדש וסאונד עוצמתי עוד יותר. מערכת רמקולים דו-כיוונית המספקת צלילים צלולים ובאס עמוק. עמיד לחלוטין במים ואבק ומציע עד 12 שעות נגינה.", 
-                in_stock: true,
-                specifications: {
-                    "עמידות": "תקן IP67 עמיד לחלוטין במים ואבק (מתאים לבריכה ולים)",
-                    "חיי סוללה": "עד 12 שעות נגינה רציפות בלחיצה אחת",
-                    "חיבורים": "USB-C לטעינה מהירה (כולל הגנת טעינה חכמה)",
-                    "קישוריות אלחוטית": "Bluetooth 5.1",
-                    "תכונות מיוחדות": "PartyBoost (חיבור מספר רמקולים תואמים יחד לסאונד סטריאו)",
-                    "הספק מוצא": "20W RMS (וופר) + 10W RMS (טוויטר)",
-                    "משקל": "550 גרם בלבד"
-                }
-            },
-            { 
-                id: "14", 
-                name: "רצועת כושר חכמה Xiaomi Smart Band 8", 
-                price: 179, 
-                category: "wearables", 
-                image_url: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6", 
-                description: "רצועת הכושר הפופולרית בעולם בגרסה משודרגת. כוללת מסך AMOLED מרשים עם קצב רענון של 60Hz, מעל 150 מצבי ספורט, ניטור מדדים רציף וחיי סוללה ארוכים במיוחד בעיצוב קליל ונוח.", 
-                in_stock: true,
-                specifications: {
-                    "מסך": "1.62 אינץ' AMOLED, קצב רענון 60Hz, בהירות עד 600 nits",
-                    "חיי סוללה": "עד 16 ימי שימוש רגילים, טעינה מהירה מלאה תוך שעה",
-                    "מעקב בריאות": "ניטור דופק 24/7, רמות SpO2, רמת לחץ (Stress), מעקב שינה מתקדם",
-                    "פעילויות ספורט": "מעל 150 מצבי אימון, כולל ריצה מקצועית וניתוח כושר",
-                    "עמידות למים": "5ATM (מתאים לשחייה ומקלחת)",
-                    "רצועות": "עיצוב חיבור מהיר להחלפת רצועות קלה ומגוון חומרים (עור, מתכת, בד)"
-                }
-            },
-            { 
-                id: "15", 
-                name: "מקלדת גיימינג מכנית Corsair K70 RGB PRO", 
-                price: 749, 
-                category: "gaming", 
-                image_url: "https://images.unsplash.com/photo-1595225476474-87563907a212", 
-                description: "מקלדת גיימינג מכנית מקצועית בגודל מלא מבית Corsair. כוללת מתגי CHERRY MX איכותיים, שלדת אלומיניום מוברש עמידה במיוחד, תאורת RGB דינמית לכל מקש וגלגלת בקרת שמע ייעודית.", 
-                in_stock: true,
-                specifications: {
-                    "סוג מתגים": "CHERRY MX Red/Speed מכניים ליניאריים מהירים וקטים",
-                    "מבנה": "שלדת אלומיניום בדרגת מטוסים (Aircraft-grade Brushed Aluminum)",
-                    "קצב דיווח (Polling Rate)": "טכנולוגיית AXON המאפשרת עד 8,000Hz (פי 8 מהיר ממקלדת רגילה)",
-                    "תאורה": "תאורת RGB נפרדת לכל מקש הניתנת לתכנות מלא",
-                    "בקרת מדיה": "כפתורי מדיה ייעודיים וגלגלת ווליום מאלומיניום",
-                    "חיבור": "כבל USB-C קלוע וניתן לניתוק",
-                    "זיכרון מובנה": "8MB לשמירת עד 50 פרופילים של הגדרות ותאורה"
-                }
-            },
-            { 
-                id: "16", 
-                name: "עכבר גיימינג אלחוטי Logitech G Pro X Superlight", 
-                price: 589, 
-                category: "gaming", 
-                image_url: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7", 
-                description: "העכבר המועדף על שחקני ה-eSports המובילים בעולם. עכבר גיימינג אלחוטי קל משקל במיוחד (פחות מ-63 גרם) המצויד בחיישן HERO 25K המדויק ביותר של Logitech וחיי סוללה ארוכים.", 
-                in_stock: true,
-                specifications: {
-                    "משקל": "פחות מ-63 גרם בעיצוב ארגונומי סימטרי",
-                    "חיישן": "HERO 25K ברזולוציה של 100 עד 25,600 DPI",
-                    "חיבור אלחוטי": "טכנולוגיית LIGHTSPEED לתגובה מהירה של 1ms ללא שיהוי",
-                    "חיי סוללה": "עד 70 שעות תנועה רציפה בלחיצה אחת",
-                    "רגליות עכבר": "רגליות PTFE איכותיות ללא תוספים להחלקה חלקה במיוחד",
-                    "מספר מקשים": "5 מקשים ניתנים לתכנות",
-                    "תאימות טעינה": "תמיכה במשטח טעינה אלחוטי Logitech POWERPLAY"
-                }
-            },
-            { 
-                id: "17", 
-                name: "נינג'ה גריל Ninja Foodi Grill XL AG551", 
-                price: 1190, 
-                category: "small_appliances", 
-                image_url: "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7", 
-                description: "הגריל הביתי שכבש את ישראל. מכשיר בישול וצלייה חכם בטכנולוגיית אוויר חם המאפשר להכין סטייקים, המבורגרים, עוף וצ'יפס ברמת עשייה מושלמת ללא עשן. כולל פרוב (מדחום) דיגיטלי מובנה.", 
-                in_stock: true,
-                specifications: {
-                    "עוצמת חימום": "2460W",
-                    "טכנולוגיית בישול": "צלייה באוויר חם במהירות גבוהה (Cyclonic Grilling Technology)",
-                    "תוכניות בישול": "6 תוכניות: גריל, אפייה, צלייה, חימום מחדש, ייבוש מזון וטיגון באוויר חם",
-                    "בקרת עשייה": "מדחום דיגיטלי מובנה (Smart Probe) למדידה מדויקת בתוך המזון",
-                    "נפח בישול": "קיבולת XL - מתאים להכנת עד 6 סטייקים או המבורגרים בו-זמנית",
-                    "ניקוי": "חלקים פנימיים מצופים קרמיקה מונעת הידבקות, מתאימים לשטיפה במדיח הכלים",
-                    "מסנן עשן": "מגן להבה נשלף מנירוסטה למניעת התזות שומן ועשן"
-                }
-            },
-            { 
-                id: "18", 
-                name: "נתב אלחוטי TP-Link Archer AX55 Wi-Fi 6", 
-                price: 329, 
-                category: "computer_accessories", 
-                image_url: "https://images.unsplash.com/photo-1544256718-3bcf237f3974", 
-                description: "שדרגו את רשת האינטרנט שלכם לדור הבא. נתב אלחוטי חזק בתקן Wi-Fi 6 המעניק מהירויות גלישה גבוהות במיוחד, כיסוי רחב ויציב ומעבד כפול ליבה עוצמתי לחיבור עשרות מכשירים בו-זמנית ללא עומס.", 
-                in_stock: true,
-                specifications: {
-                    "תקן אלחוטי": "Wi-Fi 6 (802.11ax) במהירות כוללת של עד 3000Mbps",
-                    "מהירות ערוצים": "2402Mbps בתדר 5GHz ו-574Mbps בתדר 2.4GHz",
-                    "אנטנות": "4 אנטנות חיצוניות בעלות טכנולוגיית Beamforming למיקוד השידור",
-                    "חיבורים": "1x Gigabit WAN, 4x Gigabit LAN, 1x USB 3.0 (לחיבור כונן חיצוני או מדפסת)",
-                    "מעבד": "מעבד Qualcomm כפול ליבה עוצמתי",
-                    "אבטחה": "פרוטוקול אבטחה WPA3 המתקדם ביותר, שירות TP-Link HomeShield מובנה",
-                    "תכונות מיוחדות": "תמיכה ב-OneMesh ליצירת רשת Mesh חלקה בבית עם מגדילי טווח תואמים"
-                }
-            },
-            { 
-                id: "19", 
-                name: "כונן חיצוני נייד SanDisk Extreme Portable SSD 1TB", 
-                price: 479, 
-                category: "computer_accessories", 
-                image_url: "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b", 
-                description: "אחסון מהיר ואמין לדרכים. כונן SSD חיצוני נייד בעל ביצועים גבוהים מבית SanDisk. מעוצב במיוחד לעמידות בפני נפילות, מים ואבק, וכולל חיבור USB-C מהיר המאפשר העברת קבצים ענקיים בשניות.", 
-                in_stock: true,
-                specifications: {
-                    "נפח אחסון": "1TB (1000GB)",
-                    "מהירות קריאה": "עד 1050MB/s (טכנולוגיית NVMe מהירה)",
-                    "מהירות כתיבה": "עד 1000MB/s",
-                    "עמידות ומוגנות": "עמידות בנפילות מגובה של עד 3 מטרים, תקן IP65 לעמידות במים ואבק",
-                    "חיבור פיזי": "USB 3.2 Gen 2 Type-C (כולל מתאם ל-USB-A בערכה)",
-                    "אבטחה ופרטיות": "תמיכה בהצפנת חומרה AES 256-bit מבוססת סיסמה",
-                    "עיצוב": "שלדת סיליקון עמידה עם לולאת נשיאה פרקטית לחיבור לתיק או חגורה"
-                }
-            },
-            { 
-                id: "20", 
-                name: "אוזניות גיימינג אלחוטיות SteelSeries Arctis Nova 7", 
-                price: 799, 
-                category: "gaming", 
-                image_url: "https://images.unsplash.com/photo-1608156639585-b3a032ef9689", 
-                description: "חוויית שמע אלחוטית פורצת דרך לגיימרים. אוזניות Arctis Nova 7 משלבות דרייברים באיכות Hi-Fi גבוהה עם תוכנת Sonar Spatial Audio לסאונד תלת-ממדי היקפי ומדויק. כוללות חיבור אלחוטי כפול בו-זמנית.", 
-                in_stock: true,
-                specifications: {
-                    "שמע": "מערכת אקוסטית Nova עם דרייברים High Fidelity מובחרים",
-                    "חיבור אלחוטי כפול": "2.4GHz אלחוטי (באמצעות דונגל USB-C) וקישוריות Bluetooth בו-זמנית",
-                    "חיי סוללה": "עד 38 שעות עבודה, טעינה מהירה של 15 דקות מעניקה 6 שעות שימוש",
-                    "מיקרופון": "מיקרופון ClearCast Gen 2 נשלף עם ביטול רעשים מבוסס AI",
-                    "תאימות": "PC, Mac, PlayStation 4/5, Nintendo Switch, מכשירים ניידים וטאבלטים",
-                    "ארגונומיה": "מערכת ComfortMAX עם כריות אוזניים מבד AirWeave נושם ורצועת ראש גמישה"
-                }
             }
         ];
 
@@ -733,7 +427,9 @@
             }
         };
 
-        const STOCK_DEFAULTS = { "1": 5, "2": 3, "3": 0, "4": 12, "5": 8, "6": 0, "7": 2, "8": 15, "9": 4, "10": 10, "11": 6, "12": 15, "13": 20, "14": 25, "15": 8, "16": 12, "17": 5, "18": 18, "19": 22, "20": 7 };
+        // Default stock quantities for the 8 base products (id -> units).
+        // Two products (3, 6) start out of stock to demo the "request" flow.
+        const STOCK_DEFAULTS = { "1": 5, "2": 3, "3": 0, "4": 12, "5": 8, "6": 0, "7": 2, "8": 15 };
 
         // ============================================================
         //  NEW: Brevo config for password-reset emails.
@@ -824,6 +520,9 @@
             return { label: `במלאי · ${qty} יח׳`, cls: "bg-cta-light text-cta-hover border-cta/30", dot: "bg-cta" };
         };
 
+        // ============================================================
+        //  NEW: Admin components (statistical dashboard, inventory, etc.)
+        // ============================================================
         const catName = (id) => (CATEGORIES.find(c => c.id === id) || {}).name || id;
 
         const AdminDashboard = ({ catalog, orders, requests, users, wishlistMap }) => {
@@ -1121,240 +820,9 @@
             </div>
         );
 
-        const TRANSLATIONS = {
-            he: {
-                logoSub: "אלקטרוניקה נקייה, בלי הבלגן",
-                searchPlaceholder: "חפשו מוצרים, מותגים או תכונות...",
-                cart: "עגלת קניות",
-                login: "התחברות",
-                logout: "התנתקות",
-                register: "הרשמה",
-                adminArea: "אזור ניהול",
-                allProducts: "כל המוצרים",
-                noProducts: "לא נמצאו מוצרים תואמים את החיפוש.",
-                foundProducts: "נמצאו {count} מוצרים",
-                sortBy: "מיון לפי:",
-                sortPopular: "פופולריות",
-                sortPriceLow: "מחיר: מהנמוך לגבוה",
-                sortPriceHigh: "מחיר: מהגבוה לנמוך",
-                addToCart: "הוסף לעגלה",
-                outOfStock: "אזל מהמלאי",
-                requestRestock: "בקש חידוש מלאי",
-                inStock: "במלאי",
-                specs: "מפרט טכני מלא",
-                description: "תיאור המוצר",
-                wishlist: "משאלות",
-                emptyCart: "העגלה שלך ריקה",
-                cartTotal: "סה\"כ לתשלום:",
-                checkout: "מעבר לקופה",
-                shippingDetails: "פרטי משלוח",
-                fullName: "שם מלא *",
-                phone: "מספר טלפון *",
-                email: "כתובת אימייל (מומלץ לקבלת קבלה)",
-                address: "כתובת למשלוח *",
-                confirmOrder: "אישור הזמנה וביצוע תשלום",
-                orderSuccess: "ההזמנה בוצעה בהצלחה!",
-                orderNumber: "מספר הזמנה:",
-                backToStore: "חזרה לחנות",
-                footerText: "כל הזכויות שמורות NotKSP © 2026. נבנה כפרויקט הדגמה.",
-                hello: "שלום",
-                adminDashboard: "לוח בקרה מנהל",
-                inventoryManagement: "ניהול מלאי",
-                replenishRequests: "בקשות מלאי",
-                ordersTitle: "הזמנות"
-            },
-            en: {
-                logoSub: "Clean electronics, no mess",
-                searchPlaceholder: "Search products, brands or specs...",
-                cart: "Cart",
-                login: "Login",
-                logout: "Logout",
-                register: "Register",
-                adminArea: "Admin View",
-                allProducts: "All Products",
-                noProducts: "No products found matching your search.",
-                foundProducts: "Found {count} products",
-                sortBy: "Sort by:",
-                sortPopular: "Popularity",
-                sortPriceLow: "Price: Low to High",
-                sortPriceHigh: "Price: High to Low",
-                addToCart: "Add to Cart",
-                outOfStock: "Out of Stock",
-                requestRestock: "Request Restock",
-                inStock: "In stock",
-                specs: "Technical Specifications",
-                description: "Description",
-                wishlist: "Wishlist",
-                emptyCart: "Your cart is empty",
-                cartTotal: "Total Amount:",
-                checkout: "Checkout",
-                shippingDetails: "Shipping Details",
-                fullName: "Full Name *",
-                phone: "Phone Number *",
-                email: "Email Address (for receipt)",
-                address: "Shipping Address *",
-                confirmOrder: "Confirm Order & Pay",
-                orderSuccess: "Order Placed Successfully!",
-                orderNumber: "Order Number:",
-                backToStore: "Back to Store",
-                footerText: "All rights reserved NotKSP © 2026. Built as a demo project.",
-                hello: "Hello",
-                adminDashboard: "Admin Dashboard",
-                inventoryManagement: "Inventory Management",
-                replenishRequests: "Stock Requests",
-                ordersTitle: "Orders"
-            }
-        };
-
-        const t = (key, replacements = {}) => {
-            const currentLang = window.currentLang || 'he';
-            let text = TRANSLATIONS[currentLang]?.[key] || TRANSLATIONS['he'][key] || key;
-            Object.keys(replacements).forEach(k => {
-                text = text.replace(`{${k}}`, replacements[k]);
-            });
-            return text;
-        };
-
-        const getCategoryName = (cat) => {
-            if (!cat) return "";
-            const currentLang = window.currentLang || 'he';
-            if (currentLang === 'en') {
-                const enNames = {
-                    'all': 'All Products',
-                    'computers': 'Computers',
-                    'tv_audio': 'TV & Audio',
-                    'smart_home': 'Smart Home',
-                    'audio_accessories': 'Audio & Accessories',
-                    'wearables': 'Wearables',
-                    'gaming': 'Gaming',
-                    'small_appliances': 'Kitchen Appliances',
-                    'computer_accessories': 'Computer Accessories'
-                };
-                return enNames[cat.id] || cat.name;
-            }
-            return cat.name;
-        };
-
-        const translateSpecKey = (key) => {
-            if (window.currentLang !== 'en') return key;
-            const dict = {
-                "מעבד": "Processor",
-                "זיכרון RAM": "RAM",
-                "אחסון": "Storage",
-                "מסך": "Display",
-                "כרטיס מסך": "Graphics Card",
-                "קישוריות": "Connectivity",
-                "סוללה": "Battery",
-                "משקל": "Weight",
-                "מערכת הפעלה": "OS",
-                "גודל מסך": "Screen Size",
-                "רזולוציה": "Resolution",
-                "קצב רענון": "Refresh Rate",
-                "טכנולוגיית תמונה": "Picture Technology",
-                "שמע": "Audio",
-                "חיבורים": "Ports",
-                "שפת ממשק": "System Language",
-                "עוצמת שאיבה": "Suction Power",
-                "מערכת ניווט": "Navigation System",
-                "פעולות": "Operations",
-                "נפח מכל אבק": "Dust Collector Capacity",
-                "נפח מכל מים": "Water Tank Capacity",
-                "שליטה": "Control Method",
-                "תאימות בית חכם": "Smart Home Compatibility",
-                "קוטר דרייבר": "Driver Diameter",
-                "סינון רעשים": "Noise Cancellation",
-                "חיי סוללה": "Battery Life",
-                "טעינה": "Charging Port",
-                "מיקרופונים": "Microphones",
-                "אביזרים נלווים": "Accessories Included",
-                "חומרי מבנה": "Build Materials",
-                "עמידות למים": "Water Resistance",
-                "חיישנים": "Sensors",
-                "מעקב ספורט": "Sport Tracking Modes",
-                "תכונות חכמות": "Smart Features",
-                "סוג חיבור": "Connection Type",
-                "טווח קליטה": "Wireless Range",
-                "תאימות": "Compatibility",
-                "משוב": "Haptic Feedback",
-                "מקשים": "Keys/Buttons",
-                "תאורה": "Lighting",
-                "לחץ משאבה": "Pump Pressure",
-                "מכל פולים": "Bean Container Capacity",
-                "טוחן קפה": "Grinder Type",
-                "מכל מים": "Water Container Capacity",
-                "הקצפת חלב": "Milk Frothing",
-                "בקרת טמפרטורה": "Temperature Control",
-                "ניקוי ותחזוקה": "Cleaning & Maintenance",
-                "סוג פאנל": "Panel Type",
-                "זמן תגובה": "Response Time",
-                "יחס ניגודיות": "Contrast Ratio",
-                "תמיכה בסנכרון": "Sync Technology",
-                "ארגונומיה": "Ergonomics",
-                "נפח אחסון": "Storage Capacity",
-                "מצלמה אחורית": "Rear Camera",
-                "מצלמה קדמית": "Front Camera",
-                "חיבור טעינה": "Charging Interface",
-                "אבטחה": "Security",
-                "תאימות עט": "Stylus Compatibility",
-                "הספק כולל": "Total Power",
-                "סאב-וופר": "Subwoofer",
-                "קישוריות אלחוטית": "Wireless Connectivity",
-                "תקני שמע": "Audio Standards",
-                "מידות מקרן קול": "Soundbar Dimensions",
-                "משקל כולל": "Total Weight",
-                "ראיית לילה": "Night Vision",
-                "עמידות": "Durability",
-                "זיהוי תנועה": "Motion Detection",
-                "תכונות מיוחדות": "Special Features",
-                "הספק מוצא": "Output Power",
-                "מעקב בריאות": "Health Tracking",
-                "פעילויות ספורט": "Sport Activities",
-                "רצועות": "Straps",
-                "סוג מתגים": "Switch Type",
-                "מבנה": "Structure",
-                "קצב דיווח (Polling Rate)": "Polling Rate",
-                "בקרת מדיה": "Media Controls",
-                "חיבור": "Connection",
-                "זיכרון מובנה": "Onboard Memory",
-                "חיישן": "Sensor",
-                "חיבור אלחוטי": "Wireless Connection",
-                "רגליות עכבר": "Mouse Feet",
-                "מספר מקשים": "Number of Keys",
-                "תאימות טעינה": "Charging Compatibility",
-                "עוצמת חימום": "Heating Power",
-                "טכנולוגיית בישול": "Cooking Technology",
-                "תוכניות בישול": "Cooking Programs",
-                "בקרת עשייה": "Cooking Control",
-                "נפח בישול": "Cooking Capacity",
-                "ניקוי": "Cleaning",
-                "מסנן עשן": "Smoke Filter",
-                "תקן אלחוטי": "Wireless Standard",
-                "מהירות ערוצים": "Channel Speeds",
-                "אנטנות": "Antennas",
-                "מהירות קריאה": "Read Speed",
-                "מהירות כתיבה": "Write Speed",
-                "עמידות ומוגנות": "Protection & Durability",
-                "חיבור פיזי": "Physical Interface",
-                "אבטחה ופרטיות": "Security & Privacy",
-                "עיצוב": "Design",
-                "חיבור אלחוטי כפול": "Dual Wireless Connection",
-                "מיקרופון": "Microphone"
-            };
-            return dict[key] || key;
-        };
-
         // ============================================================
         //  NEW: Auth modal — login / register / forgot password
         // ============================================================
-        const inputCls = (err) => `w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 ${err ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'}`;
-        const Field = ({ label, err, children }) => (
-            <div className="space-y-1">
-                <label className="block text-xs font-bold text-slate-700">{label}</label>
-                {children}
-                {err && <p className="text-red-500 text-xs font-semibold">{err}</p>}
-            </div>
-        );
-
         const AuthModal = ({ tab, setTab, onClose, onLogin, onRegister, onReset }) => {
             const [name, setName] = useState('');
             const [email, setEmail] = useState('');
@@ -1401,7 +869,14 @@
                 else setResetInfo({ token: res.token, link: res.resetLink });
             };
 
-
+            const inputCls = (err) => `w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 ${err ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'}`;
+            const Field = ({ label, err, children }) => (
+                <div className="space-y-1">
+                    <label className="block text-xs font-bold text-slate-700">{label}</label>
+                    {children}
+                    {err && <p className="text-red-500 text-xs font-semibold">{err}</p>}
+                </div>
+            );
 
             return (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
@@ -1544,27 +1019,12 @@
             const [seedingStatus, setSeedingStatus] = useState('');     // '', 'seeding', 'success', 'error'
             const [dbProducts, setDbProducts] = useState([]);           // Products from Supabase
 
-            // ===== Theme state (Light / Dark Mode) =====
-            const [theme, setTheme] = useState(() => {
-                try {
-                    return localStorage.getItem('notksp_theme') || 'light';
-                } catch (e) {
-                    return 'light';
-                }
-            });
-
-            useEffect(() => {
-                if (theme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                }
-                try {
-                    localStorage.setItem('notksp_theme', theme);
-                } catch (e) {}
-            }, [theme]);
-
-
+            // ===== NEW: UI state =====
+            const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+            const [authOpen, setAuthOpen] = useState(false);            // login/register modal
+            const [authTab, setAuthTab] = useState('login');            // 'login' | 'register' | 'forgot'
+            const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+            const [adminTab, setAdminTab] = useState('dashboard');
 
             // ===== Accessibility states =====
             const [accOpen, setAccOpen] = useState(false);
@@ -1584,29 +1044,49 @@
                 try { return localStorage.getItem('notksp_acc_stop_animations') === 'true'; } catch(e) { return false; }
             });
 
+            const [userOrders, setUserOrders] = useState([]);           // user purchase history
+    
+            const [requestProduct, setRequestProduct] = useState(null); // null = closed; string = open (prefilled name)
+            const [toast, setToast] = useState(null);                   // { text, tone }
+            const [reqName, setReqName] = useState('');
+            const [reqNote, setReqNote] = useState('');
+            const [reqEmail, setReqEmail] = useState('');
+            const [reqError, setReqError] = useState('');
+
+            // The key under which the current person's wishlist is stored
+            const wishlistKey = currentUser ? ('u:' + currentUser.email) : 'guest';
+            const wishlist = wishlistMap[wishlistKey] || [];
+
+            const showToast = (text, tone = 'cta') => {
+                setToast({ text, tone });
+                setTimeout(() => setToast(null), 2600);
+            };
+
+            
+            // Sync accessibility settings to document class list and document font size
             useEffect(() => {
-                const el = document.documentElement;
-
+                const html = document.documentElement;
+                
                 // 1. Contrast
-                el.classList.remove('acc-high-contrast', 'acc-grayscale');
-                if (accContrast === 'high') el.classList.add('acc-high-contrast');
-                else if (accContrast === 'grayscale') el.classList.add('acc-grayscale');
-
+                html.classList.remove('acc-contrast-high', 'acc-contrast-grayscale');
+                if (accContrast === 'high') html.classList.add('acc-contrast-high');
+                else if (accContrast === 'grayscale') html.classList.add('acc-contrast-grayscale');
+                
                 // 2. Font Size
-                el.style.fontSize = accFontSize === 100 ? '' : `${accFontSize}%`;
-
+                html.style.fontSize = accFontSize === 100 ? '' : `${accFontSize}%`;
+                
                 // 3. Readable Font
-                if (accReadableFont) el.classList.add('acc-readable-font');
-                else el.classList.remove('acc-readable-font');
-
+                if (accReadableFont) html.classList.add('acc-readable-font');
+                else html.classList.remove('acc-readable-font');
+                
                 // 4. Highlight Links
-                if (accHighlightLinks) el.classList.add('acc-highlight-links');
-                else el.classList.remove('acc-highlight-links');
-
+                if (accHighlightLinks) html.classList.add('acc-highlight-links');
+                else html.classList.remove('acc-highlight-links');
+                
                 // 5. Stop Animations
-                if (accStopAnimations) el.classList.add('acc-stop-animations');
-                else el.classList.remove('acc-stop-animations');
-
+                if (accStopAnimations) html.classList.add('acc-stop-animations');
+                else html.classList.remove('acc-stop-animations');
+                
                 // Save to localStorage
                 try {
                     localStorage.setItem('notksp_acc_contrast', accContrast);
@@ -1626,29 +1106,35 @@
                 showToast('הגדרות הנגישות אופסו');
             };
 
-            // ===== NEW: UI state =====
-            const [isWishlistOpen, setIsWishlistOpen] = useState(false);
-            const [authOpen, setAuthOpen] = useState(false);            // login/register modal
-            const [authTab, setAuthTab] = useState('login');            // 'login' | 'register' | 'forgot'
-            const [accountMenuOpen, setAccountMenuOpen] = useState(false);
-            const [adminTab, setAdminTab] = useState('dashboard');
-            const [requestProduct, setRequestProduct] = useState(null); // null = closed; string = open (prefilled name)
-            const [toast, setToast] = useState(null);                   // { text, tone }
-            const [userOrders, setUserOrders] = useState([]);           // user purchase history
-            const [reqName, setReqName] = useState('');
-            const [reqNote, setReqNote] = useState('');
-            const [reqEmail, setReqEmail] = useState('');
-            const [reqError, setReqError] = useState('');
-
-            // The key under which the current person's wishlist is stored
-            const wishlistKey = currentUser ? ('u:' + currentUser.email) : 'guest';
-            const wishlist = wishlistMap[wishlistKey] || [];
-
-            const showToast = (text, tone = 'cta') => {
-                setToast({ text, tone });
-                setTimeout(() => setToast(null), 2600);
-            };
-
+            // Fetch user orders (purchase history)
+            useEffect(() => {
+                const fetchUserOrders = async () => {
+                    if (!currentUser) {
+                        setUserOrders([]);
+                        return;
+                    }
+                    if (isSupabaseConnected && supabaseClient) {
+                        try {
+                            const { data, error } = await supabaseClient
+                                .from('orders')
+                                .select('*')
+                                .eq('customer_email', currentUser.email)
+                                .order('created_at', { ascending: false });
+                            if (!error && data) {
+                                setUserOrders(data);
+                            }
+                        } catch (e) {
+                            console.error("Error fetching user orders from Supabase:", e);
+                        }
+                    } else {
+                        // Offline mode: filter local orders state
+                        const local = orders.filter(o => o.customerEmail === currentUser.email);
+                        setUserOrders(local);
+                    }
+                };
+                fetchUserOrders();
+            }, [currentUser, orders, isSupabaseConnected]);
+    
             // Load cart and recently viewed from localStorage on initial load
             useEffect(() => {
                 const storedCart = localStorage.getItem('notksp_cart');
@@ -1788,35 +1274,6 @@
                 return () => subscription.unsubscribe();
             }, [isSupabaseConnected]);
 
-            // Fetch user orders (purchase history)
-            useEffect(() => {
-                const fetchUserOrders = async () => {
-                    if (!currentUser) {
-                        setUserOrders([]);
-                        return;
-                    }
-                    if (isSupabaseConnected && supabaseClient) {
-                        try {
-                            const { data, error } = await supabaseClient
-                                .from('orders')
-                                .select('*')
-                                .eq('customer_email', currentUser.email)
-                                .order('created_at', { ascending: false });
-                            if (!error && data) {
-                                setUserOrders(data);
-                            }
-                        } catch (e) {
-                            console.error("Error fetching user orders from Supabase:", e);
-                        }
-                    } else {
-                        // Offline mode: filter local orders state
-                        const local = orders.filter(o => o.customerEmail === currentUser.email);
-                        setUserOrders(local);
-                    }
-                };
-                fetchUserOrders();
-            }, [currentUser, orders, isSupabaseConnected]);
-
             // ===== NEW: load persistent data + seed default admin account =====
             useEffect(() => {
                 setCustomProducts(LS.get('notksp_custom_products', []));
@@ -1852,7 +1309,7 @@
             // Keep Lucide icons refreshed as new UI mounts
             useEffect(() => {
                 if (window.lucide) window.lucide.createIcons();
-            }, [isWishlistOpen, authOpen, authTab, accountMenuOpen, adminTab, requestProduct, toast, currentUser, customProducts, stockMap, requests, orders, isSupabaseModalOpen, theme, accOpen, view, userOrders]);
+            }, [isWishlistOpen, authOpen, authTab, accountMenuOpen, adminTab, requestProduct, toast, currentUser, customProducts, stockMap, requests, orders, isSupabaseModalOpen, view, userOrders, accOpen]);
 
             // Prefill checkout fields for logged-in users
             useEffect(() => {
@@ -1883,7 +1340,7 @@
                 if (window.lucide) {
                     window.lucide.createIcons();
                 }
-            }, [view, activeProduct, isCartOpen, selectedCategory, searchQuery, theme]);
+            }, [view, activeProduct, isCartOpen, selectedCategory, searchQuery, userOrders, accOpen]);
 
             // Add product to recently viewed (max 4, no duplicates, move to front)
             const addToRecentlyViewed = (productId) => {
@@ -2393,7 +1850,7 @@
                                         placeholder="חפשו מוצרים, מותגים או תכונות..." 
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pr-10 pl-4 py-2 bg-primary-light border border-slate-600 rounded-full text-white placeholder-slate-400 focus:outline-none focus:border-cta focus:ring-1 focus:ring-cta text-sm transition-all shadow-inner text-right"
+                                        className="w-full pr-10 pl-4 py-2 bg-primary-light border border-slate-600 rounded-full text-white placeholder-slate-400 focus:outline-none focus:border-cta focus:ring-1 focus:ring-cta text-sm transition-all shadow-inner"
                                     />
                                     {searchQuery && (
                                         <button 
@@ -2408,29 +1865,18 @@
 
                             {/* Actions */}
                             <div className="flex items-center gap-2 sm:gap-3">
-                                {/* Theme Toggle (Light / Dark Mode) */}
-                                <button
-                                    onClick={() => setTheme(prev => prev === 'light' ? 'dark' : 'light')}
-                                    className="p-2.5 rounded-full bg-primary-light hover:bg-primary-dark border border-slate-600 hover:border-slate-500 text-white transition-all flex items-center justify-center cursor-pointer"
-                                    title={theme === 'light' ? 'עבור למצב כהה' : 'עבור למצב בהיר'}
-                                >
-                                    <i data-lucide={theme === 'light' ? 'moon' : 'sun'} className="w-4 h-4 text-cta"></i>
-                                </button>
-
                                 {/* Supabase Status Badge */}
-                                {currentUser && currentUser.role === 'admin' && (
-                                    <button
-                                        onClick={() => setIsSupabaseModalOpen(true)}
-                                        className={`flex items-center gap-1 text-[10px] font-bold px-2.5 py-1.5 rounded-full transition-all border ${
-                                            isSupabaseConnected
-                                                ? 'bg-cta/10 text-cta border-cta/30 hover:bg-cta/20'
-                                                : 'bg-amber-500/10 text-amber-500 border-amber-500/30 hover:bg-amber-500/20'
-                                        }`}
-                                    >
-                                        <span className={`w-1.5 h-1.5 rounded-full ${isSupabaseConnected ? 'bg-cta' : 'bg-amber-500'} animate-pulse`}></span>
-                                        {isSupabaseConnected ? 'מחובר ל-Supabase' : 'מצב אופליין'}
-                                    </button>
-                                )}
+                                <button
+                                    onClick={() => setIsSupabaseModalOpen(true)}
+                                    className={`flex items-center gap-1 text-[10px] font-bold px-2.5 py-1.5 rounded-full transition-all border ${
+                                        isSupabaseConnected
+                                            ? 'bg-cta/10 text-cta border-cta/30 hover:bg-cta/20'
+                                            : 'bg-amber-500/10 text-amber-500 border-amber-500/30 hover:bg-amber-500/20'
+                                    }`}
+                                >
+                                    <span className={`w-1.5 h-1.5 rounded-full ${isSupabaseConnected ? 'bg-cta' : 'bg-amber-500'} animate-pulse`}></span>
+                                    {isSupabaseConnected ? 'מחובר ל-Supabase' : 'מצב אופליין'}
+                                </button>
                                 {/* Admin area link (managers only) */}
                                 {currentUser && currentUser.role === 'admin' && view !== 'admin' && (
                                     <button
@@ -2682,7 +2128,134 @@
                                                                 {product.price.toLocaleString('he-IL')} ₪
                                                             </div>
                                                         </div>
-                                                           {view === 'profile' && currentUser && (
+                                                        {product.stock_quantity > 0 ? (
+                                                            <button 
+                                                                onClick={() => addToCart(product)}
+                                                                className="bg-cta hover:bg-cta-hover text-primary font-bold text-xs px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-all transform active:scale-95 shadow-md shadow-cta/10"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                                                                הוסף לסל
+                                                            </button>
+                                                        ) : (
+                                                            <button 
+                                                                onClick={() => setRequestProduct(product.name)}
+                                                                className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-all transform active:scale-95 border border-slate-200"
+                                                            >
+                                                                <i data-lucide="bell" className="w-4 h-4"></i>
+                                                                עדכנו אותי
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-premium space-y-4">
+                                        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                                        </div>
+                                        <h3 className="font-heebo font-bold text-slate-800 text-lg">לא נמצאו מוצרים תואמים</h3>
+                                        <p className="text-sm text-slate-500 max-w-md mx-auto">
+                                            נסו לשנות את מילת החיפוש או לבחור קטגוריה אחרת כדי למצוא את מה שאתם מחפשים.
+                                        </p>
+                                        <button 
+                                            onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }}
+                                            className="bg-primary hover:bg-primary-light text-white text-xs font-bold px-4 py-2 rounded-full transition-all"
+                                        >
+                                            איפוס סינונים
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* Recently Viewed Products Section */}
+                                {recentlyViewedProducts.length > 0 && (
+                                    <div className="pt-6 border-t border-slate-200 space-y-4">
+                                        <h3 className="font-heebo font-black text-slate-900 text-lg">מוצרים שצפית בהם לאחרונה</h3>
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                            {recentlyViewedProducts.map(product => (
+                                                <div 
+                                                    key={product.id}
+                                                    onClick={() => openProductDetails(product)}
+                                                    className="bg-white p-3 rounded-xl border border-slate-100 shadow-premium hover:shadow-premium-hover cursor-pointer flex items-center gap-3 transition-all"
+                                                >
+                                                    <img 
+                                                        src={`${product.image_url}?auto=format&fit=crop&w=150&q=80`} 
+                                                        alt={product.name} 
+                                                        className="w-12 h-12 object-cover rounded-lg"
+                                                    />
+                                                    <div className="min-w-0">
+                                                        <h4 className="font-bold text-xs text-slate-800 truncate leading-tight">{product.name}</h4>
+                                                        <p className="text-xs font-extrabold text-primary mt-1">{product.price.toLocaleString('he-IL')} ₪</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                {/* Request an unavailable product */}
+                                <div className="pt-6 border-t border-slate-200">
+                                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-primary-dark via-primary to-primary-light border border-slate-700 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-5 text-white">
+                                        <div className="w-56 h-40 bg-cta/10 blur-3xl absolute -left-10 -top-10 rounded-full"></div>
+                                        <div className="space-y-2 text-right z-10 max-w-xl">
+                                            <div className="inline-flex items-center gap-1.5 bg-primary-light/50 border border-slate-600/50 px-3 py-1 rounded-full text-xs text-cta font-bold">
+                                                <i data-lucide="search-x" className="w-3.5 h-3.5"></i>
+                                                לא מצאת מה שחיפשת?
+                                            </div>
+                                            <h3 className="text-xl sm:text-2xl font-heebo font-black leading-tight">חסר לנו מוצר שרצית? <span className="text-cta">ספר/י לנו.</span></h3>
+                                            <p className="text-slate-300 text-sm font-light">
+                                                כתוב/כתבי איזה מוצר תרצה/י שנביא — נעביר את הבקשה לצוות הרכש ונעדכן אותך כשהוא זמין במלאי.
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={() => setRequestProduct('')}
+                                            className="z-10 bg-cta hover:bg-cta-hover text-primary font-bold px-6 py-3 rounded-full text-sm shadow-glow transition-all transform hover:scale-105 flex items-center gap-2 shrink-0"
+                                        >
+                                            <i data-lucide="plus-circle" className="w-5 h-5"></i>
+                                            שליחת בקשת מוצר
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 6. Admin Area */}
+                        {view === 'admin' && currentUser && currentUser.role === 'admin' && (
+                            <div className="fade-in space-y-6">
+                                {/* Admin tabs */}
+                                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                                    {[
+                                        { id: 'dashboard', name: 'דשבורד', icon: 'layout-dashboard' },
+                                        { id: 'inventory', name: 'ניהול מלאי', icon: 'boxes' },
+                                        { id: 'add', name: 'הוספת מוצר', icon: 'plus-square' },
+                                        { id: 'requests', name: 'בקשות מוצרים', icon: 'inbox' },
+                                        { id: 'orders', name: 'הזמנות', icon: 'receipt' }
+                                    ].map(t => (
+                                        <button
+                                            key={t.id}
+                                            onClick={() => setAdminTab(t.id)}
+                                            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${adminTab === t.id ? 'bg-primary text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'}`}
+                                        >
+                                            <i data-lucide={t.icon} className="w-4 h-4"></i>
+                                            {t.name}
+                                            {t.id === 'requests' && requests.filter(r => r.status === 'open').length > 0 && (
+                                                <span className="bg-cta text-primary rounded-full text-[10px] font-black px-1.5">{requests.filter(r => r.status === 'open').length}</span>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {adminTab === 'dashboard' && <AdminDashboard catalog={catalog} orders={orders} requests={requests} users={users} wishlistMap={wishlistMap} />}
+                                {adminTab === 'inventory' && <AdminInventory catalog={catalog} customProducts={customProducts} onSetStock={setStock} onAdjust={adjustStock} onDelete={deleteCustomProduct} />}
+                                {adminTab === 'add' && <AdminAddProduct categories={CATEGORIES} onAdd={addProduct} showToast={showToast} goToInventory={() => setAdminTab('inventory')} />}
+                                {adminTab === 'requests' && <AdminRequests requests={requests} onStatus={setRequestStatus} />}
+                                {adminTab === 'orders' && <AdminOrders orders={orders} />}
+                            </div>
+                        )}
+
+                        
+                        {/* 7. Profile View (Personal Area / אזור אישי) */}
+                        {view === 'profile' && currentUser && (
                             <div className="fade-in max-w-4xl mx-auto space-y-6">
                                 {/* Back button */}
                                 <div className="flex items-center gap-2">
@@ -2745,6 +2318,7 @@
                                                                 showToast('שגיאה במחיקת החשבון מ-Supabase', 'amber');
                                                             }
                                                         } else {
+                                                            // Offline mode deletion simulation
                                                             showToast('החשבון נמחק (סימולציה אופליין)', 'slate');
                                                             logoutUser();
                                                         }
@@ -2816,7 +2390,7 @@
                                 </div>
                             </div>
                         )}
-
+    
                         {/* 2. Checkout View */}
                         {view === 'checkout' && (
                             <div className="fade-in max-w-4xl mx-auto space-y-6">
@@ -3567,95 +3141,109 @@
                         </div>
                     )}
 
-                    {/* Accessibility Widget (WCAG 2.1 AA / IS 5568) */}
-                    <div className="accessibility-widget">
-                        {/* Toggle Button */}
-                        <button
-                            onClick={() => setAccOpen(prev => !prev)}
-                            className="fixed bottom-6 left-6 z-[60] bg-primary hover:bg-primary-light text-white p-3.5 rounded-full shadow-premium-hover hover:scale-105 active:scale-95 transition-all flex items-center justify-center border border-slate-600 cursor-pointer"
-                            aria-label="אפשרויות נגישות"
+                    
+                    {/* Floating Accessibility AA Button & Widget */}
+                    <div className="fixed bottom-6 right-6 z-50">
+                        <button 
+                            onClick={() => setAccOpen(!accOpen)}
+                            className="w-12 h-12 bg-primary hover:bg-primary-light text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all cursor-pointer border border-primary/20"
+                            aria-label="תפריט נגישות"
                             title="תפריט נגישות"
                         >
-                            <i data-lucide="accessibility" className="w-6 h-6 text-cta"></i>
+                            <i data-lucide="accessibility" className="w-6 h-6"></i>
                         </button>
-
-                        {/* Panel */}
+                        
                         {accOpen && (
-                            <div className="fixed bottom-20 left-6 z-[60] bg-white dark:bg-[#121e31] rounded-2xl shadow-premium border border-slate-200 dark:border-slate-800 p-5 w-72 fade-in space-y-4 text-right">
-                                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2 flex-row">
-                                    <button onClick={() => setAccOpen(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
-                                        <i data-lucide="x" className="w-4 h-4"></i>
-                                    </button>
-                                    <h3 className="font-heebo font-black text-sm text-slate-800 dark:text-white flex items-center gap-1.5 justify-end flex-row">
-                                        תפריט נגישות <i data-lucide="accessibility" className="w-4 h-4 text-cta"></i>
-                                    </h3>
-                                </div>
-
-                                {/* FontSize Selector */}
-                                <div className="space-y-1.5">
-                                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">
-                                        גודל טקסט
-                                    </span>
-                                    <div className="flex gap-1.5">
-                                        <button onClick={() => setAccFontSize(100)} className={`flex-1 py-1.5 rounded-lg border text-xs font-semibold ${accFontSize === 100 ? 'bg-cta/15 text-cta border-cta/30 font-bold' : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}>
-                                            רגיל
-                                        </button>
-                                        <button onClick={() => setAccFontSize(115)} className={`flex-1 py-1.5 rounded-lg border text-xs font-semibold ${accFontSize === 115 ? 'bg-cta/15 text-cta border-cta/30 font-bold' : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}>115%</button>
-                                        <button onClick={() => setAccFontSize(130)} className={`flex-1 py-1.5 rounded-lg border text-xs font-semibold ${accFontSize === 130 ? 'bg-cta/15 text-cta border-cta/30 font-bold' : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}>130%</button>
+                            <>
+                                <div className="fixed inset-0 z-40" onClick={() => setAccOpen(false)}></div>
+                                <div className="absolute bottom-14 right-0 w-80 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 rounded-2xl shadow-premium-hover p-5 z-50 fade-in text-right">
+                                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+                                        <button onClick={resetAccessibility} className="text-[10px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold px-2 py-1 rounded-lg transition-colors cursor-pointer">אפס הגדרות</button>
+                                        <h3 className="font-heebo font-black text-slate-800 dark:text-white text-sm flex items-center gap-1.5 justify-end">
+                                            נגישות אתר (IS 5568 AA) <i data-lucide="accessibility" className="w-4 h-4 text-primary"></i>
+                                        </h3>
                                     </div>
-                                </div>
-
-                                {/* Contrast Selector */}
-                                <div className="space-y-1.5">
-                                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">
-                                        ניגודיות וצבע
-                                    </span>
-                                    <div className="flex gap-1.5">
-                                        <button onClick={() => setAccContrast('normal')} className={`flex-1 py-1.5 rounded-lg border text-xs font-semibold ${accContrast === 'normal' ? 'bg-cta/15 text-cta border-cta/30 font-bold' : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}>
-                                            רגיל
-                                        </button>
-                                        <button onClick={() => setAccContrast('high')} className={`flex-1 py-1.5 rounded-lg border text-xs font-semibold ${accContrast === 'high' ? 'bg-cta/15 text-cta border-cta/30 font-bold' : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}>
-                                            ניגודיות גבוהה
-                                        </button>
-                                        <button onClick={() => setAccContrast('grayscale')} className={`flex-1 py-1.5 rounded-lg border text-xs font-semibold ${accContrast === 'grayscale' ? 'bg-cta/15 text-cta border-cta/30 font-bold' : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}>
-                                            מונוכרום
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Feature Toggles */}
-                                <div className="space-y-2">
-                                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">
-                                        עזרי קריאה וניווט
-                                    </span>
                                     
-                                    {/* Readable Font */}
-                                    <button onClick={() => setAccReadableFont(prev => !prev)} className={`w-full py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-between transition-colors ${accReadableFont ? 'bg-cta/15 text-cta border-cta/30' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'} flex-row`}>
-                                        <span className={`w-4 h-4 rounded border flex items-center justify-center text-[10px] ${accReadableFont ? 'bg-cta border-cta text-primary font-bold' : 'border-slate-300'}`}>{accReadableFont ? '✓' : ''}</span>
-                                        <span>גופן קריא ופשוט</span>
-                                    </button>
+                                    <div className="space-y-4">
+                                        {/* Color contrast */}
+                                        <div className="space-y-1.5">
+                                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">ניגודיות צבעים</label>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                <button 
+                                                    onClick={() => setAccContrast('normal')}
+                                                    className={`px-3 py-2 rounded-lg text-xs font-bold transition-all border cursor-pointer ${accContrast === 'normal' ? 'bg-primary text-white border-primary' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}
+                                                >
+                                                    רגיל
+                                                </button>
+                                                <button 
+                                                    onClick={() => setAccContrast('high')}
+                                                    className={`px-3 py-2 rounded-lg text-xs font-bold transition-all border cursor-pointer ${accContrast === 'high' ? 'bg-primary text-white border-primary' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}
+                                                >
+                                                    ניגודיות גבוהה
+                                                </button>
+                                                <button 
+                                                    onClick={() => setAccContrast('grayscale')}
+                                                    className={`px-3 py-2 rounded-lg text-xs font-bold transition-all border cursor-pointer ${accContrast === 'grayscale' ? 'bg-primary text-white border-primary' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}
+                                                >
+                                                    מונוכרום
+                                                </button>
+                                            </div>
+                                        </div>
 
-                                    {/* Highlight Links */}
-                                    <button onClick={() => setAccHighlightLinks(prev => !prev)} className={`w-full py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-between transition-colors ${accHighlightLinks ? 'bg-cta/15 text-cta border-cta/30' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'} flex-row`}>
-                                        <span className={`w-4 h-4 rounded border flex items-center justify-center text-[10px] ${accHighlightLinks ? 'bg-cta border-cta text-primary font-bold' : 'border-slate-300'}`}>{accHighlightLinks ? '✓' : ''}</span>
-                                        <span>הדגשת קישורים וכפתורים</span>
-                                    </button>
+                                        {/* Font size */}
+                                        <div className="space-y-1.5">
+                                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">גודל גופן</label>
+                                            <div className="grid grid-cols-4 gap-2">
+                                                {[100, 110, 120, 130].map(sz => (
+                                                    <button 
+                                                        key={sz}
+                                                        onClick={() => setAccFontSize(sz)}
+                                                        className={`px-2 py-2 rounded-lg text-xs font-bold transition-all border cursor-pointer ${accFontSize === sz ? 'bg-primary text-white border-primary' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}
+                                                    >
+                                                        {sz}%
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
 
-                                    {/* Stop Animations */}
-                                    <button onClick={() => setAccStopAnimations(prev => !prev)} className={`w-full py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-between transition-colors ${accStopAnimations ? 'bg-cta/15 text-cta border-cta/30' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'} flex-row`}>
-                                        <span className={`w-4 h-4 rounded border flex items-center justify-center text-[10px] ${accStopAnimations ? 'bg-cta border-cta text-primary font-bold' : 'border-slate-300'}`}>{accStopAnimations ? '✓' : ''}</span>
-                                        <span>חסימת אנימציות</span>
-                                    </button>
+                                        {/* Other enhancements */}
+                                        <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                                            <button 
+                                                onClick={() => setAccReadableFont(!accReadableFont)}
+                                                className={`w-full px-3 py-2 rounded-lg text-xs font-bold border transition-all flex items-center justify-between cursor-pointer ${accReadableFont ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'}`}
+                                            >
+                                                <span className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${accReadableFont ? 'border-primary bg-primary' : 'border-slate-400'}`}>
+                                                    {accReadableFont && <span className="w-1.5 h-1.5 bg-white rounded-full"></span>}
+                                                </span>
+                                                <span>גופן קריא (Sans-Serif)</span>
+                                            </button>
+
+                                            <button 
+                                                onClick={() => setAccHighlightLinks(!accHighlightLinks)}
+                                                className={`w-full px-3 py-2 rounded-lg text-xs font-bold border transition-all flex items-center justify-between cursor-pointer ${accHighlightLinks ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'}`}
+                                            >
+                                                <span className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${accHighlightLinks ? 'border-primary bg-primary' : 'border-slate-400'}`}>
+                                                    {accHighlightLinks && <span className="w-1.5 h-1.5 bg-white rounded-full"></span>}
+                                                </span>
+                                                <span>הדגשת קישורים וכפתורים</span>
+                                            </button>
+
+                                            <button 
+                                                onClick={() => setAccStopAnimations(!accStopAnimations)}
+                                                className={`w-full px-3 py-2 rounded-lg text-xs font-bold border transition-all flex items-center justify-between cursor-pointer ${accStopAnimations ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'}`}
+                                            >
+                                                <span className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${accStopAnimations ? 'border-primary bg-primary' : 'border-slate-400'}`}>
+                                                    {accStopAnimations && <span className="w-1.5 h-1.5 bg-white rounded-full"></span>}
+                                                </span>
+                                                <span>ביטול אנימציות ותנועה</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-
-                                {/* Reset Button */}
-                                <button onClick={resetAccessibility} className="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-2 rounded-xl text-xs transition-colors border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-1">
-                                    <i data-lucide="rotate-ccw" className="w-3.5 h-3.5"></i> איפוס הגדרות נגישות
-                                </button>
-                            </div>
+                            </>
                         )}
                     </div>
-
+    
                     {/* 9. Toast */}
                     {toast && (
                         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] fade-in">
