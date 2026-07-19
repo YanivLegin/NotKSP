@@ -12,6 +12,17 @@ create table if not exists public.profiles (
 
 alter table public.profiles enable row level security;
 
+-- Helper function to check if a user is an admin without triggering infinite recursion in RLS
+create or replace function public.is_admin(user_id uuid)
+returns boolean as $$
+begin
+  return exists (
+    select 1 from public.profiles
+    where id = user_id and role = 'admin'
+  );
+end;
+$$ language plpgsql security definer;
+
 -- Drop existing policies if any
 drop policy if exists "Allow users to read their own profile" on public.profiles;
 drop policy if exists "Allow users to update their own profile" on public.profiles;
@@ -23,7 +34,7 @@ create policy "Allow users to update their own profile" on public.profiles
   for update using (auth.uid() = id);
 create policy "Allow admins to read all profiles" on public.profiles 
   for select using (
-    (select role from public.profiles where id = auth.uid()) = 'admin' or auth.jwt() ->> 'email' = 'admin@notksp.co.il'
+    public.is_admin(auth.uid()) or auth.jwt() ->> 'email' = 'admin@notksp.co.il'
   );
 
 -- 2. Products Table
@@ -48,7 +59,7 @@ create policy "Allow public read access to products" on public.products
   for select using (true);
 create policy "Allow admin write access to products" on public.products 
   for all using (
-    (select role from public.profiles where id = auth.uid()) = 'admin' or auth.jwt() ->> 'email' = 'admin@notksp.co.il'
+    public.is_admin(auth.uid()) or auth.jwt() ->> 'email' = 'admin@notksp.co.il'
   );
 
 -- 3. Orders Table
@@ -74,7 +85,7 @@ create policy "Allow users to read their own orders" on public.orders
   for select using (customer_email = auth.jwt() ->> 'email');
 create policy "Allow admins to read/write all orders" on public.orders 
   for all using (
-    (select role from public.profiles where id = auth.uid()) = 'admin' or auth.jwt() ->> 'email' = 'admin@notksp.co.il'
+    public.is_admin(auth.uid()) or auth.jwt() ->> 'email' = 'admin@notksp.co.il'
   );
 create policy "Allow public to insert orders" on public.orders 
   for insert with check (true);
@@ -101,7 +112,7 @@ create policy "Allow anyone to insert a request" on public.requests
   for insert with check (true);
 create policy "Allow admins to manage all requests" on public.requests 
   for all using (
-    (select role from public.profiles where id = auth.uid()) = 'admin' or auth.jwt() ->> 'email' = 'admin@notksp.co.il'
+    public.is_admin(auth.uid()) or auth.jwt() ->> 'email' = 'admin@notksp.co.il'
   );
 
 -- 5. Wishlists Table
