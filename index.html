@@ -221,11 +221,13 @@
         const { useState, useEffect, useMemo, useRef } = React;
 
         // Supabase configuration
-        let initialUrl = 'https://ykoallfmckyoiwmtbvjp.supabase.co';
-        let initialKey = '';
+        const SUPABASE_DEFAULT_URL = 'https://ykoallfmckyoiwmtbvjp.supabase.co';
+        const SUPABASE_DEFAULT_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlrb2FsbGZtY2t5b2l3bXRidmpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NjQ5MjUsImV4cCI6MjEwMDA0MDkyNX0.bbpy43BESi5rvdRStHxcZQwy1F1UE6o1gkhhBkzxVyo';
+        let initialUrl = SUPABASE_DEFAULT_URL;
+        let initialKey = SUPABASE_DEFAULT_KEY;
         try {
-            initialUrl = localStorage.getItem('notksp_supabase_url') || 'https://ykoallfmckyoiwmtbvjp.supabase.co';
-            initialKey = localStorage.getItem('notksp_supabase_anon_key') || '';
+            initialUrl = localStorage.getItem('notksp_supabase_url') || SUPABASE_DEFAULT_URL;
+            initialKey = localStorage.getItem('notksp_supabase_anon_key') || SUPABASE_DEFAULT_KEY;
         } catch (e) {
             console.warn("localStorage read failed:", e);
         }
