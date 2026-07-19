@@ -169,9 +169,18 @@
         const { useState, useEffect, useMemo, useRef } = React;
 
         // Supabase configuration
+        let initialUrl = 'https://ykoallfmckyoiwmtbvjp.supabase.co';
+        let initialKey = '';
+        try {
+            initialUrl = localStorage.getItem('notksp_supabase_url') || 'https://ykoallfmckyoiwmtbvjp.supabase.co';
+            initialKey = localStorage.getItem('notksp_supabase_anon_key') || '';
+        } catch (e) {
+            console.warn("localStorage read failed:", e);
+        }
+
         const SUPABASE_CONFIG = {
-            url: localStorage.getItem('notksp_supabase_url') || 'https://ykoallfmckyoiwmtbvjp.supabase.co',
-            anonKey: localStorage.getItem('notksp_supabase_anon_key') || ''
+            url: initialUrl,
+            anonKey: initialKey
         };
 
         let supabase = null;
@@ -2707,13 +2716,17 @@
                                         <button 
                                             onClick={async () => {
                                                 if (!supabaseUrl.trim() || !supabaseKey.trim()) {
-                                                    localStorage.removeItem('notksp_supabase_url');
-                                                    localStorage.removeItem('notksp_supabase_anon_key');
+                                                    try {
+                                                        localStorage.removeItem('notksp_supabase_url');
+                                                        localStorage.removeItem('notksp_supabase_anon_key');
+                                                    } catch (e) {}
                                                     window.location.reload();
                                                     return;
                                                 }
-                                                localStorage.setItem('notksp_supabase_url', supabaseUrl.trim());
-                                                localStorage.setItem('notksp_supabase_anon_key', supabaseKey.trim());
+                                                try {
+                                                    localStorage.setItem('notksp_supabase_url', supabaseUrl.trim());
+                                                    localStorage.setItem('notksp_supabase_anon_key', supabaseKey.trim());
+                                                } catch (e) {}
                                                 showToast('ההגדרות נשמרו. האתר נטען מחדש...', 'cta');
                                                 setTimeout(() => window.location.reload(), 1000);
                                             }}
@@ -2725,8 +2738,10 @@
                                             onClick={() => {
                                                 setSupabaseUrl('');
                                                 setSupabaseKey('');
-                                                localStorage.removeItem('notksp_supabase_url');
-                                                localStorage.removeItem('notksp_supabase_anon_key');
+                                                try {
+                                                    localStorage.removeItem('notksp_supabase_url');
+                                                    localStorage.removeItem('notksp_supabase_anon_key');
+                                                } catch (e) {}
                                                 showToast('החיבור נמחק. האתר נטען מחדש...', 'slate');
                                                 setTimeout(() => window.location.reload(), 1000);
                                             }}
