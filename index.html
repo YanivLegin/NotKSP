@@ -755,15 +755,21 @@
         };
 
         const stockMeta = (qty) => {
+            const currentLang = window.currentLang || 'he';
+            if (currentLang === 'en') {
+                if (qty <= 0) return { label: "Out of Stock", cls: "bg-red-100 text-red-700 border-red-200", dot: "bg-red-500" };
+                if (qty <= 3) return { label: `Low Stock · Only ${qty} left`, cls: "bg-amber-100 text-amber-700 border-amber-200", dot: "bg-amber-500" };
+                return { label: `In Stock · ${qty} units`, cls: "bg-cta-light text-cta-hover border-cta/30", dot: "bg-cta" };
+            }
             if (qty <= 0) return { label: "אזל מהמלאי", cls: "bg-red-100 text-red-700 border-red-200", dot: "bg-red-500" };
             if (qty <= 3) return { label: `מלאי נמוך · נותרו ${qty}`, cls: "bg-amber-100 text-amber-700 border-amber-200", dot: "bg-amber-500" };
             return { label: `במלאי · ${qty} יח׳`, cls: "bg-cta-light text-cta-hover border-cta/30", dot: "bg-cta" };
         };
 
-        // ============================================================
-        //  NEW: Admin components (statistical dashboard, inventory, etc.)
-        // ============================================================
-        const catName = (id) => (CATEGORIES.find(c => c.id === id) || {}).name || id;
+        const catName = (id) => {
+            const cat = CATEGORIES.find(c => c.id === id);
+            return getCategoryName(cat) || id;
+        };
 
         const AdminDashboard = ({ catalog, orders, requests, users, wishlistMap }) => {
             const totalUnits = catalog.reduce((s, p) => s + p.stock_quantity, 0);
@@ -1060,6 +1066,228 @@
             </div>
         );
 
+        const TRANSLATIONS = {
+            he: {
+                logoSub: "אלקטרוניקה נקייה, בלי הבלגן",
+                searchPlaceholder: "חפשו מוצרים, מותגים או תכונות...",
+                cart: "עגלת קניות",
+                login: "התחברות",
+                logout: "התנתקות",
+                register: "הרשמה",
+                adminArea: "אזור ניהול",
+                allProducts: "כל המוצרים",
+                noProducts: "לא נמצאו מוצרים תואמים את החיפוש.",
+                foundProducts: "נמצאו {count} מוצרים",
+                sortBy: "מיון לפי:",
+                sortPopular: "פופולריות",
+                sortPriceLow: "מחיר: מהנמוך לגבוה",
+                sortPriceHigh: "מחיר: מהגבוה לנמוך",
+                addToCart: "הוסף לעגלה",
+                outOfStock: "אזל מהמלאי",
+                requestRestock: "בקש חידוש מלאי",
+                inStock: "במלאי",
+                specs: "מפרט טכני מלא",
+                description: "תיאור המוצר",
+                wishlist: "משאלות",
+                emptyCart: "העגלה שלך ריקה",
+                cartTotal: "סה\"כ לתשלום:",
+                checkout: "מעבר לקופה",
+                shippingDetails: "פרטי משלוח",
+                fullName: "שם מלא *",
+                phone: "מספר טלפון *",
+                email: "כתובת אימייל (מומלץ לקבלת קבלה)",
+                address: "כתובת למשלוח *",
+                confirmOrder: "אישור הזמנה וביצוע תשלום",
+                orderSuccess: "ההזמנה בוצעה בהצלחה!",
+                orderNumber: "מספר הזמנה:",
+                backToStore: "חזרה לחנות",
+                footerText: "כל הזכויות שמורות NotKSP © 2026. נבנה כפרויקט הדגמה.",
+                hello: "שלום",
+                adminDashboard: "לוח בקרה מנהל",
+                inventoryManagement: "ניהול מלאי",
+                replenishRequests: "בקשות מלאי",
+                ordersTitle: "הזמנות"
+            },
+            en: {
+                logoSub: "Clean electronics, no mess",
+                searchPlaceholder: "Search products, brands or specs...",
+                cart: "Cart",
+                login: "Login",
+                logout: "Logout",
+                register: "Register",
+                adminArea: "Admin View",
+                allProducts: "All Products",
+                noProducts: "No products found matching your search.",
+                foundProducts: "Found {count} products",
+                sortBy: "Sort by:",
+                sortPopular: "Popularity",
+                sortPriceLow: "Price: Low to High",
+                sortPriceHigh: "Price: High to Low",
+                addToCart: "Add to Cart",
+                outOfStock: "Out of Stock",
+                requestRestock: "Request Restock",
+                inStock: "In stock",
+                specs: "Technical Specifications",
+                description: "Description",
+                wishlist: "Wishlist",
+                emptyCart: "Your cart is empty",
+                cartTotal: "Total Amount:",
+                checkout: "Checkout",
+                shippingDetails: "Shipping Details",
+                fullName: "Full Name *",
+                phone: "Phone Number *",
+                email: "Email Address (for receipt)",
+                address: "Shipping Address *",
+                confirmOrder: "Confirm Order & Pay",
+                orderSuccess: "Order Placed Successfully!",
+                orderNumber: "Order Number:",
+                backToStore: "Back to Store",
+                footerText: "All rights reserved NotKSP © 2026. Built as a demo project.",
+                hello: "Hello",
+                adminDashboard: "Admin Dashboard",
+                inventoryManagement: "Inventory Management",
+                replenishRequests: "Stock Requests",
+                ordersTitle: "Orders"
+            }
+        };
+
+        const t = (key, replacements = {}) => {
+            const currentLang = window.currentLang || 'he';
+            let text = TRANSLATIONS[currentLang]?.[key] || TRANSLATIONS['he'][key] || key;
+            Object.keys(replacements).forEach(k => {
+                text = text.replace(`{${k}}`, replacements[k]);
+            });
+            return text;
+        };
+
+        const getCategoryName = (cat) => {
+            if (!cat) return "";
+            const currentLang = window.currentLang || 'he';
+            if (currentLang === 'en') {
+                const enNames = {
+                    'all': 'All Products',
+                    'computers': 'Computers',
+                    'tv_audio': 'TV & Audio',
+                    'smart_home': 'Smart Home',
+                    'audio_accessories': 'Audio & Accessories',
+                    'wearables': 'Wearables',
+                    'gaming': 'Gaming',
+                    'small_appliances': 'Kitchen Appliances',
+                    'computer_accessories': 'Computer Accessories'
+                };
+                return enNames[cat.id] || cat.name;
+            }
+            return cat.name;
+        };
+
+        const translateSpecKey = (key) => {
+            if (window.currentLang !== 'en') return key;
+            const dict = {
+                "מעבד": "Processor",
+                "זיכרון RAM": "RAM",
+                "אחסון": "Storage",
+                "מסך": "Display",
+                "כרטיס מסך": "Graphics Card",
+                "קישוריות": "Connectivity",
+                "סוללה": "Battery",
+                "משקל": "Weight",
+                "מערכת הפעלה": "OS",
+                "גודל מסך": "Screen Size",
+                "רזולוציה": "Resolution",
+                "קצב רענון": "Refresh Rate",
+                "טכנולוגיית תמונה": "Picture Technology",
+                "שמע": "Audio",
+                "חיבורים": "Ports",
+                "שפת ממשק": "System Language",
+                "עוצמת שאיבה": "Suction Power",
+                "מערכת ניווט": "Navigation System",
+                "פעולות": "Operations",
+                "נפח מכל אבק": "Dust Collector Capacity",
+                "נפח מכל מים": "Water Tank Capacity",
+                "שליטה": "Control Method",
+                "תאימות בית חכם": "Smart Home Compatibility",
+                "קוטר דרייבר": "Driver Diameter",
+                "סינון רעשים": "Noise Cancellation",
+                "חיי סוללה": "Battery Life",
+                "טעינה": "Charging Port",
+                "מיקרופונים": "Microphones",
+                "אביזרים נלווים": "Accessories Included",
+                "חומרי מבנה": "Build Materials",
+                "עמידות למים": "Water Resistance",
+                "חיישנים": "Sensors",
+                "מעקב ספורט": "Sport Tracking Modes",
+                "תכונות חכמות": "Smart Features",
+                "סוג חיבור": "Connection Type",
+                "טווח קליטה": "Wireless Range",
+                "תאימות": "Compatibility",
+                "משוב": "Haptic Feedback",
+                "מקשים": "Keys/Buttons",
+                "תאורה": "Lighting",
+                "לחץ משאבה": "Pump Pressure",
+                "מכל פולים": "Bean Container Capacity",
+                "טוחן קפה": "Grinder Type",
+                "מכל מים": "Water Container Capacity",
+                "הקצפת חלב": "Milk Frothing",
+                "בקרת טמפרטורה": "Temperature Control",
+                "ניקוי ותחזוקה": "Cleaning & Maintenance",
+                "סוג פאנל": "Panel Type",
+                "זמן תגובה": "Response Time",
+                "יחס ניגודיות": "Contrast Ratio",
+                "תמיכה בסנכרון": "Sync Technology",
+                "ארגונומיה": "Ergonomics",
+                "נפח אחסון": "Storage Capacity",
+                "מצלמה אחורית": "Rear Camera",
+                "מצלמה קדמית": "Front Camera",
+                "חיבור טעינה": "Charging Interface",
+                "אבטחה": "Security",
+                "תאימות עט": "Stylus Compatibility",
+                "הספק כולל": "Total Power",
+                "סאב-וופר": "Subwoofer",
+                "קישוריות אלחוטית": "Wireless Connectivity",
+                "תקני שמע": "Audio Standards",
+                "מידות מקרן קול": "Soundbar Dimensions",
+                "משקל כולל": "Total Weight",
+                "ראיית לילה": "Night Vision",
+                "עמידות": "Durability",
+                "זיהוי תנועה": "Motion Detection",
+                "תכונות מיוחדות": "Special Features",
+                "הספק מוצא": "Output Power",
+                "מעקב בריאות": "Health Tracking",
+                "פעילויות ספורט": "Sport Activities",
+                "רצועות": "Straps",
+                "סוג מתגים": "Switch Type",
+                "מבנה": "Structure",
+                "קצב דיווח (Polling Rate)": "Polling Rate",
+                "בקרת מדיה": "Media Controls",
+                "חיבור": "Connection",
+                "זיכרון מובנה": "Onboard Memory",
+                "חיישן": "Sensor",
+                "חיבור אלחוטי": "Wireless Connection",
+                "רגליות עכבר": "Mouse Feet",
+                "מספר מקשים": "Number of Keys",
+                "תאימות טעינה": "Charging Compatibility",
+                "עוצמת חימום": "Heating Power",
+                "טכנולוגיית בישול": "Cooking Technology",
+                "תוכניות בישול": "Cooking Programs",
+                "בקרת עשייה": "Cooking Control",
+                "נפח בישול": "Cooking Capacity",
+                "ניקוי": "Cleaning",
+                "מסנן עשן": "Smoke Filter",
+                "תקן אלחוטי": "Wireless Standard",
+                "מהירות ערוצים": "Channel Speeds",
+                "אנטנות": "Antennas",
+                "מהירות קריאה": "Read Speed",
+                "מהירות כתיבה": "Write Speed",
+                "עמידות ומוגנות": "Protection & Durability",
+                "חיבור פיזי": "Physical Interface",
+                "אבטחה ופרטיות": "Security & Privacy",
+                "עיצוב": "Design",
+                "חיבור אלחוטי כפול": "Dual Wireless Connection",
+                "מיקרופון": "Microphone"
+            };
+            return dict[key] || key;
+        };
+
         // ============================================================
         //  NEW: Auth modal — login / register / forgot password
         // ============================================================
@@ -1280,6 +1508,27 @@
                     localStorage.setItem('notksp_theme', theme);
                 } catch (e) {}
             }, [theme]);
+
+            // ===== Language state (Hebrew / English) =====
+            const [lang, setLang] = useState(() => {
+                try {
+                    const saved = localStorage.getItem('notksp_lang') || 'he';
+                    window.currentLang = saved;
+                    return saved;
+                } catch (e) {
+                    window.currentLang = 'he';
+                    return 'he';
+                }
+            });
+
+            useEffect(() => {
+                window.currentLang = lang;
+                document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+                document.documentElement.lang = lang;
+                try {
+                    localStorage.setItem('notksp_lang', lang);
+                } catch (e) {}
+            }, [lang]);
 
             // ===== NEW: UI state =====
             const [isWishlistOpen, setIsWishlistOpen] = useState(false);
@@ -1997,33 +2246,50 @@
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
                             
                             {/* Logo */}
-                            <a href="#" onClick={(e) => { e.preventDefault(); setView('home'); }} className="flex items-center gap-2 select-none group">
-                                <div className="bg-cta p-2 rounded-lg text-primary font-black shadow-glow transform transition-transform group-hover:scale-105">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
-                                </div>
-                                <div className="text-right">
-                                    <span className="font-heebo font-black text-2xl tracking-tight block leading-none">Not<span className="text-cta">KSP</span></span>
-                                    <span className="text-[10px] text-slate-300 font-light block mt-0.5">אלקטרוניקה נקייה, בלי הבלגן</span>
-                                </div>
-                            </a>
+                            <div className="flex items-center gap-4">
+                                <a href="#" onClick={(e) => { e.preventDefault(); setView('home'); }} className="flex items-center gap-2 select-none group">
+                                    <div className="bg-cta p-2 rounded-lg text-primary font-black shadow-glow transform transition-transform group-hover:scale-105">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
+                                    </div>
+                                    <div className={lang === 'he' ? 'text-right' : 'text-left'}>
+                                        <span className="font-heebo font-black text-2xl tracking-tight block leading-none">Not<span className="text-cta">KSP</span></span>
+                                        <span className="text-[10px] text-slate-300 font-light block mt-0.5">{t('logoSub')}</span>
+                                    </div>
+                                </a>
+                                
+                                {/* Language Switcher (Top Right next to Logo) */}
+                                <button
+                                    onClick={() => setLang(prev => prev === 'he' ? 'en' : 'he')}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-light hover:bg-primary-dark border border-slate-600 hover:border-slate-500 text-white font-bold text-xs transition-all cursor-pointer shadow-sm active:scale-95"
+                                >
+                                    <i data-lucide="globe" className="w-3.5 h-3.5 text-cta"></i>
+                                    {lang === 'he' ? 'EN' : 'עב'}
+                                </button>
+                            </div>
 
                             {/* Search bar */}
                             {view === 'home' && (
                                 <div className="flex-1 max-w-lg relative group">
-                                    <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-cta transition-colors">
+                                    <div className={`absolute inset-y-0 flex items-center pointer-events-none text-slate-400 group-focus-within:text-cta transition-colors ${
+                                        lang === 'he' ? 'right-3' : 'left-3'
+                                    }`}>
                                         <i data-lucide="search" className="w-5 h-5"></i>
                                     </div>
                                     <input 
                                         type="text" 
-                                        placeholder="חפשו מוצרים, מותגים או תכונות..." 
+                                        placeholder={t('searchPlaceholder')} 
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pr-10 pl-4 py-2 bg-primary-light border border-slate-600 rounded-full text-white placeholder-slate-400 focus:outline-none focus:border-cta focus:ring-1 focus:ring-cta text-sm transition-all shadow-inner"
+                                        className={`w-full py-2 bg-primary-light border border-slate-600 rounded-full text-white placeholder-slate-400 focus:outline-none focus:border-cta focus:ring-1 focus:ring-cta text-sm transition-all shadow-inner ${
+                                            lang === 'he' ? 'pr-10 pl-4 text-right' : 'pl-10 pr-4 text-left'
+                                        }`}
                                     />
                                     {searchQuery && (
                                         <button 
                                             onClick={() => setSearchQuery('')}
-                                            className="absolute inset-y-0 left-3 flex items-center text-slate-400 hover:text-white"
+                                            className={`absolute inset-y-0 flex items-center text-slate-400 hover:text-white ${
+                                                lang === 'he' ? 'left-3' : 'right-3'
+                                            }`}
                                         >
                                             <i data-lucide="x" className="w-4 h-4"></i>
                                         </button>
@@ -2125,16 +2391,16 @@
                                                         <div className="text-xs font-bold text-slate-800 truncate">{currentUser.name}</div>
                                                         <div className="text-[10px] text-slate-400 truncate" dir="ltr">{currentUser.email}</div>
                                                     </div>
-                                                    <button onClick={() => { setAccountMenuOpen(false); setIsWishlistOpen(true); }} className="w-full text-right px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 justify-end">
-                                                        רשימת המשאלות שלי <i data-lucide="heart" className="w-4 h-4 text-slate-400"></i>
+                                                    <button onClick={() => { setAccountMenuOpen(false); setIsWishlistOpen(true); }} className={`w-full px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 ${lang === 'he' ? 'text-right justify-end' : 'text-left justify-start flex-row-reverse'}`}>
+                                                        {lang === 'en' ? 'My Wishlist' : 'רשימת המשאלות שלי'} <i data-lucide="heart" className="w-4 h-4 text-slate-400"></i>
                                                     </button>
                                                     {currentUser.role === 'admin' && (
-                                                        <button onClick={() => { setAccountMenuOpen(false); setView('admin'); setAdminTab('dashboard'); }} className="w-full text-right px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 justify-end">
-                                                            אזור ניהול <i data-lucide="layout-dashboard" className="w-4 h-4 text-slate-400"></i>
+                                                        <button onClick={() => { setAccountMenuOpen(false); setView('admin'); setAdminTab('dashboard'); }} className={`w-full px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 ${lang === 'he' ? 'text-right justify-end' : 'text-left justify-start flex-row-reverse'}`}>
+                                                            {t('adminArea')} <i data-lucide="layout-dashboard" className="w-4 h-4 text-slate-400"></i>
                                                         </button>
                                                     )}
-                                                    <button onClick={logoutUser} className="w-full text-right px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2 justify-end">
-                                                        התנתקות <i data-lucide="log-out" className="w-4 h-4"></i>
+                                                    <button onClick={logoutUser} className={`w-full px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2 ${lang === 'he' ? 'text-right justify-end' : 'text-left justify-start flex-row-reverse'}`}>
+                                                        {t('logout')} <i data-lucide="log-out" className="w-4 h-4"></i>
                                                     </button>
                                                 </div>
                                             </>
@@ -2144,10 +2410,10 @@
                                     <button
                                         onClick={() => { setAuthTab('login'); setAuthOpen(true); }}
                                         className="flex items-center gap-1.5 bg-primary-light hover:bg-primary-dark border border-slate-600 hover:border-slate-500 rounded-full px-3 py-2.5 transition-all text-white"
-                                        aria-label="התחברות"
+                                        aria-label={t('login')}
                                     >
                                         <i data-lucide="user" className="w-5 h-5"></i>
-                                        <span className="hidden sm:block text-xs font-bold">התחברות</span>
+                                        <span className="hidden sm:block text-xs font-bold">{t('login')}</span>
                                     </button>
                                 )}
                             </div>
@@ -2168,7 +2434,7 @@
                                             }`}
                                         >
                                             <CategoryIcon iconName={cat.icon} className="w-4 h-4" />
-                                            {cat.name}
+                                            {getCategoryName(cat)}
                                         </button>
                                     ))}
                                 </div>
@@ -2223,11 +2489,11 @@
                                     <div>
                                         <h2 className="text-xl sm:text-2xl font-heebo font-black text-slate-900">
                                             {selectedCategory === 'all' 
-                                                ? 'הקטלוג שלנו' 
-                                                : CATEGORIES.find(c => c.id === selectedCategory)?.name
+                                                ? (lang === 'en' ? 'Our Catalog' : 'הקטלוג שלנו') 
+                                                : getCategoryName(CATEGORIES.find(c => c.id === selectedCategory))
                                             }
                                         </h2>
-                                        <p className="text-xs text-slate-500 mt-1">מציג {filteredProducts.length} מוצרים</p>
+                                        <p className="text-xs text-slate-500 mt-1">{t('foundProducts', { count: filteredProducts.length })}</p>
                                     </div>
                                     {searchQuery && (
                                         <div className="bg-slate-100 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 text-slate-600">
@@ -2727,12 +2993,12 @@
                                             <div className="space-y-2">
                                                 <h3 className="font-heebo font-bold text-slate-800 text-sm border-b border-slate-100 pb-1 flex items-center gap-1.5">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-slate-500"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-                                                    מפרט טכני מלא
+                                                    {t('specs')}
                                                 </h3>
                                                 <div className="space-y-1.5 text-xs text-slate-700">
                                                     {Object.entries(activeProduct.specifications).map(([key, val]) => (
                                                         <div key={key} className="flex justify-between py-1 border-b border-dashed border-slate-100 gap-4">
-                                                            <span className="font-semibold text-slate-500 shrink-0">{key}</span>
+                                                            <span className="font-semibold text-slate-500 shrink-0">{translateSpecKey(key)}</span>
                                                             <span className="text-slate-800 text-left">{val}</span>
                                                         </div>
                                                     ))}
@@ -2744,7 +3010,7 @@
                                         {similarProducts.length > 0 && (
                                             <div className="space-y-2 pt-2">
                                                 <h3 className="font-heebo font-bold text-slate-800 text-sm border-b border-slate-100 pb-1">
-                                                    אולי יעניין אותך גם
+                                                    {lang === 'en' ? 'Similar Products' : 'אולי יעניין אותך גם'}
                                                 </h3>
                                                 <div className="grid grid-cols-3 gap-2">
                                                     {similarProducts.map(prod => (
