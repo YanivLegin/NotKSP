@@ -148,3 +148,15 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- Function to allow users to self-delete their account (runs as security definer to bypass RLS on auth.users)
+create or replace function public.delete_current_user()
+returns void
+language plpgsql
+security definer
+as $$
+begin
+  -- Deleting from auth.users cascades to public.profiles
+  delete from auth.users where id = auth.uid();
+end;
+$$;
