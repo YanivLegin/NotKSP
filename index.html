@@ -22,6 +22,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -63,6 +64,82 @@
             scroll-behavior: smooth;
         }
         
+        /* Dark Mode Global Overrides for 100% Readability and Aesthetics */
+        .dark body {
+            background-color: #0b1320 !important;
+            color: #f1f5f9 !important;
+        }
+        
+        .dark .bg-white {
+            background-color: #121e31 !important;
+            border-color: #1e2e46 !important;
+        }
+        
+        .dark .bg-secondary {
+            background-color: #0b1320 !important;
+        }
+        
+        .dark .bg-slate-50,
+        .dark .bg-slate-100,
+        .dark .bg-slate-200 {
+            background-color: #18263a !important;
+            border-color: #24354b !important;
+        }
+        
+        .dark .text-slate-900,
+        .dark .text-slate-800,
+        .dark .text-slate-700,
+        .dark .text-primary {
+            color: #f1f5f9 !important;
+        }
+        
+        .dark .text-slate-600,
+        .dark .text-slate-500,
+        .dark .text-primary-light {
+            color: #cbd5e1 !important;
+        }
+        
+        .dark .text-slate-400 {
+            color: #94a3b8 !important;
+        }
+        
+        .dark .border-slate-100,
+        .dark .border-slate-200,
+        .dark .border-slate-300 {
+            border-color: #1e2e46 !important;
+        }
+        
+        .dark input,
+        .dark select,
+        .dark textarea {
+            background-color: #18263a !important;
+            color: #ffffff !important;
+            border-color: #24354b !important;
+        }
+        
+        .dark input::placeholder,
+        .dark textarea::placeholder {
+            color: #64748b !important;
+        }
+        
+        .dark .shadow-premium {
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        .dark .shadow-premium-hover:hover {
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6), 0 1px 5px rgba(0, 0, 0, 0.2) !important;
+        }
+        
+        .dark .bg-white.rounded-2xl {
+            background-color: #121e31 !important;
+            border-color: #1e2e46 !important;
+        }
+
+        .dark .hover\:bg-slate-200:hover,
+        .dark .hover\:bg-slate-100:hover {
+            background-color: #1f3047 !important;
+        }
+
         /* Hide scrollbars but keep functionality */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
@@ -1184,6 +1261,26 @@
             const [seedingStatus, setSeedingStatus] = useState('');     // '', 'seeding', 'success', 'error'
             const [dbProducts, setDbProducts] = useState([]);           // Products from Supabase
 
+            // ===== Theme state (Light / Dark Mode) =====
+            const [theme, setTheme] = useState(() => {
+                try {
+                    return localStorage.getItem('notksp_theme') || 'light';
+                } catch (e) {
+                    return 'light';
+                }
+            });
+
+            useEffect(() => {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                try {
+                    localStorage.setItem('notksp_theme', theme);
+                } catch (e) {}
+            }, [theme]);
+
             // ===== NEW: UI state =====
             const [isWishlistOpen, setIsWishlistOpen] = useState(false);
             const [authOpen, setAuthOpen] = useState(false);            // login/register modal
@@ -1380,7 +1477,7 @@
             // Keep Lucide icons refreshed as new UI mounts
             useEffect(() => {
                 if (window.lucide) window.lucide.createIcons();
-            }, [isWishlistOpen, authOpen, authTab, accountMenuOpen, adminTab, requestProduct, toast, currentUser, customProducts, stockMap, requests, orders, isSupabaseModalOpen]);
+            }, [isWishlistOpen, authOpen, authTab, accountMenuOpen, adminTab, requestProduct, toast, currentUser, customProducts, stockMap, requests, orders, isSupabaseModalOpen, theme]);
 
             // Prefill checkout fields for logged-in users
             useEffect(() => {
@@ -1411,7 +1508,7 @@
                 if (window.lucide) {
                     window.lucide.createIcons();
                 }
-            }, [view, activeProduct, isCartOpen, selectedCategory, searchQuery]);
+            }, [view, activeProduct, isCartOpen, selectedCategory, searchQuery, theme]);
 
             // Add product to recently viewed (max 4, no duplicates, move to front)
             const addToRecentlyViewed = (productId) => {
@@ -1936,6 +2033,15 @@
 
                             {/* Actions */}
                             <div className="flex items-center gap-2 sm:gap-3">
+                                {/* Theme Toggle (Light / Dark Mode) */}
+                                <button
+                                    onClick={() => setTheme(prev => prev === 'light' ? 'dark' : 'light')}
+                                    className="p-2.5 rounded-full bg-primary-light hover:bg-primary-dark border border-slate-600 hover:border-slate-500 text-white transition-all flex items-center justify-center cursor-pointer"
+                                    title={theme === 'light' ? 'עבור למצב כהה' : 'עבור למצב בהיר'}
+                                >
+                                    <i data-lucide={theme === 'light' ? 'moon' : 'sun'} className="w-4 h-4 text-cta"></i>
+                                </button>
+
                                 {/* Supabase Status Badge */}
                                 {currentUser && currentUser.role === 'admin' && (
                                     <button
