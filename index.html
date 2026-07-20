@@ -1572,6 +1572,10 @@
             // ---- Inventory management (admin) ----
             const setStock = async (id, qty) => {
                 const q = Math.max(0, parseInt(qty, 10) || 0);
+                
+                // Optimistic UI Update
+                persistStock({ ...stockMap, [id]: q });
+                
                 if (isSupabaseConnected && supabaseClient) {
                     try {
                         const { error } = await supabaseClient
@@ -1579,14 +1583,12 @@
                             .update({ stock_quantity: q })
                             .eq('id', id);
                         if (error) throw error;
-                        fetchSupabaseData(); // reload
-                        showToast('המלאי עודכן ב-Supabase');
-                        return;
+                        fetchSupabaseData(); // reload in background
+                        showToast('המלאי עודכן בהצלחה');
                     } catch (e) {
                         showToast('שגיאה בעדכון המלאי: ' + e.message, 'amber');
                     }
                 }
-                persistStock({ ...stockMap, [id]: q });
             };
             const adjustStock = async (id, delta) => await setStock(id, stockOf(id) + delta);
 
@@ -1603,37 +1605,38 @@
                     specifications: data.specifications || {}
                 };
 
+                // Optimistic UI Update
+                persistCustom([...customProducts, product]);
+                persistStock({ ...stockMap, [id]: product.stock_quantity });
+
                 if (isSupabaseConnected && supabaseClient) {
                     try {
                         const { error } = await supabaseClient.from('products').insert(product);
                         if (error) throw error;
                         fetchSupabaseData(); // reload
-                        showToast('המוצר נוסף ל-Supabase בהצלחה!');
-                        return product;
+                        showToast('המוצר נוסף בהצלחה!');
                     } catch (e) {
                         showToast('שגיאה בהוספת המוצר ל-Supabase: ' + e.message, 'amber');
                     }
                 }
-
-                persistCustom([...customProducts, product]);
-                persistStock({ ...stockMap, [id]: product.stock_quantity });
                 return product;
             };
 
             const deleteCustomProduct = async (id) => {
+                // Optimistic UI Update
+                persistCustom(customProducts.filter(p => p.id !== id));
+                const m = { ...stockMap }; delete m[id]; persistStock(m);
+
                 if (isSupabaseConnected && supabaseClient) {
                     try {
                         const { error } = await supabaseClient.from('products').delete().eq('id', id);
                         if (error) throw error;
                         fetchSupabaseData(); // reload
-                        showToast('המוצר נמחק מ-Supabase בהצלחה');
-                        return;
+                        showToast('המוצר נמחק בהצלחה');
                     } catch (e) {
                         showToast('שגיאה במחיקת המוצר: ' + e.message, 'amber');
                     }
                 }
-                persistCustom(customProducts.filter(p => p.id !== id));
-                const m = { ...stockMap }; delete m[id]; persistStock(m);
             };
 
             // ---- Auth ----
