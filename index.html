@@ -1554,6 +1554,14 @@
                         showToast('התחברת בהצלחה!');
                         return { ok: true };
                     } catch (e) {
+                        // Supabase auth failed — try offline fallback (covers hardcoded admin)
+                        const user = users.find(u => u.email === email);
+                        if (user && user.passwordHash === pseudoHash(password)) {
+                            setCurrentUser(user);
+                            LS.set('notksp_session', user.email);
+                            showToast('התחברת בהצלחה!');
+                            return { ok: true, user };
+                        }
                         return { ok: false, error: e.message || "אימייל או סיסמה שגויים" };
                     }
                 }
