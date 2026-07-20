@@ -218,7 +218,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo, useRef, useCallback, memo } = React;
+        const { useState, useEffect, useMemo, useRef } = React;
 
         // Supabase configuration
         let initialUrl = 'https://ykoallfmckyoiwmtbvjp.supabase.co';
@@ -820,10 +820,20 @@
             </div>
         );
 
+        // Field helper — defined OUTSIDE AuthModal so it is never re-created on
+        // each keystroke, which would cause React to unmount/remount inputs.
+        const AuthField = ({ label, err, children }) => (
+            <div className="space-y-1">
+                <label className="block text-xs font-bold text-slate-700">{label}</label>
+                {children}
+                {err && <p className="text-red-500 text-xs font-semibold">{err}</p>}
+            </div>
+        );
+
         // ============================================================
-        //  NEW: Auth modal — login / register / forgot password
+        //  Auth modal — login / register / forgot password
         // ============================================================
-        const AuthModal = memo(({ initialTab, onClose, onLogin, onRegister, onReset }) => {
+        const AuthModal = ({ initialTab, onClose, onLogin, onRegister, onReset }) => {
             const [tab, setTab] = useState(initialTab || 'login');
             const [name, setName] = useState('');
             const [email, setEmail] = useState('');
@@ -871,13 +881,6 @@
             };
 
             const inputCls = (err) => `w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 ${err ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'}`;
-            const Field = ({ label, err, children }) => (
-                <div className="space-y-1">
-                    <label className="block text-xs font-bold text-slate-700">{label}</label>
-                    {children}
-                    {err && <p className="text-red-500 text-xs font-semibold">{err}</p>}
-                </div>
-            );
 
             return (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
@@ -909,27 +912,27 @@
                             {formError && <div className="bg-red-50 border border-red-200 text-red-600 text-xs font-semibold rounded-lg p-3 flex items-center gap-2"><i data-lucide="alert-circle" className="w-4 h-4 shrink-0"></i>{formError}</div>}
 
                             {tab === 'register' && (
-                                <Field label="שם מלא *" err={errors.name}>
+                                <AuthField label="שם מלא *" err={errors.name}>
                                     <input value={name} onChange={e => setName(e.target.value)} placeholder="ישראל ישראלי" className={inputCls(errors.name)} />
-                                </Field>
+                                </AuthField>
                             )}
 
                             {(tab === 'login' || tab === 'register' || tab === 'forgot') && (
-                                <Field label="אימייל *" err={errors.email}>
+                                <AuthField label="אימייל *" err={errors.email}>
                                     <input value={email} onChange={e => setEmail(e.target.value)} placeholder="name@example.com" dir="ltr" className={inputCls(errors.email) + ' text-left'} />
-                                </Field>
+                                </AuthField>
                             )}
 
                             {(tab === 'login' || tab === 'register') && (
-                                <Field label="סיסמה *" err={errors.password}>
+                                <AuthField label="סיסמה *" err={errors.password}>
                                     <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="לפחות 6 תווים, אות וספרה" dir="ltr" className={inputCls(errors.password) + ' text-left'} />
-                                </Field>
+                                </AuthField>
                             )}
 
                             {tab === 'register' && (
-                                <Field label="אימות סיסמה *" err={errors.confirm}>
+                                <AuthField label="אימות סיסמה *" err={errors.confirm}>
                                     <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} dir="ltr" className={inputCls(errors.confirm) + ' text-left'} />
-                                </Field>
+                                </AuthField>
                             )}
 
                             {tab === 'login' && (
@@ -982,8 +985,7 @@
                     </div>
                 </div>
             );
-        }); // end AuthModal (memo)
-
+        }; // end AuthModal
 
         function App() {
             // State
@@ -1607,12 +1609,6 @@
                 // No backend configured yet -> simulate and surface the token for the demo
                 return { ok: true, sent: false, token, resetLink };
             };
-
-            // Stable refs for AuthModal to prevent re-mount on every render
-            const stableAuthClose    = useCallback(() => setAuthOpen(false), []);
-            const stableAuthLogin    = useCallback(loginUser, []);
-            const stableAuthRegister = useCallback(registerUser, []);
-            const stableAuthReset    = useCallback(requestPasswordReset, []);
 
             const isWishlisted = (id) => wishlist.includes(id);
             const toggleWishlist = async (id) => {
@@ -3097,10 +3093,10 @@
                     {authOpen && (
                         <AuthModal
                             initialTab={authTab}
-                            onClose={stableAuthClose}
-                            onLogin={stableAuthLogin}
-                            onRegister={stableAuthRegister}
-                            onReset={stableAuthReset}
+                            onClose={() => setAuthOpen(false)}
+                            onLogin={loginUser}
+                            onRegister={registerUser}
+                            onReset={requestPasswordReset}
                         />
                     )}
 
