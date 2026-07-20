@@ -1608,7 +1608,12 @@
                 return { ok: true, sent: false, token, resetLink };
             };
 
-            // ---- Wishlist ----
+            // Stable refs for AuthModal to prevent re-mount on every render
+            const stableAuthClose    = useCallback(() => setAuthOpen(false), []);
+            const stableAuthLogin    = useCallback(loginUser, []);
+            const stableAuthRegister = useCallback(registerUser, []);
+            const stableAuthReset    = useCallback(requestPasswordReset, []);
+
             const isWishlisted = (id) => wishlist.includes(id);
             const toggleWishlist = async (id) => {
                 const current = wishlistMap[wishlistKey] || [];
@@ -3092,10 +3097,10 @@
                     {authOpen && (
                         <AuthModal
                             initialTab={authTab}
-                            onClose={useCallback(() => setAuthOpen(false), [])}
-                            onLogin={useCallback(loginUser, [])}
-                            onRegister={useCallback(registerUser, [])}
-                            onReset={useCallback(requestPasswordReset, [])}
+                            onClose={stableAuthClose}
+                            onLogin={stableAuthLogin}
+                            onRegister={stableAuthRegister}
+                            onReset={stableAuthReset}
                         />
                     )}
 
