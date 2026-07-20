@@ -1687,6 +1687,8 @@
                             msg = 'האימייל לא אושר — אשר אותו ב-Supabase Dashboard או בטל את חובת האישור';
                         else if (msg.includes('Too many requests'))
                             msg = 'יותר מדי ניסיונות — נסה שוב בעוד מספר דקות';
+                        else if (msg.includes('Email logins are disabled'))
+                            msg = 'התחברות באמצעות אימייל כבויה ב-Supabase! אנא הדלק את האפשרות "Enable Email provider" בהגדרות.';
 
                         // Offline fallback (covers hardcoded admin)
                         const user = users.find(u => u.email === email);
