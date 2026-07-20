@@ -326,6 +326,11 @@
             anonKey: initialKey
         };
 
+        // Language stub — site is Hebrew-only; these exist to prevent crashes
+        // from leftover translation references in the codebase.
+        const lang = 'he';
+        const t = (key) => key;
+
         let supabaseClient = null;
         if (SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
             try {
