@@ -509,6 +509,18 @@
         // ============================================================
         //  NEW: Storage helpers (localStorage-based persistence layer)
         // ============================================================
+        
+        const Icon = ({ name, className }) => {
+            const ref = React.useRef(null);
+            React.useEffect(() => {
+                if (ref.current && window.lucide) {
+                    ref.current.innerHTML = `<i data-lucide="${name}" class="${className || ''}"></i>`;
+                    window.lucide.createIcons({ root: ref.current });
+                }
+            }, [name, className]);
+            return <span ref={ref} style={{ display: 'contents' }}></span>;
+        };
+
         const LS = {
             get(key, fallback) {
                 try {
@@ -576,7 +588,7 @@
             return (
                 <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-5 flex items-center gap-4">
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${tones[tone]} flex items-center justify-center shrink-0`}>
-                        <i data-lucide={icon} className="w-6 h-6"></i>
+                        <Icon name={icon} className={"w-6 h-6"} />
                     </div>
                     <div className="min-w-0">
                         <div className="text-[11px] text-slate-500 font-semibold truncate">{label}</div>
@@ -671,19 +683,19 @@
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-5 space-y-4">
-                            <h3 className="font-heebo font-black text-slate-800 text-sm flex items-center gap-2"><i data-lucide="boxes" className="w-4 h-4 text-primary"></i> מלאי לפי מוצר (הנמוכים ביותר)</h3>
+                            <h3 className="font-heebo font-black text-slate-800 text-sm flex items-center gap-2"><Icon name={"boxes"} className={"w-4 h-4 text-primary"} /> מלאי לפי מוצר (הנמוכים ביותר)</h3>
                             <BarChart data={stockByProduct} unit=" יח׳" color="#1B3A5C" />
                         </div>
                         <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-5 space-y-4">
-                            <h3 className="font-heebo font-black text-slate-800 text-sm flex items-center gap-2"><i data-lucide="flame" className="w-4 h-4 text-cta-hover"></i> המוצרים הנמכרים ביותר</h3>
+                            <h3 className="font-heebo font-black text-slate-800 text-sm flex items-center gap-2"><Icon name={"flame"} className={"w-4 h-4 text-cta-hover"} /> המוצרים הנמכרים ביותר</h3>
                             <BarChart data={topSold} unit=" נמכרו" color="#00C48C" />
                         </div>
                         <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-5 space-y-4">
-                            <h3 className="font-heebo font-black text-slate-800 text-sm flex items-center gap-2"><i data-lucide="heart" className="w-4 h-4 text-red-500"></i> מבוקשים ברשימת המשאלות</h3>
+                            <h3 className="font-heebo font-black text-slate-800 text-sm flex items-center gap-2"><Icon name={"heart"} className={"w-4 h-4 text-red-500"} /> מבוקשים ברשימת המשאלות</h3>
                             <BarChart data={topWishlist} unit=" שמירות" color="#ef4444" />
                         </div>
                         <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-5 space-y-4">
-                            <h3 className="font-heebo font-black text-slate-800 text-sm flex items-center gap-2"><i data-lucide="pie-chart" className="w-4 h-4 text-primary"></i> הכנסות לפי קטגוריה</h3>
+                            <h3 className="font-heebo font-black text-slate-800 text-sm flex items-center gap-2"><Icon name={"pie-chart"} className={"w-4 h-4 text-primary"} /> הכנסות לפי קטגוריה</h3>
                             <BarChart data={revByCat} unit=" ₪" color="#2C527C" />
                         </div>
                     </div>
@@ -742,7 +754,7 @@
                                             <td className="py-2.5 px-4 text-center">
                                                 {customIds.has(p.id) ? (
                                                     <button onClick={() => onDelete(p.id)} className="text-slate-400 hover:text-red-500 p-1" aria-label="מחק מוצר">
-                                                        <i data-lucide="trash-2" className="w-4 h-4"></i>
+                                                        <Icon name={"trash-2"} className={"w-4 h-4"} />
                                                     </button>
                                                 ) : <span className="text-[10px] text-slate-300">בסיס</span>}
                                             </td>
@@ -824,15 +836,15 @@
                                 <div key={i} className="flex items-center gap-2">
                                     <input value={s.k} onChange={e => setSpec(i, 'k', e.target.value)} placeholder="מאפיין (למשל: מעבד)" className="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary" />
                                     <input value={s.v} onChange={e => setSpec(i, 'v', e.target.value)} placeholder="ערך (למשל: Intel i7)" className="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary" />
-                                    <button onClick={() => removeSpecRow(i)} className="text-slate-400 hover:text-red-500 p-1.5 shrink-0"><i data-lucide="x" className="w-4 h-4"></i></button>
+                                    <button onClick={() => removeSpecRow(i)} className="text-slate-400 hover:text-red-500 p-1.5 shrink-0"><Icon name={"x"} className={"w-4 h-4"} /></button>
                                 </div>
                             ))}
-                            <button onClick={addSpecRow} className="text-xs font-bold text-primary hover:underline flex items-center gap-1"><i data-lucide="plus" className="w-3.5 h-3.5"></i> הוסף שורת מפרט</button>
+                            <button onClick={addSpecRow} className="text-xs font-bold text-primary hover:underline flex items-center gap-1"><Icon name={"plus"} className={"w-3.5 h-3.5"} /> הוסף שורת מפרט</button>
                         </div>
 
                         <div className="pt-2 flex items-center gap-3">
                             <button onClick={submit} disabled={loading} className="bg-cta hover:bg-cta-hover text-primary font-bold px-6 py-3 rounded-xl text-sm shadow-md transition-all flex items-center gap-2 disabled:opacity-60">
-                                <i data-lucide="check" className="w-5 h-5"></i> {loading ? 'מוסיף...' : 'הוספת המוצר לחנות'}
+                                <Icon name={"check"} className={"w-5 h-5"} /> {loading ? 'מוסיף...' : 'הוספת המוצר לחנות'}
                             </button>
                         </div>
                     </div>
@@ -848,7 +860,7 @@
                 </div>
                 {requests.length === 0 ? (
                     <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-10 text-center text-slate-400 text-sm">
-                        <i data-lucide="inbox" className="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                        <Icon name={"inbox"} className={"w-8 h-8 mx-auto mb-2 opacity-50"} />
                         עדיין אין בקשות מלקוחות.
                     </div>
                 ) : (
@@ -868,7 +880,7 @@
                                 {r.email && <p className="text-[11px] text-slate-500" dir="ltr">✉ {r.email}</p>}
                                 <div className="pt-1">
                                     {r.status === 'open' ? (
-                                        <button onClick={() => onStatus(r.id, 'handled')} className="text-xs font-bold text-primary hover:underline flex items-center gap-1"><i data-lucide="check" className="w-3.5 h-3.5"></i> סמן כטופל</button>
+                                        <button onClick={() => onStatus(r.id, 'handled')} className="text-xs font-bold text-primary hover:underline flex items-center gap-1"><Icon name={"check"} className={"w-3.5 h-3.5"} /> סמן כטופל</button>
                                     ) : (
                                         <button onClick={() => onStatus(r.id, 'open')} className="text-xs font-bold text-slate-400 hover:underline">החזר לממתין</button>
                                     )}
@@ -888,7 +900,7 @@
                 </div>
                 {orders.length === 0 ? (
                     <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-10 text-center text-slate-400 text-sm">
-                        <i data-lucide="receipt" className="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                        <Icon name={"receipt"} className={"w-8 h-8 mx-auto mb-2 opacity-50"} />
                         עדיין לא בוצעו הזמנות.
                     </div>
                 ) : (
@@ -981,7 +993,7 @@
                     <div onClick={onClose} className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
                     <div className="relative bg-white w-full max-w-md rounded-2xl shadow-premium-hover border border-slate-100 overflow-hidden fade-in z-10">
                         <button onClick={onClose} className="absolute top-4 left-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full p-2 z-20" aria-label="סגירה">
-                            <i data-lucide="x" className="w-4 h-4"></i>
+                            <Icon name={"x"} className={"w-4 h-4"} />
                         </button>
                         <div className="bg-primary text-white px-6 pt-6 pb-4 text-right">
                             <div className="flex items-center gap-2 mb-1">
@@ -1003,7 +1015,7 @@
                         )}
 
                         <div className="p-6 space-y-4">
-                            {formError && <div className="bg-red-50 border border-red-200 text-red-600 text-xs font-semibold rounded-lg p-3 flex items-center gap-2"><i data-lucide="alert-circle" className="w-4 h-4 shrink-0"></i>{formError}</div>}
+                            {formError && <div className="bg-red-50 border border-red-200 text-red-600 text-xs font-semibold rounded-lg p-3 flex items-center gap-2"><Icon name={"alert-circle"} className={"w-4 h-4 shrink-0"} />{formError}</div>}
 
                             {tab === 'register' && (
                                 <AuthField label="שם מלא *" err={errors.name}>
@@ -1060,12 +1072,12 @@
                                         <div className="space-y-3">
                                             {resetInfo.sent ? (
                                                 <div className="bg-cta-light border border-cta/30 rounded-lg p-4 text-xs text-slate-700 flex items-start gap-2">
-                                                    <i data-lucide="mail-check" className="w-5 h-5 text-cta-hover shrink-0"></i>
+                                                    <Icon name={"mail-check"} className={"w-5 h-5 text-cta-hover shrink-0"} />
                                                     <span>מייל איפוס נשלח דרך Brevo לכתובת <strong dir="ltr">{email}</strong>. בדוק/בדקי את תיבת הדואר.</span>
                                                 </div>
                                             ) : (
                                                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-xs text-slate-700 space-y-2">
-                                                    <div className="flex items-center gap-2 font-bold text-amber-700"><i data-lucide="info" className="w-4 h-4"></i> מצב הדגמה (Backend של Brevo לא מחובר עדיין)</div>
+                                                    <div className="flex items-center gap-2 font-bold text-amber-700"><Icon name={"info"} className={"w-4 h-4"} /> מצב הדגמה (Backend של Brevo לא מחובר עדיין)</div>
                                                     <p>לאחר חיבור ה-Backend, מייל אמיתי יישלח דרך Brevo. בינתיים, קוד האיפוס שלך:</p>
                                                     <div className="bg-white border border-amber-200 rounded px-3 py-2 font-heebo font-black text-center text-lg tracking-widest text-primary">{resetInfo.token}</div>
                                                 </div>
@@ -1425,10 +1437,7 @@
                 LS.set('notksp_dark_mode', isDarkMode);
             }, [isDarkMode]);
 
-            // Keep Lucide icons refreshed as new UI mounts
-            useEffect(() => {
-                if (window.lucide) window.lucide.createIcons();
-            }, [isWishlistOpen, authOpen, authTab, accountMenuOpen, adminTab, requestProduct, toast, currentUser, customProducts, stockMap, requests, orders, isSupabaseModalOpen, view, userOrders, accOpen, isDarkMode]);
+            
 
             // Prefill checkout fields for logged-in users
             useEffect(() => {
@@ -1978,7 +1987,7 @@
                             {view === 'home' && (
                                 <div className="flex-1 max-w-lg relative group">
                                     <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-cta transition-colors">
-                                        <i data-lucide="search" className="w-5 h-5"></i>
+                                        <Icon name={"search"} className={"w-5 h-5"} />
                                     </div>
                                     <input 
                                         type="text" 
@@ -1992,7 +2001,7 @@
                                             onClick={() => setSearchQuery('')}
                                             className="absolute inset-y-0 left-3 flex items-center text-slate-400 hover:text-white"
                                         >
-                                            <i data-lucide="x" className="w-4 h-4"></i>
+                                            <Icon name={"x"} className={"w-4 h-4"} />
                                         </button>
                                     )}
                                 </div>
@@ -2006,7 +2015,7 @@
                                     className="p-2 text-slate-300 hover:text-white hover:bg-primary-light rounded-full transition-colors flex items-center justify-center"
                                     title="החלף מצב תצוגה"
                                 >
-                                    <i data-lucide={isDarkMode ? "sun" : "moon"} className="w-5 h-5"></i>
+                                    <Icon name={isDarkMode ? "sun" : "moon"} className={"w-5 h-5"} />
                                 </button>
                                 {/* Supabase Status Badge — admin only */}
                                 {currentUser?.role === 'admin' && (
@@ -2028,7 +2037,7 @@
                                         onClick={() => { setView('admin'); setAdminTab('dashboard'); window.scrollTo({ top: 0 }); }}
                                         className="hidden sm:flex items-center gap-1.5 bg-cta hover:bg-cta-hover text-primary font-bold text-xs px-3 py-2 rounded-full transition-all"
                                     >
-                                        <i data-lucide="layout-dashboard" className="w-4 h-4"></i>
+                                        <Icon name={"layout-dashboard"} className={"w-4 h-4"} />
                                         אזור ניהול
                                     </button>
                                 )}
@@ -2037,7 +2046,7 @@
                                         onClick={() => setView('home')}
                                         className="hidden sm:flex items-center gap-1.5 bg-primary-light hover:bg-primary-dark border border-slate-600 text-white font-bold text-xs px-3 py-2 rounded-full transition-all"
                                     >
-                                        <i data-lucide="store" className="w-4 h-4"></i>
+                                        <Icon name={"store"} className={"w-4 h-4"} />
                                         לחנות
                                     </button>
                                 )}
@@ -2048,7 +2057,7 @@
                                     className="relative bg-primary-light hover:bg-primary-dark border border-slate-600 hover:border-slate-500 rounded-full p-2.5 flex items-center justify-center transition-all group"
                                     aria-label="רשימת משאלות"
                                 >
-                                    <i data-lucide="heart" className="w-5 h-5 text-slate-100 group-hover:text-cta transition-colors"></i>
+                                    <Icon name={"heart"} className={"w-5 h-5 text-slate-100 group-hover:text-cta transition-colors"} />
                                     {wishlist.length > 0 && (
                                         <span className="absolute -top-1 -left-1.5 bg-cta text-primary font-bold text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-md">
                                             {wishlist.length}
@@ -2062,7 +2071,7 @@
                                     className="relative bg-primary-light hover:bg-primary-dark border border-slate-600 hover:border-slate-500 rounded-full p-2.5 flex items-center justify-center transition-all group"
                                     aria-label="עגלת קניות"
                                 >
-                                    <i data-lucide="shopping-bag" className="w-5 h-5 text-slate-100 group-hover:text-cta transition-colors"></i>
+                                    <Icon name={"shopping-bag"} className={"w-5 h-5 text-slate-100 group-hover:text-cta transition-colors"} />
                                     {cartCount > 0 && (
                                         <span className="absolute -top-1 -left-1.5 bg-cta text-primary font-bold text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-md animate-bounce">
                                             {cartCount}
@@ -2081,7 +2090,7 @@
                                                 {currentUser.name.trim().charAt(0)}
                                             </span>
                                             <span className="hidden sm:block text-xs font-bold text-white max-w-[90px] truncate">{currentUser.name}</span>
-                                            <i data-lucide="chevron-down" className="w-3.5 h-3.5 text-slate-300 hidden sm:block"></i>
+                                            <Icon name={"chevron-down"} className={"w-3.5 h-3.5 text-slate-300 hidden sm:block"} />
                                         </button>
                                         {accountMenuOpen && (
                                             <>
@@ -2092,18 +2101,18 @@
                                                         <div className="text-[10px] text-slate-400 truncate" dir="ltr">{currentUser.email}</div>
                                                     </div>
                                                     <button onClick={() => { setAccountMenuOpen(false); setIsWishlistOpen(true); }} className="w-full text-right px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 justify-end">
-                                                        רשימת המשאלות שלי <i data-lucide="heart" className="w-4 h-4 text-slate-400"></i>
+                                                        רשימת המשאלות שלי <Icon name={"heart"} className={"w-4 h-4 text-slate-400"} />
                                                     </button>
                                                     {currentUser.role === 'admin' && (
                                                         <button onClick={() => { setAccountMenuOpen(false); setView('admin'); setAdminTab('dashboard'); }} className="w-full text-right px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 justify-end">
-                                                            אזור ניהול <i data-lucide="layout-dashboard" className="w-4 h-4 text-slate-400"></i>
+                                                            אזור ניהול <Icon name={"layout-dashboard"} className={"w-4 h-4 text-slate-400"} />
                                                         </button>
                                                     )}
                                                     <button onClick={() => { setAccountMenuOpen(false); setView('profile'); }} className="w-full text-right px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 justify-end">
-                                                        אזור אישי <i data-lucide="user" className="w-4 h-4 text-slate-400"></i>
+                                                        אזור אישי <Icon name={"user"} className={"w-4 h-4 text-slate-400"} />
                                                     </button>
                                                     <button onClick={logoutUser} className="w-full text-right px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2 justify-end">
-                                                        התנתקות <i data-lucide="log-out" className="w-4 h-4"></i>
+                                                        התנתקות <Icon name={"log-out"} className={"w-4 h-4"} />
                                                     </button>
                                                 </div>
                                             </>
@@ -2115,7 +2124,7 @@
                                         className="flex items-center gap-1.5 bg-primary-light hover:bg-primary-dark border border-slate-600 hover:border-slate-500 rounded-full px-3 py-2.5 transition-all text-white"
                                         aria-label="התחברות"
                                     >
-                                        <i data-lucide="user" className="w-5 h-5"></i>
+                                        <Icon name={"user"} className={"w-5 h-5"} />
                                         <span className="hidden sm:block text-xs font-bold">התחברות</span>
                                     </button>
                                 )}
@@ -2170,9 +2179,9 @@
                                                 לכל המוצרים
                                             </a>
                                             <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-300">
-                                                <i data-lucide="check-circle" className="w-4 h-4 text-cta"></i> משלוח מהיר
+                                                <Icon name={"check-circle"} className={"w-4 h-4 text-cta"} /> משלוח מהיר
                                                 <span className="text-slate-500">•</span>
-                                                <i data-lucide="check-circle" className="w-4 h-4 text-cta"></i> אחריות יבואן רשמי
+                                                <Icon name={"check-circle"} className={"w-4 h-4 text-cta"} /> אחריות יבואן רשמי
                                             </div>
                                         </div>
                                     </div>
@@ -2201,7 +2210,7 @@
                                     {searchQuery && (
                                         <div className="bg-slate-100 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 text-slate-600">
                                             תוצאות חיפוש עבור: <strong className="text-primary">"{searchQuery}"</strong>
-                                            <button onClick={() => setSearchQuery('')} className="hover:text-primary"><i data-lucide="x" className="w-3.5 h-3.5"></i></button>
+                                            <button onClick={() => setSearchQuery('')} className="hover:text-primary"><Icon name={"x"} className={"w-3.5 h-3.5"} /></button>
                                         </div>
                                     )}
                                 </div>
@@ -2286,7 +2295,7 @@
                                                                 onClick={() => setRequestProduct(product.name)}
                                                                 className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-all transform active:scale-95 border border-slate-200"
                                                             >
-                                                                <i data-lucide="bell" className="w-4 h-4"></i>
+                                                                <Icon name={"bell"} className={"w-4 h-4"} />
                                                                 עדכנו אותי
                                                             </button>
                                                         )}
@@ -2344,7 +2353,7 @@
                                         <div className="w-56 h-40 bg-cta/10 blur-3xl absolute -left-10 -top-10 rounded-full"></div>
                                         <div className="space-y-2 text-right z-10 max-w-xl">
                                             <div className="inline-flex items-center gap-1.5 bg-primary-light/50 border border-slate-600/50 px-3 py-1 rounded-full text-xs text-cta font-bold">
-                                                <i data-lucide="search-x" className="w-3.5 h-3.5"></i>
+                                                <Icon name={"search-x"} className={"w-3.5 h-3.5"} />
                                                 לא מצאת מה שחיפשת?
                                             </div>
                                             <h3 className="text-xl sm:text-2xl font-heebo font-black leading-tight">חסר לנו מוצר שרצית? <span className="text-cta">ספר/י לנו.</span></h3>
@@ -2356,7 +2365,7 @@
                                             onClick={() => setRequestProduct('')}
                                             className="z-10 bg-cta hover:bg-cta-hover text-primary font-bold px-6 py-3 rounded-full text-sm shadow-glow transition-all transform hover:scale-105 flex items-center gap-2 shrink-0"
                                         >
-                                            <i data-lucide="plus-circle" className="w-5 h-5"></i>
+                                            <Icon name={"plus-circle"} className={"w-5 h-5"} />
                                             שליחת בקשת מוצר
                                         </button>
                                     </div>
@@ -2381,7 +2390,7 @@
                                             onClick={() => setAdminTab(t.id)}
                                             className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${adminTab === t.id ? 'bg-primary text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'}`}
                                         >
-                                            <i data-lucide={t.icon} className="w-4 h-4"></i>
+                                            <Icon name={t.icon} className={"w-4 h-4"} />
                                             {t.name}
                                             {t.id === 'requests' && requests.filter(r => r.status === 'open').length > 0 && (
                                                 <span className="bg-cta text-primary rounded-full text-[10px] font-black px-1.5">{requests.filter(r => r.status === 'open').length}</span>
@@ -2443,7 +2452,7 @@
                                         {/* Dangerous Zone (Delete Account) */}
                                         <div className="bg-red-50/50 dark:bg-red-950/20 rounded-2xl p-6 border border-red-100 dark:border-red-900/50 space-y-4">
                                             <h4 className="font-heebo font-black text-red-700 dark:text-red-400 text-sm flex items-center gap-1.5 justify-end">
-                                                אזור מסוכן <i data-lucide="alert-octagon" className="w-4 h-4"></i>
+                                                אזור מסוכן <Icon name={"alert-octagon"} className={"w-4 h-4"} />
                                             </h4>
                                             <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed text-right">
                                                 מחיקת החשבון היא פעולה סופית ולא הפיכה. מחיקת החשבון תסיר מיד את כל המידע האישי שלך, פרופיל המשתמש והיסטוריית ההזמנות מבסיס הנתונים.
@@ -2471,7 +2480,7 @@
                                                 }}
                                                 className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm shadow-red-200 dark:shadow-none"
                                             >
-                                                <i data-lucide="trash-2" className="w-4 h-4"></i>
+                                                <Icon name={"trash-2"} className={"w-4 h-4"} />
                                                 מחק את החשבון שלי
                                             </button>
                                         </div>
@@ -2527,7 +2536,7 @@
                                             </div>
                                         ) : (
                                             <div className="text-center py-12 text-slate-400 space-y-3">
-                                                <i data-lucide="receipt" className="w-12 h-12 text-slate-300 mx-auto"></i>
+                                                <Icon name={"receipt"} className={"w-12 h-12 text-slate-300 mx-auto"} />
                                                 <p className="text-sm">עדיין לא ביצעת רכישות בחנות</p>
                                             </div>
                                         )}
@@ -2560,13 +2569,13 @@
                                         {/* Guest / account banner (KSP / Ivory style — buy without an account) */}
                                         {currentUser ? (
                                             <div className="bg-cta-light border border-cta/30 rounded-xl p-3 flex items-center gap-2.5 text-xs text-slate-700">
-                                                <i data-lucide="user-check" className="w-4 h-4 text-cta-hover shrink-0"></i>
+                                                <Icon name={"user-check"} className={"w-4 h-4 text-cta-hover shrink-0"} />
                                                 מחובר/ת כ־<strong className="text-primary">{currentUser.name}</strong>. הפרטים מולאו עבורך אוטומטית.
                                             </div>
                                         ) : (
                                             <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                                                 <div className="flex items-center gap-2 text-slate-600">
-                                                    <i data-lucide="user-round" className="w-4 h-4 text-slate-400 shrink-0"></i>
+                                                    <Icon name={"user-round"} className={"w-4 h-4 text-slate-400 shrink-0"} />
                                                     ממשיכים כאורח — אפשר לסיים את הרכישה גם בלי חשבון.
                                                 </div>
                                                 <button type="button" onClick={() => { setAuthTab('login'); setAuthOpen(true); }} className="text-primary font-bold hover:underline whitespace-nowrap self-start sm:self-auto">
@@ -2640,7 +2649,7 @@
 
                                             {/* Info alert */}
                                             <div className="bg-cta-light border border-cta/30 rounded-xl p-4 flex gap-3 text-slate-700">
-                                                <div className="text-cta shrink-0"><i data-lucide="info" className="w-5 h-5"></i></div>
+                                                <div className="text-cta shrink-0"><Icon name={"info"} className={"w-5 h-5"} /></div>
                                                 <div className="text-xs space-y-1 leading-relaxed">
                                                     <strong className="text-primary block">הזמנת סימולציה (Mock Checkout)</strong>
                                                     רכישה זו היא סימולציה בלבד לצרכי פיתוח. לא תתבקשו להזין פרטי אשראי והזמנה זו לא תחויב באמת.
@@ -2905,7 +2914,7 @@
                                                     onClick={() => { setRequestProduct(activeProduct.name); setActiveProduct(null); }}
                                                     className="bg-primary hover:bg-primary-light text-white font-bold text-sm px-6 py-2.5 rounded-full flex items-center gap-2 transition-all transform active:scale-95 shadow-md"
                                                 >
-                                                    <i data-lucide="bell" className="w-5 h-5"></i>
+                                                    <Icon name={"bell"} className={"w-5 h-5"} />
                                                     עדכנו אותי כשחוזר
                                                 </button>
                                             )}
@@ -3060,12 +3069,12 @@
                                 <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col h-full fade-in border-r border-slate-100">
                                     <div className="px-6 py-5 bg-primary text-white flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <i data-lucide="heart" className="w-5 h-5 text-cta"></i>
+                                            <Icon name={"heart"} className={"w-5 h-5 text-cta"} />
                                             <h2 className="font-heebo font-black text-lg">רשימת המשאלות</h2>
                                             <span className="bg-cta text-primary font-bold text-xs rounded-full px-2 py-0.5">{wishlistProducts.length}</span>
                                         </div>
                                         <button onClick={() => setIsWishlistOpen(false)} className="text-slate-300 hover:text-white p-1.5" aria-label="סגור">
-                                            <i data-lucide="x" className="w-5 h-5"></i>
+                                            <Icon name={"x"} className={"w-5 h-5"} />
                                         </button>
                                     </div>
                                     <div className="flex-1 overflow-y-auto px-6 py-4 custom-scrollbar divide-y divide-slate-100">
@@ -3080,7 +3089,7 @@
                                                     </div>
                                                     <div className="flex flex-col items-end gap-2 shrink-0">
                                                         <button onClick={() => toggleWishlist(item.id)} className="text-slate-400 hover:text-red-500 p-1" aria-label="הסר">
-                                                            <i data-lucide="trash-2" className="w-4 h-4"></i>
+                                                            <Icon name={"trash-2"} className={"w-4 h-4"} />
                                                         </button>
                                                         {item.stock_quantity > 0 ? (
                                                             <button onClick={() => addToCart(item)} className="bg-cta hover:bg-cta-hover text-primary font-bold text-[11px] px-3 py-1.5 rounded-full transition-all">הוסף לסל</button>
@@ -3093,7 +3102,7 @@
                                         ) : (
                                             <div className="text-center py-20 space-y-4">
                                                 <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400">
-                                                    <i data-lucide="heart" className="w-8 h-8"></i>
+                                                    <Icon name={"heart"} className={"w-8 h-8"} />
                                                 </div>
                                                 <h3 className="font-heebo font-bold text-slate-800">רשימת המשאלות ריקה</h3>
                                                 <p className="text-xs text-slate-400 max-w-xs mx-auto">לחצו על הלב שעל מוצר כדי לשמור אותו לכאן לזמן אחר.</p>
@@ -3112,11 +3121,11 @@
                             <div onClick={() => setIsSupabaseModalOpen(false)} className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
                             <div className="relative bg-white w-full max-w-md rounded-2xl shadow-premium-hover border border-slate-100 overflow-hidden fade-in z-10">
                                 <button onClick={() => setIsSupabaseModalOpen(false)} className="absolute top-4 left-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full p-2 z-20" aria-label="סגירה">
-                                    <i data-lucide="x" className="w-4 h-4"></i>
+                                    <Icon name={"x"} className={"w-4 h-4"} />
                                 </button>
                                 <div className="bg-primary text-white px-6 pt-6 pb-4 text-right">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <i data-lucide="database" className="w-5 h-5 text-cta"></i>
+                                        <Icon name={"database"} className={"w-5 h-5 text-cta"} />
                                         <span className="font-heebo font-black text-lg">הגדרות חיבור Supabase</span>
                                     </div>
                                     <p className="text-xs text-slate-300">חברו את NotKSP לבסיס הנתונים של Supabase לסנכרון מלא של מוצרים, מלאי, משתמשים והזמנות.</p>
@@ -3247,11 +3256,11 @@
                             <div onClick={() => setRequestProduct(null)} className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
                             <div className="relative bg-white w-full max-w-md rounded-2xl shadow-premium-hover border border-slate-100 overflow-hidden fade-in z-10">
                                 <button onClick={() => setRequestProduct(null)} className="absolute top-4 left-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full p-2 z-20" aria-label="סגירה">
-                                    <i data-lucide="x" className="w-4 h-4"></i>
+                                    <Icon name={"x"} className={"w-4 h-4"} />
                                 </button>
                                 <div className="bg-primary text-white px-6 pt-6 pb-4 text-right">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <i data-lucide="package-search" className="w-5 h-5 text-cta"></i>
+                                        <Icon name={"package-search"} className={"w-5 h-5 text-cta"} />
                                         <span className="font-heebo font-black text-lg">בקשת מוצר</span>
                                     </div>
                                     <p className="text-xs text-slate-300">נשמח לדעת איזה מוצר תרצו — נעדכן אתכם כשהוא זמין.</p>
@@ -3278,7 +3287,7 @@
                                         }}
                                         className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-sm shadow-md transition-all flex items-center justify-center gap-2"
                                     >
-                                        <i data-lucide="send" className="w-4 h-4"></i> שליחת הבקשה
+                                        <Icon name={"send"} className={"w-4 h-4"} /> שליחת הבקשה
                                     </button>
                                 </div>
                             </div>
@@ -3294,7 +3303,7 @@
                             aria-label="תפריט נגישות"
                             title="תפריט נגישות"
                         >
-                            <i data-lucide="accessibility" className="w-6 h-6"></i>
+                            <Icon name={"accessibility"} className={"w-6 h-6"} />
                         </button>
                         
                         {accOpen && (
@@ -3304,7 +3313,7 @@
                                     <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
                                         <button onClick={resetAccessibility} className="text-[10px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold px-2 py-1 rounded-lg transition-colors cursor-pointer">אפס הגדרות</button>
                                         <h3 className="font-heebo font-black text-slate-800 dark:text-white text-sm flex items-center gap-1.5 justify-end">
-                                            נגישות אתר (IS 5568 AA) <i data-lucide="accessibility" className="w-4 h-4 text-primary"></i>
+                                            נגישות אתר (IS 5568 AA) <Icon name={"accessibility"} className={"w-4 h-4 text-primary"} />
                                         </h3>
                                     </div>
                                     
@@ -3392,7 +3401,7 @@
                     {toast && (
                         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] fade-in">
                             <div className={`px-5 py-3 rounded-full shadow-premium-hover text-xs font-bold flex items-center gap-2 ${toast.tone === 'amber' ? 'bg-amber-500 text-white' : toast.tone === 'slate' ? 'bg-slate-800 text-white' : 'bg-cta text-primary'}`}>
-                                <i data-lucide={toast.tone === 'amber' ? 'alert-triangle' : 'check-circle'} className="w-4 h-4"></i>
+                                <Icon name={toast.tone === 'amber' ? 'alert-triangle' : 'check-circle'} className={"w-4 h-4"} />
                                 {toast.text}
                             </div>
                         </div>
