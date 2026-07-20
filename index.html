@@ -510,6 +510,69 @@
         //  NEW: Storage helpers (localStorage-based persistence layer)
         // ============================================================
         
+        
+        const BrandLogo = ({ size = "text-2xl", iconSize = "w-8 h-8", showSub = true, className = "" }) => (
+            <div className={`flex items-center gap-2.5 group cursor-pointer ${className}`}>
+                <div className={`relative flex items-center justify-center ${iconSize} transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-3`}>
+                    <div className="absolute inset-0 bg-cta/40 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="relative z-10 w-full h-full drop-shadow-2xl">
+                        {/* Base Hexagon */}
+                        <path d="M20 3L35 11.6603V28.9808L20 37.641L5 28.9808V11.6603L20 3Z" fill="url(#grad_base)"/>
+                        {/* Top face */}
+                        <path d="M20 3L35 11.6603L20 20.3205L5 11.6603L20 3Z" fill="url(#grad_top)"/>
+                        {/* Right face */}
+                        <path d="M35 11.6603V28.9808L20 37.641V20.3205L35 11.6603Z" fill="url(#grad_right)"/>
+                        {/* Left face */}
+                        <path d="M5 11.6603V28.9808L20 37.641V20.3205L5 11.6603Z" fill="url(#grad_left)"/>
+                        
+                        {/* Grid Lines for tech feel */}
+                        <path d="M20 20.3205L27.5 16M20 20.3205L20 29" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
+
+                        {/* Left Face N (Isometric angle) */}
+                        <path d="M10 16.5V26.5M10 16.5L16 26.5M16 26.5V16.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-sm"/>
+                        
+                        {/* Right Face K (Isometric angle) */}
+                        <path d="M24 16.5V26.5M30 16.5L24 21.5L30 26.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-sm"/>
+                        
+                        {/* Center glowing core */}
+                        <circle cx="20" cy="20.32" r="3" fill="#00FFB2" filter="blur(2px)"/>
+                        <circle cx="20" cy="20.32" r="1.5" fill="#FFFFFF"/>
+                        <circle cx="20" cy="20.32" r="5" fill="none" stroke="#00FFB2" strokeWidth="0.5" className="opacity-50"/>
+
+                        <defs>
+                            <linearGradient id="grad_base" x1="20" y1="3" x2="20" y2="37.6" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#00C48C"/>
+                                <stop offset="1" stopColor="#008A62"/>
+                            </linearGradient>
+                            <linearGradient id="grad_top" x1="5" y1="11.6" x2="35" y2="11.6" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#00E5A3"/>
+                                <stop offset="0.5" stopColor="#00C48C"/>
+                                <stop offset="1" stopColor="#008A62"/>
+                            </linearGradient>
+                            <linearGradient id="grad_right" x1="35" y1="11.6" x2="20" y2="37.6" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#1B3A5C"/>
+                                <stop offset="1" stopColor="#0A1622"/>
+                            </linearGradient>
+                            <linearGradient id="grad_left" x1="5" y1="11.6" x2="20" y2="37.6" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="#2C527C"/>
+                                <stop offset="1" stopColor="#152B43"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div className="text-right flex flex-col justify-center">
+                    <span className={`font-heebo font-black ${size} tracking-tighter block leading-none`}>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-200 drop-shadow-md">Not</span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-br from-cta to-[#008A62] drop-shadow-md relative">
+                            KSP
+                            <span className="absolute -top-1 -right-2 w-1.5 h-1.5 bg-cta rounded-full animate-pulse shadow-[0_0_8px_rgba(0,196,140,0.8)]"></span>
+                        </span>
+                    </span>
+                    {showSub && <span className={`text-[10px] text-cta/90 font-bold tracking-[0.1em] uppercase block mt-1`}>Tech Refined</span>}
+                </div>
+            </div>
+        );
+
         const Icon = ({ name, className }) => {
             const ref = React.useRef(null);
             React.useEffect(() => {
@@ -1979,13 +2042,7 @@
                             
                             {/* Logo */}
                             <a href="#" onClick={(e) => { e.preventDefault(); setView('home'); }} className="flex items-center gap-2 select-none group">
-                                <div className="bg-cta p-2 rounded-lg text-primary font-black shadow-glow transform transition-transform group-hover:scale-105">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
-                                </div>
-                                <div className="text-right">
-                                    <span className="font-heebo font-black text-2xl tracking-tight block leading-none">Not<span className="text-cta">KSP</span></span>
-                                    <span className="text-[10px] text-slate-300 font-light block mt-0.5">אלקטרוניקה נקייה, בלי הבלגן</span>
-                                </div>
+                                <BrandLogo size="text-3xl" iconSize="w-10 h-10" />
                             </a>
 
                             {/* Search bar */}
