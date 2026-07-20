@@ -1285,18 +1285,30 @@
                 setRequests(LS.get('notksp_requests', []));
                 setWishlistMap(LS.get('notksp_wishlist', {}));
 
+                const ADMIN_SEED = {
+                    id: 'admin',
+                    name: 'מנהל החנות',
+                    email: 'admin@notksp.co.il',
+                    passwordHash: pseudoHash('Admin#2026'),
+                    role: 'admin',
+                    createdAt: Date.now()
+                };
+
                 let loadedUsers = LS.get('notksp_users', null);
                 if (!loadedUsers) {
-                    // First run: seed a demo admin account (credentials shown in the UI)
-                    loadedUsers = [{
-                        id: 'admin',
-                        name: 'מנהל החנות',
-                        email: 'admin@notksp.co.il',
-                        passwordHash: pseudoHash('Admin#2026'),
-                        role: 'admin',
-                        createdAt: Date.now()
-                    }];
+                    loadedUsers = [ADMIN_SEED];
                     LS.set('notksp_users', loadedUsers);
+                } else if (!loadedUsers.find(u => u.email === 'admin@notksp.co.il')) {
+                    // Admin missing from saved list — add it
+                    loadedUsers = [ADMIN_SEED, ...loadedUsers];
+                    LS.set('notksp_users', loadedUsers);
+                } else {
+                    // Ensure admin's passwordHash is always up to date
+                    loadedUsers = loadedUsers.map(u =>
+                        u.email === 'admin@notksp.co.il'
+                            ? { ...u, passwordHash: pseudoHash('Admin#2026'), role: 'admin' }
+                            : u
+                    );
                 }
                 setUsers(loadedUsers);
 
