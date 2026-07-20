@@ -22,6 +22,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -58,7 +59,6 @@
     <style type="text/css">
         body {
             font-family: 'Assistant', sans-serif;
-            background-color: #F4F5F7;
             overflow-x: hidden;
             scroll-behavior: smooth;
         }
@@ -214,7 +214,7 @@
     <!-- Supabase JS Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-secondary font-sans text-slate-800 antialiased">
+<body class="bg-secondary dark:bg-slate-900 font-sans text-slate-800 dark:text-slate-100 antialiased">
     <div id="root"></div>
 
     <script type="text/babel">
@@ -1122,6 +1122,7 @@
             const [authTab, setAuthTab] = useState('login');            // 'login' | 'register' | 'forgot'
             const [accountMenuOpen, setAccountMenuOpen] = useState(false);
             const [adminTab, setAdminTab] = useState('dashboard');
+            const [isDarkMode, setIsDarkMode] = useState(() => LS.get('notksp_dark_mode', false));
 
             // ===== Accessibility states =====
             const [accOpen, setAccOpen] = useState(false);
@@ -1415,10 +1416,19 @@
                 }
             }, [isSupabaseConnected]);
 
+            useEffect(() => {
+                if (isDarkMode) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                LS.set('notksp_dark_mode', isDarkMode);
+            }, [isDarkMode]);
+
             // Keep Lucide icons refreshed as new UI mounts
             useEffect(() => {
                 if (window.lucide) window.lucide.createIcons();
-            }, [isWishlistOpen, authOpen, authTab, accountMenuOpen, adminTab, requestProduct, toast, currentUser, customProducts, stockMap, requests, orders, isSupabaseModalOpen, view, userOrders, accOpen]);
+            }, [isWishlistOpen, authOpen, authTab, accountMenuOpen, adminTab, requestProduct, toast, currentUser, customProducts, stockMap, requests, orders, isSupabaseModalOpen, view, userOrders, accOpen, isDarkMode]);
 
             // Prefill checkout fields for logged-in users
             useEffect(() => {
@@ -1990,6 +2000,14 @@
 
                             {/* Actions */}
                             <div className="flex items-center gap-2 sm:gap-3">
+                                {/* Dark Mode Toggle */}
+                                <button
+                                    onClick={() => setIsDarkMode(!isDarkMode)}
+                                    className="p-2 text-slate-300 hover:text-white hover:bg-primary-light rounded-full transition-colors flex items-center justify-center"
+                                    title="החלף מצב תצוגה"
+                                >
+                                    <i data-lucide={isDarkMode ? "sun" : "moon"} className="w-5 h-5"></i>
+                                </button>
                                 {/* Supabase Status Badge — admin only */}
                                 {currentUser?.role === 'admin' && (
                                     <button
