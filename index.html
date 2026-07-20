@@ -1357,8 +1357,7 @@
             </div>
         );
 
-        const AuthModal = ({ initialTab, onClose, onLogin, onRegister, onReset }) => {
-            const [tab, setTab] = useState(initialTab || 'login');
+        const AuthModal = ({ tab, setTab, onClose, onLogin, onRegister, onReset }) => {
             const [name, setName] = useState('');
             const [email, setEmail] = useState('');
             const [password, setPassword] = useState('');
@@ -3642,7 +3641,8 @@
                     {/* 7. Auth Modal */}
                     {authOpen && (
                         <AuthModal
-                            initialTab={authTab}
+                            tab={authTab}
+                            setTab={setAuthTab}
                             onClose={() => setAuthOpen(false)}
                             onLogin={loginUser}
                             onRegister={registerUser}
