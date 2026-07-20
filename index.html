@@ -1566,7 +1566,16 @@
                         showToast('התחברת בהצלחה!');
                         return { ok: true };
                     } catch (e) {
-                        // Supabase auth failed — try offline fallback (covers hardcoded admin)
+                        // Translate common Supabase errors to Hebrew
+                        let msg = e.message || '';
+                        if (msg.includes('Invalid login credentials') || msg.includes('invalid_credentials'))
+                            msg = 'אימייל או סיסמה שגויים';
+                        else if (msg.includes('Email not confirmed'))
+                            msg = 'האימייל לא אושר — אשר אותו ב-Supabase Dashboard או בטל את חובת האישור';
+                        else if (msg.includes('Too many requests'))
+                            msg = 'יותר מדי ניסיונות — נסה שוב בעוד מספר דקות';
+
+                        // Offline fallback (covers hardcoded admin)
                         const user = users.find(u => u.email === email);
                         if (user && user.passwordHash === pseudoHash(password)) {
                             setCurrentUser(user);
@@ -1574,7 +1583,7 @@
                             showToast('התחברת בהצלחה!');
                             return { ok: true, user };
                         }
-                        return { ok: false, error: e.message || "אימייל או סיסמה שגויים" };
+                        return { ok: false, error: msg };
                     }
                 }
                 // Offline fallback
