@@ -1177,7 +1177,7 @@
                             <Icon name={"x"} className={"w-4 h-4"} />
                         </button>
                         <div className="bg-primary text-white px-6 pt-6 pb-4 text-right">
-                            <div className="flex items-center justify-end gap-2 mb-1">
+                            <div className="flex items-center justify-start gap-2 mb-1">
                                 <BrandLogo size="text-2xl" iconSize="w-8 h-8" showSub={false} />
                             </div>
                             <p className="text-sm text-slate-300">
@@ -1911,10 +1911,11 @@
                         return { ok: true, sent: true };
                     } catch (error) {
                         console.error('Reset error:', error);
-                        if (error.message.includes('rate limit')) {
+                        const msg = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
+                        if (msg.includes('rate limit')) {
                             return { ok: false, error: "נשלחו יותר מדי בקשות לאיפוס סיסמה. אנא נסה שוב בעוד כשעה." };
                         }
-                        return { ok: false, error: "שגיאה בשליחת קישור האיפוס: " + error.message };
+                        return { ok: false, error: "שגיאה בשליחת קישור האיפוס: " + msg };
                     }
                 }
                 
