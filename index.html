@@ -722,7 +722,7 @@
         // ============================================================
         
         
-                const BrandLogo = ({ size = "text-2xl", iconSize = "w-10 h-10", showSub = true, className = "" }) => (
+                const BrandLogo = ({ size = "text-3xl", iconSize = "w-10 h-10", showSub = true, className = "" }) => (
             <div className={`flex items-center gap-3 group cursor-pointer select-none ${className}`}>
                 <div className={`relative flex items-center justify-center ${iconSize} transform transition-transform duration-300 group-hover:scale-105`}>
                     <div className="absolute inset-0 bg-cta/30 blur-md rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -736,7 +736,7 @@
                     <span className={`font-black tracking-tight text-white ${size} leading-none`}>
                         Not<span className="text-cta">KSP</span>
                     </span>
-                    {showSub && <span className="text-[10px] text-slate-300 tracking-widest uppercase font-semibold mt-0.5">Electronics</span>}
+                    {showSub && <span className="text-sm text-slate-300 tracking-widest uppercase font-semibold mt-0.5">Electronics</span>}
                 </div>
             </div>
         );
@@ -822,9 +822,9 @@
                         <Icon name={icon} className={"w-6 h-6"} />
                     </div>
                     <div className="min-w-0">
-                        <div className="text-[11px] text-slate-500 font-semibold truncate">{label}</div>
-                        <div className="text-xl font-heebo font-black text-slate-900 leading-tight">{value}</div>
-                        {sub && <div className="text-[10px] text-slate-400 truncate">{sub}</div>}
+                        <div className="text-base text-slate-500 font-semibold truncate">{label}</div>
+                        <div className="text-2xl font-heebo font-black text-slate-900 leading-tight">{value}</div>
+                        {sub && <div className="text-sm text-slate-400 truncate">{sub}</div>}
                     </div>
                 </div>
             );
@@ -835,10 +835,10 @@
             const max = Math.max(1, ...data.map(d => d.value));
             return (
                 <div className="space-y-2.5">
-                    {data.length === 0 && <p className="text-xs text-slate-400 text-center py-4">אין נתונים להצגה עדיין.</p>}
+                    {data.length === 0 && <p className="text-sm text-slate-400 text-center py-4">אין נתונים להצגה עדיין.</p>}
                     {data.map((d) => (
                         <div key={d.label} className="space-y-1">
-                            <div className="flex justify-between text-[11px] text-slate-600">
+                            <div className="flex justify-between text-base text-slate-600">
                                 <span className="truncate ml-2 font-semibold">{d.label}</span>
                                 <span className="font-heebo font-bold text-slate-800 shrink-0">{(Number(d.value) || 0).toLocaleString('he-IL')}{unit}</span>
                             </div>
@@ -895,8 +895,8 @@
             return (
                 <div className="space-y-6">
                     <div>
-                        <h2 className="text-2xl font-heebo font-black text-slate-900">דשבורד ניהול</h2>
-                        <p className="text-xs text-slate-500 mt-1">מבט־על על המלאי, ההזמנות והביקוש בחנות.</p>
+                        <h2 className="text-3xl font-heebo font-black text-slate-900">דשבורד ניהול</h2>
+                        <p className="text-sm text-slate-500 mt-1">מבט־על על המלאי, ההזמנות והביקוש בחנות.</p>
                     </div>
 
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -914,19 +914,19 @@
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-5 space-y-4">
-                            <h3 className="font-heebo font-black text-slate-800 text-sm flex items-center gap-2"><Icon name={"boxes"} className={"w-4 h-4 text-primary"} /> מלאי לפי מוצר (הנמוכים ביותר)</h3>
+                            <h3 className="font-heebo font-black text-slate-800 text-base flex items-center gap-2"><Icon name={"boxes"} className={"w-4 h-4 text-primary"} /> מלאי לפי מוצר (הנמוכים ביותר)</h3>
                             <BarChart data={stockByProduct} unit=" יח׳" color="#1B3A5C" />
                         </div>
                         <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-5 space-y-4">
-                            <h3 className="font-heebo font-black text-slate-800 text-sm flex items-center gap-2"><Icon name={"flame"} className={"w-4 h-4 text-cta-hover"} /> המוצרים הנמכרים ביותר</h3>
+                            <h3 className="font-heebo font-black text-slate-800 text-base flex items-center gap-2"><Icon name={"flame"} className={"w-4 h-4 text-cta-hover"} /> המוצרים הנמכרים ביותר</h3>
                             <BarChart data={topSold} unit=" נמכרו" color="#00C48C" />
                         </div>
                         <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-5 space-y-4">
-                            <h3 className="font-heebo font-black text-slate-800 text-sm flex items-center gap-2"><Icon name={"heart"} className={"w-4 h-4 text-red-500"} /> מבוקשים ברשימת המשאלות</h3>
+                            <h3 className="font-heebo font-black text-slate-800 text-base flex items-center gap-2"><Icon name={"heart"} className={"w-4 h-4 text-red-500"} /> מבוקשים ברשימת המשאלות</h3>
                             <BarChart data={topWishlist} unit=" שמירות" color="#ef4444" />
                         </div>
                         <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-5 space-y-4">
-                            <h3 className="font-heebo font-black text-slate-800 text-sm flex items-center gap-2"><Icon name={"pie-chart"} className={"w-4 h-4 text-primary"} /> הכנסות לפי קטגוריה</h3>
+                            <h3 className="font-heebo font-black text-slate-800 text-base flex items-center gap-2"><Icon name={"pie-chart"} className={"w-4 h-4 text-primary"} /> הכנסות לפי קטגוריה</h3>
                             <BarChart data={revByCat} unit=" ₪" color="#2C527C" />
                         </div>
                     </div>
@@ -940,13 +940,13 @@
                 <div className="space-y-5">
                     <div className="flex items-end justify-between flex-wrap gap-2">
                         <div>
-                            <h2 className="text-2xl font-heebo font-black text-slate-900">ניהול מלאי</h2>
-                            <p className="text-xs text-slate-500 mt-1">עדכון כמויות המלאי מתעדכן מיידית בחנות ואצל הלקוח.</p>
+                            <h2 className="text-3xl font-heebo font-black text-slate-900">ניהול מלאי</h2>
+                            <p className="text-sm text-slate-500 mt-1">עדכון כמויות המלאי מתעדכן מיידית בחנות ואצל הלקוח.</p>
                         </div>
                     </div>
                     <div className="bg-white rounded-2xl border border-slate-100 shadow-premium overflow-hidden">
                         <div className="overflow-x-auto custom-scrollbar">
-                            <table className="w-full text-right text-xs">
+                            <table className="w-full text-right text-sm">
                                 <thead>
                                     <tr className="bg-slate-50 text-slate-500 border-b border-slate-100">
                                         <th className="py-3 px-4 font-bold">מוצר</th>
@@ -980,14 +980,14 @@
                                                 </div>
                                             </td>
                                             <td className="py-2.5 px-4 text-center">
-                                                <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${m.cls}`}><span className={`w-1.5 h-1.5 rounded-full ${m.dot}`}></span>{m.label}</span>
+                                                <span className={`inline-flex items-center gap-1 text-sm font-bold px-2 py-0.5 rounded-full border ${m.cls}`}><span className={`w-1.5 h-1.5 rounded-full ${m.dot}`}></span>{m.label}</span>
                                             </td>
                                             <td className="py-2.5 px-4 text-center">
                                                 {customIds.has(p.id) ? (
                                                     <button onClick={() => onDelete(p.id)} className="text-slate-400 hover:text-red-500 p-1" aria-label="מחק מוצר">
                                                         <Icon name={"trash-2"} className={"w-4 h-4"} />
                                                     </button>
-                                                ) : <span className="text-[10px] text-slate-300">בסיס</span>}
+                                                ) : <span className="text-sm text-slate-300">בסיס</span>}
                                             </td>
                                         </tr>
                                     ); })}
@@ -1034,18 +1034,18 @@
 
             const field = (label, node, err) => (
                 <div className="space-y-1">
-                    <label className="block text-xs font-bold text-slate-700">{label}</label>
+                    <label className="block text-sm font-bold text-slate-700">{label}</label>
                     {node}
-                    {err && <p className="text-red-500 text-xs font-semibold">{err}</p>}
+                    {err && <p className="text-red-500 text-sm font-semibold">{err}</p>}
                 </div>
             );
-            const inputCls = (err) => `w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 ${err ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'}`;
+            const inputCls = (err) => `w-full px-4 py-2.5 rounded-lg border text-base focus:outline-none focus:ring-2 ${err ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'}`;
 
             return (
                 <div className="max-w-3xl space-y-5">
                     <div>
-                        <h2 className="text-2xl font-heebo font-black text-slate-900">הוספת מוצר חדש</h2>
-                        <p className="text-xs text-slate-500 mt-1">מוסיפים מוצר פעם אחת — הוא מופיע מיד בחנות עם ניהול מלאי מלא. (Scalability)</p>
+                        <h2 className="text-3xl font-heebo font-black text-slate-900">הוספת מוצר חדש</h2>
+                        <p className="text-sm text-slate-500 mt-1">מוסיפים מוצר פעם אחת — הוא מופיע מיד בחנות עם ניהול מלאי מלא. (Scalability)</p>
                     </div>
                     <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-6 space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1062,19 +1062,19 @@
                         {field("תיאור המוצר *", <textarea value={description} onChange={e => setDescription(e.target.value)} rows="3" placeholder="תיאור שיווקי קצר של המוצר..." className={inputCls(errors.description)} />, errors.description)}
 
                         <div className="space-y-2">
-                            <label className="block text-xs font-bold text-slate-700">מפרט טכני (אופציונלי)</label>
+                            <label className="block text-sm font-bold text-slate-700">מפרט טכני (אופציונלי)</label>
                             {specs.map((s, i) => (
                                 <div key={i} className="flex items-center gap-2">
-                                    <input value={s.k} onChange={e => setSpec(i, 'k', e.target.value)} placeholder="מאפיין (למשל: מעבד)" className="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary" />
-                                    <input value={s.v} onChange={e => setSpec(i, 'v', e.target.value)} placeholder="ערך (למשל: Intel i7)" className="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary" />
+                                    <input value={s.k} onChange={e => setSpec(i, 'k', e.target.value)} placeholder="מאפיין (למשל: מעבד)" className="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary" />
+                                    <input value={s.v} onChange={e => setSpec(i, 'v', e.target.value)} placeholder="ערך (למשל: Intel i7)" className="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary" />
                                     <button onClick={() => removeSpecRow(i)} className="text-slate-400 hover:text-red-500 p-1.5 shrink-0"><Icon name={"x"} className={"w-4 h-4"} /></button>
                                 </div>
                             ))}
-                            <button onClick={addSpecRow} className="text-xs font-bold text-primary hover:underline flex items-center gap-1"><Icon name={"plus"} className={"w-3.5 h-3.5"} /> הוסף שורת מפרט</button>
+                            <button onClick={addSpecRow} className="text-sm font-bold text-primary hover:underline flex items-center gap-1"><Icon name={"plus"} className={"w-3.5 h-3.5"} /> הוסף שורת מפרט</button>
                         </div>
 
                         <div className="pt-2 flex items-center gap-3">
-                            <button onClick={submit} disabled={loading} className="bg-cta hover:bg-cta-hover text-primary font-bold px-6 py-3 rounded-xl text-sm shadow-md transition-all flex items-center gap-2 disabled:opacity-60">
+                            <button onClick={submit} disabled={loading} className="bg-cta hover:bg-cta-hover text-primary font-bold px-6 py-3 rounded-xl text-base shadow-md transition-all flex items-center gap-2 disabled:opacity-60">
                                 <Icon name={"check"} className={"w-5 h-5"} /> {loading ? 'מוסיף...' : 'הוספת המוצר לחנות'}
                             </button>
                         </div>
@@ -1086,11 +1086,11 @@
         const AdminRequests = ({ requests, onStatus }) => (
             <div className="space-y-5">
                 <div>
-                    <h2 className="text-2xl font-heebo font-black text-slate-900">בקשות מוצרים מלקוחות</h2>
-                    <p className="text-xs text-slate-500 mt-1">מוצרים שלקוחות ביקשו — כולל מוצרים שאזלו מהמלאי.</p>
+                    <h2 className="text-3xl font-heebo font-black text-slate-900">בקשות מוצרים מלקוחות</h2>
+                    <p className="text-sm text-slate-500 mt-1">מוצרים שלקוחות ביקשו — כולל מוצרים שאזלו מהמלאי.</p>
                 </div>
                 {requests.length === 0 ? (
-                    <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-10 text-center text-slate-400 text-sm">
+                    <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-10 text-center text-slate-400 text-base">
                         <Icon name={"inbox"} className={"w-8 h-8 mx-auto mb-2 opacity-50"} />
                         עדיין אין בקשות מלקוחות.
                     </div>
@@ -1100,20 +1100,20 @@
                             <div key={r.id} className={`bg-white rounded-2xl border shadow-premium p-4 space-y-2 ${r.status === 'open' ? 'border-cta/40' : 'border-slate-100 opacity-70'}`}>
                                 <div className="flex items-start justify-between gap-2">
                                     <div>
-                                        <h4 className="font-heebo font-black text-slate-800 text-sm">{r.productName || '(ללא שם מוצר)'}</h4>
-                                        <p className="text-[10px] text-slate-400">{r.id} · {r.date}</p>
+                                        <h4 className="font-heebo font-black text-slate-800 text-base">{r.productName || '(ללא שם מוצר)'}</h4>
+                                        <p className="text-sm text-slate-400">{r.id} · {r.date}</p>
                                     </div>
-                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${r.status === 'open' ? 'bg-cta-light text-cta-hover' : 'bg-slate-100 text-slate-500'}`}>
+                                    <span className={`text-sm font-bold px-2 py-0.5 rounded-full ${r.status === 'open' ? 'bg-cta-light text-cta-hover' : 'bg-slate-100 text-slate-500'}`}>
                                         {r.status === 'open' ? 'ממתין' : 'טופל'}
                                     </span>
                                 </div>
-                                {r.note && <p className="text-xs text-slate-600 bg-slate-50 rounded-lg p-2">{r.note}</p>}
-                                {r.email && <p className="text-[11px] text-slate-500" dir="ltr">✉ {r.email}</p>}
+                                {r.note && <p className="text-sm text-slate-600 bg-slate-50 rounded-lg p-2">{r.note}</p>}
+                                {r.email && <p className="text-base text-slate-500" dir="ltr">✉ {r.email}</p>}
                                 <div className="pt-1">
                                     {r.status === 'open' ? (
-                                        <button onClick={() => onStatus(r.id, 'handled')} className="text-xs font-bold text-primary hover:underline flex items-center gap-1"><Icon name={"check"} className={"w-3.5 h-3.5"} /> סמן כטופל</button>
+                                        <button onClick={() => onStatus(r.id, 'handled')} className="text-sm font-bold text-primary hover:underline flex items-center gap-1"><Icon name={"check"} className={"w-3.5 h-3.5"} /> סמן כטופל</button>
                                     ) : (
-                                        <button onClick={() => onStatus(r.id, 'open')} className="text-xs font-bold text-slate-400 hover:underline">החזר לממתין</button>
+                                        <button onClick={() => onStatus(r.id, 'open')} className="text-sm font-bold text-slate-400 hover:underline">החזר לממתין</button>
                                     )}
                                 </div>
                             </div>
@@ -1126,11 +1126,11 @@
         const AdminOrders = ({ orders }) => (
             <div className="space-y-5">
                 <div>
-                    <h2 className="text-2xl font-heebo font-black text-slate-900">הזמנות</h2>
-                    <p className="text-xs text-slate-500 mt-1">כל ההזמנות שבוצעו בחנות (כולל רכישות אורח).</p>
+                    <h2 className="text-3xl font-heebo font-black text-slate-900">הזמנות</h2>
+                    <p className="text-sm text-slate-500 mt-1">כל ההזמנות שבוצעו בחנות (כולל רכישות אורח).</p>
                 </div>
                 {orders.length === 0 ? (
-                    <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-10 text-center text-slate-400 text-sm">
+                    <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-10 text-center text-slate-400 text-base">
                         <Icon name={"receipt"} className={"w-8 h-8 mx-auto mb-2 opacity-50"} />
                         עדיין לא בוצעו הזמנות.
                     </div>
@@ -1140,13 +1140,13 @@
                             <div key={o.id} className="bg-white rounded-2xl border border-slate-100 shadow-premium p-4">
                                 <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-100 pb-2 mb-2">
                                     <div className="flex items-center gap-2">
-                                        <span className="font-heebo font-extrabold text-primary bg-slate-100 px-2 py-0.5 rounded text-xs">{o.id}</span>
-                                        <span className="text-xs text-slate-500">{o.date}</span>
-                                        {o.isGuest && <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">אורח</span>}
+                                        <span className="font-heebo font-extrabold text-primary bg-slate-100 px-2 py-0.5 rounded text-sm">{o.id}</span>
+                                        <span className="text-sm text-slate-500">{o.date}</span>
+                                        {o.isGuest && <span className="text-sm font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">אורח</span>}
                                     </div>
-                                    <span className="font-heebo font-black text-primary text-sm">{(Number(o.total) || 0).toLocaleString('he-IL')} ₪</span>
+                                    <span className="font-heebo font-black text-primary text-base">{(Number(o.total) || 0).toLocaleString('he-IL')} ₪</span>
                                 </div>
-                                <div className="flex items-center justify-between text-xs text-slate-600 flex-wrap gap-1">
+                                <div className="flex items-center justify-between text-sm text-slate-600 flex-wrap gap-1">
                                     <span className="font-bold">{o.customerName} · <span dir="ltr">{o.customerPhone}</span></span>
                                     <span className="text-slate-400">{o.items.reduce((s, i) => s + i.quantity, 0)} פריטים</span>
                                 </div>
@@ -1161,9 +1161,9 @@
         // each keystroke, which would cause React to unmount/remount inputs.
         const AuthField = ({ label, err, children }) => (
             <div className="space-y-1">
-                <label className="block text-xs font-bold text-slate-700">{label}</label>
+                <label className="block text-sm font-bold text-slate-700">{label}</label>
                 {children}
-                {err && <p className="text-red-500 text-xs font-semibold">{err}</p>}
+                {err && <p className="text-red-500 text-sm font-semibold">{err}</p>}
             </div>
         );
 
@@ -1217,7 +1217,7 @@
                 else setResetInfo({ token: res.token, link: res.resetLink });
             };
 
-            const inputCls = (err) => `w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 ${err ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'}`;
+            const inputCls = (err) => `w-full px-4 py-2.5 rounded-lg border text-base focus:outline-none focus:ring-2 ${err ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'}`;
 
             return (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
@@ -1229,9 +1229,9 @@
                         <div className="bg-primary text-white px-6 pt-6 pb-4 text-right">
                             <div className="flex items-center gap-2 mb-1">
                                 <div className="bg-cta p-1.5 rounded-lg text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg></div>
-                                <span className="font-heebo font-black text-lg">Not<span className="text-cta">KSP</span></span>
+                                <span className="font-heebo font-black text-xl">Not<span className="text-cta">KSP</span></span>
                             </div>
-                            <p className="text-xs text-slate-300">
+                            <p className="text-sm text-slate-300">
                                 {tab === 'login' && 'התחברות לחשבון שלך'}
                                 {tab === 'register' && 'הרשמה — פתיחת חשבון חדש'}
                                 {tab === 'forgot' && 'שחזור סיסמה'}
@@ -1240,13 +1240,13 @@
 
                         {tab !== 'forgot' && (
                             <div className="flex border-b border-slate-100">
-                                <button onClick={() => switchTab('login')} className={`flex-1 py-3 text-xs font-bold transition-colors ${tab === 'login' ? 'text-primary border-b-2 border-cta' : 'text-slate-400'}`}>התחברות</button>
-                                <button onClick={() => switchTab('register')} className={`flex-1 py-3 text-xs font-bold transition-colors ${tab === 'register' ? 'text-primary border-b-2 border-cta' : 'text-slate-400'}`}>הרשמה</button>
+                                <button onClick={() => switchTab('login')} className={`flex-1 py-3 text-sm font-bold transition-colors ${tab === 'login' ? 'text-primary border-b-2 border-cta' : 'text-slate-400'}`}>התחברות</button>
+                                <button onClick={() => switchTab('register')} className={`flex-1 py-3 text-sm font-bold transition-colors ${tab === 'register' ? 'text-primary border-b-2 border-cta' : 'text-slate-400'}`}>הרשמה</button>
                             </div>
                         )}
 
                         <div className="p-6 space-y-4">
-                            {formError && <div className="bg-red-50 border border-red-200 text-red-600 text-xs font-semibold rounded-lg p-3 flex items-center gap-2"><Icon name={"alert-circle"} className={"w-4 h-4 shrink-0"} />{formError}</div>}
+                            {formError && <div className="bg-red-50 border border-red-200 text-red-600 text-sm font-semibold rounded-lg p-3 flex items-center gap-2"><Icon name={"alert-circle"} className={"w-4 h-4 shrink-0"} />{formError}</div>}
 
                             {tab === 'register' && (
                                 <AuthField label="שם מלא *" err={errors.name}>
@@ -1274,46 +1274,46 @@
 
                             {tab === 'login' && (
                                 <>
-                                    <button onClick={submitLogin} className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-sm shadow-md transition-all">התחברות</button>
-                                    <div className="flex items-center justify-between text-xs">
+                                    <button onClick={submitLogin} className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-base shadow-md transition-all">התחברות</button>
+                                    <div className="flex items-center justify-between text-sm">
                                         <button onClick={() => switchTab('forgot')} className="text-primary font-semibold hover:underline">שכחת סיסמה?</button>
                                         <button onClick={() => switchTab('register')} className="text-slate-500 hover:text-primary">אין לך חשבון? הרשמה</button>
                                     </div>
-                                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-[11px] text-slate-500 leading-relaxed">
+                                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-base text-slate-500 leading-relaxed">
                                         <strong className="text-slate-700">חשבון מנהל לדוגמה:</strong> <span dir="ltr">admin@notksp.co.il</span> / <span dir="ltr">Admin#2026</span>
                                     </div>
                                 </>
                             )}
 
                             {tab === 'register' && (
-                                <button onClick={submitRegister} className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-sm shadow-md transition-all">יצירת חשבון</button>
+                                <button onClick={submitRegister} className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-base shadow-md transition-all">יצירת חשבון</button>
                             )}
 
                             {tab === 'forgot' && (
                                 <>
                                     {!resetInfo ? (
                                         <>
-                                            <p className="text-xs text-slate-500 leading-relaxed">נשלח קישור לאיפוס סיסמה לכתובת האימייל שלך (באמצעות Brevo).</p>
-                                            <button onClick={submitReset} disabled={loading} className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-sm shadow-md transition-all disabled:opacity-60">
+                                            <p className="text-sm text-slate-500 leading-relaxed">נשלח קישור לאיפוס סיסמה לכתובת האימייל שלך (באמצעות Brevo).</p>
+                                            <button onClick={submitReset} disabled={loading} className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-base shadow-md transition-all disabled:opacity-60">
                                                 {loading ? 'שולח...' : 'שליחת קישור איפוס'}
                                             </button>
-                                            <button onClick={() => switchTab('login')} className="w-full text-slate-500 hover:text-primary text-xs">חזרה להתחברות</button>
+                                            <button onClick={() => switchTab('login')} className="w-full text-slate-500 hover:text-primary text-sm">חזרה להתחברות</button>
                                         </>
                                     ) : (
                                         <div className="space-y-3">
                                             {resetInfo.sent ? (
-                                                <div className="bg-cta-light border border-cta/30 rounded-lg p-4 text-xs text-slate-700 flex items-start gap-2">
+                                                <div className="bg-cta-light border border-cta/30 rounded-lg p-4 text-sm text-slate-700 flex items-start gap-2">
                                                     <Icon name={"mail-check"} className={"w-5 h-5 text-cta-hover shrink-0"} />
                                                     <span>מייל איפוס נשלח דרך Brevo לכתובת <strong dir="ltr">{email}</strong>. בדוק/בדקי את תיבת הדואר.</span>
                                                 </div>
                                             ) : (
-                                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-xs text-slate-700 space-y-2">
+                                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-slate-700 space-y-2">
                                                     <div className="flex items-center gap-2 font-bold text-amber-700"><Icon name={"info"} className={"w-4 h-4"} /> מצב הדגמה (Backend של Brevo לא מחובר עדיין)</div>
                                                     <p>לאחר חיבור ה-Backend, מייל אמיתי יישלח דרך Brevo. בינתיים, קוד האיפוס שלך:</p>
-                                                    <div className="bg-white border border-amber-200 rounded px-3 py-2 font-heebo font-black text-center text-lg tracking-widest text-primary">{resetInfo.token}</div>
+                                                    <div className="bg-white border border-amber-200 rounded px-3 py-2 font-heebo font-black text-center text-xl tracking-widest text-primary">{resetInfo.token}</div>
                                                 </div>
                                             )}
-                                            <button onClick={() => switchTab('login')} className="w-full bg-primary hover:bg-primary-light text-white font-bold py-2.5 rounded-xl text-xs transition-all">חזרה להתחברות</button>
+                                            <button onClick={() => switchTab('login')} className="w-full bg-primary hover:bg-primary-light text-white font-bold py-2.5 rounded-xl text-sm transition-all">חזרה להתחברות</button>
                                         </div>
                                     )}
                                 </>
@@ -2211,7 +2211,7 @@
                             
                             {/* Logo */}
                             <a href="#" onClick={(e) => { e.preventDefault(); setView('home'); }} className="flex items-center gap-2 select-none group">
-                                <BrandLogo size="text-3xl" iconSize="w-12 h-12 sm:w-20 sm:h-20" />
+                                <BrandLogo size="text-4xl" iconSize="w-12 h-12 sm:w-20 sm:h-20" />
                             </a>
 
                             {/* Search bar */}
@@ -2225,7 +2225,7 @@
                                         placeholder="חפשו מוצרים, מותגים או תכונות..." 
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pr-10 pl-4 py-2 bg-primary-light border border-slate-600 rounded-full text-white placeholder-slate-400 focus:outline-none focus:border-cta focus:ring-1 focus:ring-cta text-sm transition-all shadow-inner"
+                                        className="w-full pr-10 pl-4 py-2 bg-primary-light border border-slate-600 rounded-full text-white placeholder-slate-400 focus:outline-none focus:border-cta focus:ring-1 focus:ring-cta text-base transition-all shadow-inner"
                                     />
                                     {searchQuery && (
                                         <button 
@@ -2261,7 +2261,7 @@
                                 {currentUser?.role === 'admin' && (
                                     <button
                                         onClick={() => setIsSupabaseModalOpen(true)}
-                                        className={`hidden md:flex items-center gap-1 text-[10px] font-bold px-2.5 py-1.5 rounded-full transition-all border ${
+                                        className={`hidden md:flex items-center gap-1 text-sm font-bold px-2.5 py-1.5 rounded-full transition-all border ${
                                             isSupabaseConnected
                                                 ? 'bg-cta/10 text-cta border-cta/30 hover:bg-cta/20'
                                                 : 'bg-amber-500/10 text-amber-500 border-amber-500/30 hover:bg-amber-500/20'
@@ -2275,7 +2275,7 @@
                                 {currentUser && currentUser.role === 'admin' && view !== 'admin' && (
                                     <button
                                         onClick={() => { setView('admin'); setAdminTab('dashboard'); window.scrollTo({ top: 0 }); }}
-                                        className="hidden sm:flex items-center gap-1.5 bg-cta hover:bg-cta-hover text-primary font-bold text-xs px-3 py-2 rounded-full transition-all"
+                                        className="hidden sm:flex items-center gap-1.5 bg-cta hover:bg-cta-hover text-primary font-bold text-sm px-3 py-2 rounded-full transition-all"
                                     >
                                         <Icon name={"layout-dashboard"} className={"w-4 h-4"} />
                                         אזור ניהול
@@ -2284,7 +2284,7 @@
                                 {currentUser && currentUser.role === 'admin' && view === 'admin' && (
                                     <button
                                         onClick={() => setView('home')}
-                                        className="hidden sm:flex items-center gap-1.5 bg-primary-light hover:bg-primary-dark border border-slate-600 text-white font-bold text-xs px-3 py-2 rounded-full transition-all"
+                                        className="hidden sm:flex items-center gap-1.5 bg-primary-light hover:bg-primary-dark border border-slate-600 text-white font-bold text-sm px-3 py-2 rounded-full transition-all"
                                     >
                                         <Icon name={"store"} className={"w-4 h-4"} />
                                         לחנות
@@ -2299,7 +2299,7 @@
                                 >
                                     <Icon name={"heart"} className={"w-5 h-5 text-slate-100 group-hover:text-cta transition-colors"} />
                                     {wishlist.length > 0 && (
-                                        <span className="absolute -top-1 -left-1.5 bg-cta text-primary font-bold text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+                                        <span className="absolute -top-1 -left-1.5 bg-cta text-primary font-bold text-sm rounded-full w-5 h-5 flex items-center justify-center shadow-md">
                                             {wishlist.length}
                                         </span>
                                     )}
@@ -2313,7 +2313,7 @@
                                 >
                                     <Icon name={"shopping-bag"} className={"w-5 h-5 text-slate-100 group-hover:text-cta transition-colors"} />
                                     {cartCount > 0 && (
-                                        <span className="absolute -top-1 -left-1.5 bg-cta text-primary font-bold text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-md animate-bounce">
+                                        <span className="absolute -top-1 -left-1.5 bg-cta text-primary font-bold text-sm rounded-full w-5 h-5 flex items-center justify-center shadow-md animate-bounce">
                                             {cartCount}
                                         </span>
                                     )}
@@ -2326,10 +2326,10 @@
                                             onClick={() => setAccountMenuOpen(o => !o)}
                                             className="flex items-center gap-2 bg-primary-light hover:bg-primary-dark border border-slate-600 rounded-full pr-2 pl-3 py-1.5 transition-all"
                                         >
-                                            <span className="w-7 h-7 rounded-full bg-cta text-primary font-black text-xs flex items-center justify-center">
+                                            <span className="w-7 h-7 rounded-full bg-cta text-primary font-black text-sm flex items-center justify-center">
                                                 {currentUser.name.trim().charAt(0)}
                                             </span>
-                                            <span className="hidden sm:block text-xs font-bold text-white max-w-[90px] truncate">{currentUser.name}</span>
+                                            <span className="hidden sm:block text-sm font-bold text-white max-w-[90px] truncate">{currentUser.name}</span>
                                             <Icon name={"chevron-down"} className={"w-3.5 h-3.5 text-slate-300 hidden sm:block"} />
                                         </button>
                                         {accountMenuOpen && (
@@ -2337,21 +2337,21 @@
                                                 <div className="fixed inset-0 z-40" onClick={() => setAccountMenuOpen(false)}></div>
                                                 <div className="absolute left-0 mt-2 w-52 bg-white rounded-xl shadow-premium-hover border border-slate-100 py-1.5 z-50 fade-in text-right">
                                                     <div className="px-4 py-2 border-b border-slate-100">
-                                                        <div className="text-xs font-bold text-slate-800 truncate">{currentUser.name}</div>
-                                                        <div className="text-[10px] text-slate-400 truncate" dir="ltr">{currentUser.email}</div>
+                                                        <div className="text-sm font-bold text-slate-800 truncate">{currentUser.name}</div>
+                                                        <div className="text-sm text-slate-400 truncate" dir="ltr">{currentUser.email}</div>
                                                     </div>
-                                                    <button onClick={() => { setAccountMenuOpen(false); setIsWishlistOpen(true); }} className="w-full text-right px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 justify-end">
+                                                    <button onClick={() => { setAccountMenuOpen(false); setIsWishlistOpen(true); }} className="w-full text-right px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 justify-end">
                                                         רשימת המשאלות שלי <Icon name={"heart"} className={"w-4 h-4 text-slate-400"} />
                                                     </button>
                                                     {currentUser.role === 'admin' && (
-                                                        <button onClick={() => { setAccountMenuOpen(false); setView('admin'); setAdminTab('dashboard'); }} className="w-full text-right px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 justify-end">
+                                                        <button onClick={() => { setAccountMenuOpen(false); setView('admin'); setAdminTab('dashboard'); }} className="w-full text-right px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 justify-end">
                                                             אזור ניהול <Icon name={"layout-dashboard"} className={"w-4 h-4 text-slate-400"} />
                                                         </button>
                                                     )}
-                                                    <button onClick={() => { setAccountMenuOpen(false); setView('profile'); }} className="w-full text-right px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 justify-end">
+                                                    <button onClick={() => { setAccountMenuOpen(false); setView('profile'); }} className="w-full text-right px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 justify-end">
                                                         אזור אישי <Icon name={"user"} className={"w-4 h-4 text-slate-400"} />
                                                     </button>
-                                                    <button onClick={logoutUser} className="w-full text-right px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2 justify-end">
+                                                    <button onClick={logoutUser} className="w-full text-right px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2 justify-end">
                                                         התנתקות <Icon name={"log-out"} className={"w-4 h-4"} />
                                                     </button>
                                                 </div>
@@ -2365,7 +2365,7 @@
                                         aria-label="התחברות"
                                     >
                                         <Icon name={"user"} className={"w-5 h-5"} />
-                                        <span className="hidden sm:block text-xs font-bold">התחברות</span>
+                                        <span className="hidden sm:block text-sm font-bold">התחברות</span>
                                     </button>
                                 )}
                             </div>
@@ -2379,7 +2379,7 @@
                                         <button
                                             key={cat.id}
                                             onClick={() => setSelectedCategory(cat.id)}
-                                            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm whitespace-nowrap transition-all duration-300 ${
+                                            className={`flex items-center gap-2 px-4 py-2 rounded-full text-base whitespace-nowrap transition-all duration-300 ${
                                                 selectedCategory === cat.id
                                                     ? 'bg-primary text-white font-bold shadow-md dark:bg-cta dark:text-primary'
                                                     : 'bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 dark:border-slate-700 font-semibold'
@@ -2407,7 +2407,7 @@
                                     {/* Drawer Header */}
                                     <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-primary text-white">
                                         <div className="flex items-center gap-2">
-                                            <BrandLogo size="text-xl" iconSize="w-8 h-8" />
+                                            <BrandLogo size="text-2xl" iconSize="w-8 h-8" />
                                         </div>
                                         <button 
                                             onClick={() => setIsMobileMenuOpen(false)}
@@ -2421,12 +2421,12 @@
                                     <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
                                         {currentUser ? (
                                             <div className="flex items-center gap-3">
-                                                <span className="w-10 h-10 rounded-full bg-cta text-primary font-black flex items-center justify-center text-lg shadow-md">
+                                                <span className="w-10 h-10 rounded-full bg-cta text-primary font-black flex items-center justify-center text-xl shadow-md">
                                                     {currentUser.name.trim().charAt(0)}
                                                 </span>
                                                 <div>
-                                                    <div className="text-sm font-bold text-slate-800 dark:text-slate-100">שלום, {currentUser.name}</div>
-                                                    <div className="text-xs text-slate-500 dark:text-slate-400" dir="ltr">{currentUser.email}</div>
+                                                    <div className="text-base font-bold text-slate-800 dark:text-slate-100">שלום, {currentUser.name}</div>
+                                                    <div className="text-sm text-slate-500 dark:text-slate-400" dir="ltr">{currentUser.email}</div>
                                                 </div>
                                             </div>
                                         ) : (
@@ -2447,9 +2447,9 @@
                                             className="flex-1 p-4 flex flex-col items-center justify-center gap-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border-l border-slate-100 dark:border-slate-800 relative"
                                         >
                                             <Icon name="heart" className="w-6 h-6" />
-                                            <span className="text-xs font-semibold">משאלות</span>
+                                            <span className="text-sm font-semibold">משאלות</span>
                                             {wishlist.length > 0 && (
-                                                <span className="absolute top-2 right-1/4 bg-cta text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+                                                <span className="absolute top-2 right-1/4 bg-cta text-primary text-sm font-bold px-1.5 py-0.5 rounded-full shadow-sm">
                                                     {wishlist.length}
                                                 </span>
                                             )}
@@ -2459,9 +2459,9 @@
                                             className="flex-1 p-4 flex flex-col items-center justify-center gap-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors relative"
                                         >
                                             <Icon name="shopping-bag" className="w-6 h-6" />
-                                            <span className="text-xs font-semibold">עגלה</span>
+                                            <span className="text-sm font-semibold">עגלה</span>
                                             {cartCount > 0 && (
-                                                <span className="absolute top-2 right-1/4 bg-cta text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm animate-bounce">
+                                                <span className="absolute top-2 right-1/4 bg-cta text-primary text-sm font-bold px-1.5 py-0.5 rounded-full shadow-sm animate-bounce">
                                                     {cartCount}
                                                 </span>
                                             )}
@@ -2470,7 +2470,7 @@
 
                                     {/* Categories List */}
                                     <div className="flex-1 py-2">
-                                        <div className="px-4 py-2 text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                                        <div className="px-4 py-2 text-sm font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                                             קטגוריות מוצרים
                                         </div>
                                         {CATEGORIES.map(cat => (
@@ -2506,7 +2506,7 @@
                                         {currentUser?.role === 'admin' && (
                                             <button
                                                 onClick={() => { setIsMobileMenuOpen(false); setView('admin'); setAdminTab('dashboard'); window.scrollTo({ top: 0 }); }}
-                                                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-primary dark:text-cta font-bold bg-primary/10 dark:bg-cta/10 rounded-lg"
+                                                className="w-full flex items-center gap-3 px-3 py-2 text-base text-primary dark:text-cta font-bold bg-primary/10 dark:bg-cta/10 rounded-lg"
                                             >
                                                 <Icon name="layout-dashboard" className="w-5 h-5" />
                                                 אזור ניהול (Admin)
@@ -2515,7 +2515,7 @@
                                         {currentUser && (
                                             <button
                                                 onClick={() => { setIsMobileMenuOpen(false); setView('profile'); window.scrollTo({ top: 0 }); }}
-                                                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                                                className="w-full flex items-center gap-3 px-3 py-2 text-base text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                                             >
                                                 <Icon name="settings" className="w-5 h-5" />
                                                 אזור אישי
@@ -2523,7 +2523,7 @@
                                         )}
                                         <button
                                             onClick={() => { setIsDarkMode(!isDarkMode); }}
-                                            className="w-full flex items-center justify-between px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                                            className="w-full flex items-center justify-between px-3 py-2 text-base text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                                         >
                                             <div className="flex items-center gap-3">
                                                 <Icon name={isDarkMode ? "sun" : "moon"} className="w-5 h-5" />
@@ -2536,7 +2536,7 @@
                                         {currentUser && (
                                             <button
                                                 onClick={() => { setIsMobileMenuOpen(false); logoutUser(); }}
-                                                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors mt-2"
+                                                className="w-full flex items-center gap-3 px-3 py-2 text-base text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors mt-2"
                                             >
                                                 <Icon name="log-out" className="w-5 h-5" />
                                                 התנתקות
@@ -2558,21 +2558,21 @@
                                 {/* Hero banner */}
                                 <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-primary-dark via-primary to-primary-light text-white p-6 sm:p-10 shadow-premium flex flex-col md:flex-row items-center justify-between gap-6 border border-slate-700">
                                     <div className="space-y-4 max-w-xl text-right z-10">
-                                        <div className="inline-flex items-center gap-1.5 bg-primary-light/50 border border-slate-600/50 px-3 py-1 rounded-full text-xs text-cta font-bold">
+                                        <div className="inline-flex items-center gap-1.5 bg-primary-light/50 border border-slate-600/50 px-3 py-1 rounded-full text-sm text-cta font-bold">
                                             <span className="w-2 h-2 rounded-full bg-cta animate-ping"></span>
                                             חוויית קנייה אחרת לגמרי
                                         </div>
-                                        <h1 className="text-3xl sm:text-4xl font-heebo font-black tracking-tight leading-tight">
+                                        <h1 className="text-4xl sm:text-5xl font-heebo font-black tracking-tight leading-tight">
                                             אלקטרוניקה איכותית לכל בית, <span className="text-cta">בלי הרעש מסביב.</span>
                                         </h1>
-                                        <p className="text-slate-300 text-sm sm:text-base font-light">
+                                        <p className="text-slate-300 text-base sm:text-lg font-light">
                                             אנחנו מאמינים שמגיע לכם מפרט טכני ברור בעברית, מחיר הוגן וישר לעניין, ללא פרסומות מציקות ועומס מיותר. פשוט למצוא, לבחור ולקנות.
                                         </p>
                                         <div className="pt-2 flex items-center gap-4">
-                                            <a href="#catalog" className="bg-cta hover:bg-cta-hover text-primary font-bold px-5 py-2.5 rounded-full text-sm shadow-md transition-all transform hover:scale-105">
+                                            <a href="#catalog" className="bg-cta hover:bg-cta-hover text-primary font-bold px-5 py-2.5 rounded-full text-base shadow-md transition-all transform hover:scale-105">
                                                 לכל המוצרים
                                             </a>
-                                            <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-300">
+                                            <div className="hidden sm:flex items-center gap-1.5 text-sm text-slate-300">
                                                 <Icon name={"check-circle"} className={"w-4 h-4 text-cta"} /> משלוח מהיר
                                                 <span className="text-slate-500">•</span>
                                                 <Icon name={"check-circle"} className={"w-4 h-4 text-cta"} /> אחריות יבואן רשמי
@@ -2593,16 +2593,16 @@
                                 {/* Catalog grid header */}
                                 <div id="catalog" className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-700 pb-4">
                                     <div>
-                                        <h2 className="text-xl sm:text-2xl font-heebo font-black text-slate-900 dark:text-slate-100">
+                                        <h2 className="text-2xl sm:text-3xl font-heebo font-black text-slate-900 dark:text-slate-100">
                                             {selectedCategory === 'all' 
                                                 ? 'הקטלוג שלנו' 
                                                 : CATEGORIES.find(c => c.id === selectedCategory)?.name
                                             }
                                         </h2>
-                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">מציג {filteredProducts.length} מוצרים</p>
+                                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">מציג {filteredProducts.length} מוצרים</p>
                                     </div>
                                     {searchQuery && (
-                                        <div className="bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
+                                        <div className="bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
                                             תוצאות חיפוש עבור: <strong className="text-primary">"{searchQuery}"</strong>
                                             <button onClick={() => setSearchQuery('')} className="hover:text-primary"><Icon name={"x"} className={"w-3.5 h-3.5"} /></button>
                                         </div>
@@ -2629,7 +2629,7 @@
                                                         loading="lazy"
                                                     />
                                                     <div className="absolute top-3 right-3">
-                                                        <span className="bg-primary/90 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full backdrop-blur-sm">
+                                                        <span className="bg-primary/90 text-white text-sm font-bold uppercase tracking-wider px-2.5 py-1 rounded-full backdrop-blur-sm">
                                                             {CATEGORIES.find(c => c.id === product.category)?.name}
                                                         </span>
                                                     </div>
@@ -2643,7 +2643,7 @@
                                                     </button>
                                                     {product.stock_quantity <= 0 && (
                                                         <div className="absolute inset-0 flex items-center justify-center">
-                                                            <span className="bg-slate-900/80 text-white text-xs font-heebo font-black px-4 py-1.5 rounded-full">אזל מהמלאי</span>
+                                                            <span className="bg-slate-900/80 text-white text-sm font-heebo font-black px-4 py-1.5 rounded-full">אזל מהמלאי</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -2653,33 +2653,33 @@
                                                     <div className="space-y-1">
                                                         <h3 
                                                             onClick={() => openProductDetails(product)}
-                                                            className="font-heebo font-bold text-sm text-slate-800 hover:text-primary transition-colors cursor-pointer line-clamp-2 min-h-[40px] leading-tight"
+                                                            className="font-heebo font-bold text-base text-slate-800 hover:text-primary transition-colors cursor-pointer line-clamp-2 min-h-[40px] leading-tight"
                                                         >
                                                             {product.name}
                                                         </h3>
-                                                        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                                                        <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">
                                                             {product.description}
                                                         </p>
                                                     </div>
 
                                                     {/* Quantitative stock indicator (shown to customers) */}
                                                     {(() => { const m = stockMeta(product.stock_quantity); return (
-                                                        <div className={`inline-flex items-center gap-1.5 self-start text-[10px] font-bold px-2 py-0.5 rounded-full border ${m.cls}`}>
+                                                        <div className={`inline-flex items-center gap-1.5 self-start text-sm font-bold px-2 py-0.5 rounded-full border ${m.cls}`}>
                                                             <span className={`w-1.5 h-1.5 rounded-full ${m.dot}`}></span>{m.label}
                                                         </div>
                                                     ); })()}
 
                                                     <div className="flex items-center justify-between pt-2 border-t border-slate-100">
                                                         <div className="text-right">
-                                                            <div className="text-xs text-slate-400 font-light leading-none">מחיר</div>
-                                                            <div className="text-lg font-heebo font-extrabold text-primary leading-tight">
+                                                            <div className="text-sm text-slate-400 font-light leading-none">מחיר</div>
+                                                            <div className="text-xl font-heebo font-extrabold text-primary leading-tight">
                                                                 {(Number(product.price) || 0).toLocaleString('he-IL')} ₪
                                                             </div>
                                                         </div>
                                                         {product.stock_quantity > 0 ? (
                                                             <button 
                                                                 onClick={() => addToCart(product)}
-                                                                className="bg-cta hover:bg-cta-hover text-primary font-bold text-xs px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-all transform active:scale-95 shadow-md shadow-cta/10"
+                                                                className="bg-cta hover:bg-cta-hover text-primary font-bold text-sm px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-all transform active:scale-95 shadow-md shadow-cta/10"
                                                             >
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
                                                                 הוסף לסל
@@ -2687,7 +2687,7 @@
                                                         ) : (
                                                             <button 
                                                                 onClick={() => setRequestProduct(product.name)}
-                                                                className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-all transform active:scale-95 border border-slate-200"
+                                                                className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-all transform active:scale-95 border border-slate-200"
                                                             >
                                                                 <Icon name={"bell"} className={"w-4 h-4"} />
                                                                 עדכנו אותי
@@ -2703,13 +2703,13 @@
                                         <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                                         </div>
-                                        <h3 className="font-heebo font-bold text-slate-800 text-lg">לא נמצאו מוצרים תואמים</h3>
-                                        <p className="text-sm text-slate-500 max-w-md mx-auto">
+                                        <h3 className="font-heebo font-bold text-slate-800 text-xl">לא נמצאו מוצרים תואמים</h3>
+                                        <p className="text-base text-slate-500 max-w-md mx-auto">
                                             נסו לשנות את מילת החיפוש או לבחור קטגוריה אחרת כדי למצוא את מה שאתם מחפשים.
                                         </p>
                                         <button 
                                             onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }}
-                                            className="bg-primary hover:bg-primary-light text-white text-xs font-bold px-4 py-2 rounded-full transition-all"
+                                            className="bg-primary hover:bg-primary-light text-white text-sm font-bold px-4 py-2 rounded-full transition-all"
                                         >
                                             איפוס סינונים
                                         </button>
@@ -2719,7 +2719,7 @@
                                 {/* Recently Viewed Products Section */}
                                 {recentlyViewedProducts.length > 0 && (
                                     <div className="pt-6 border-t border-slate-200 space-y-4">
-                                        <h3 className="font-heebo font-black text-slate-900 text-lg">מוצרים שצפית בהם לאחרונה</h3>
+                                        <h3 className="font-heebo font-black text-slate-900 text-xl">מוצרים שצפית בהם לאחרונה</h3>
                                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                             {recentlyViewedProducts.map(product => (
                                                 <div 
@@ -2733,8 +2733,8 @@
                                                         className="w-12 h-12 object-cover rounded-lg"
                                                     />
                                                     <div className="min-w-0">
-                                                        <h4 className="font-bold text-xs text-slate-800 truncate leading-tight">{product.name}</h4>
-                                                        <p className="text-xs font-extrabold text-primary mt-1">{(Number(product.price) || 0).toLocaleString('he-IL')} ₪</p>
+                                                        <h4 className="font-bold text-sm text-slate-800 truncate leading-tight">{product.name}</h4>
+                                                        <p className="text-sm font-extrabold text-primary mt-1">{(Number(product.price) || 0).toLocaleString('he-IL')} ₪</p>
                                                     </div>
                                                 </div>
                                             ))}
@@ -2746,18 +2746,18 @@
                                     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-primary-dark via-primary to-primary-light border border-slate-700 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-5 text-white">
                                         <div className="w-56 h-40 bg-cta/10 blur-3xl absolute -left-10 -top-10 rounded-full"></div>
                                         <div className="space-y-2 text-right z-10 max-w-xl">
-                                            <div className="inline-flex items-center gap-1.5 bg-primary-light/50 border border-slate-600/50 px-3 py-1 rounded-full text-xs text-cta font-bold">
+                                            <div className="inline-flex items-center gap-1.5 bg-primary-light/50 border border-slate-600/50 px-3 py-1 rounded-full text-sm text-cta font-bold">
                                                 <Icon name={"search-x"} className={"w-3.5 h-3.5"} />
                                                 לא מצאת מה שחיפשת?
                                             </div>
-                                            <h3 className="text-xl sm:text-2xl font-heebo font-black leading-tight">חסר לנו מוצר שרצית? <span className="text-cta">ספר/י לנו.</span></h3>
-                                            <p className="text-slate-300 text-sm font-light">
+                                            <h3 className="text-2xl sm:text-3xl font-heebo font-black leading-tight">חסר לנו מוצר שרצית? <span className="text-cta">ספר/י לנו.</span></h3>
+                                            <p className="text-slate-300 text-base font-light">
                                                 כתוב/כתבי איזה מוצר תרצה/י שנביא — נעביר את הבקשה לצוות הרכש ונעדכן אותך כשהוא זמין במלאי.
                                             </p>
                                         </div>
                                         <button
                                             onClick={() => setRequestProduct('')}
-                                            className="z-10 bg-cta hover:bg-cta-hover text-primary font-bold px-6 py-3 rounded-full text-sm shadow-glow transition-all transform hover:scale-105 flex items-center gap-2 shrink-0"
+                                            className="z-10 bg-cta hover:bg-cta-hover text-primary font-bold px-6 py-3 rounded-full text-base shadow-glow transition-all transform hover:scale-105 flex items-center gap-2 shrink-0"
                                         >
                                             <Icon name={"plus-circle"} className={"w-5 h-5"} />
                                             שליחת בקשת מוצר
@@ -2782,12 +2782,12 @@
                                         <button
                                             key={t.id}
                                             onClick={() => setAdminTab(t.id)}
-                                            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${adminTab === t.id ? 'bg-primary text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'}`}
+                                            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${adminTab === t.id ? 'bg-primary text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'}`}
                                         >
                                             <Icon name={t.icon} className={"w-4 h-4"} />
                                             {t.name}
                                             {t.id === 'requests' && requests.filter(r => r.status === 'open').length > 0 && (
-                                                <span className="bg-cta text-primary rounded-full text-[10px] font-black px-1.5">{requests.filter(r => r.status === 'open').length}</span>
+                                                <span className="bg-cta text-primary rounded-full text-sm font-black px-1.5">{requests.filter(r => r.status === 'open').length}</span>
                                             )}
                                         </button>
                                     ))}
@@ -2809,7 +2809,7 @@
                                 <div className="flex items-center gap-2">
                                     <button 
                                         onClick={() => setView('home')}
-                                        className="text-slate-500 hover:text-slate-800 dark:hover:text-white text-xs font-bold flex items-center gap-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 px-3 py-1.5 rounded-full transition-all border border-slate-200 dark:border-slate-700 cursor-pointer"
+                                        className="text-slate-500 hover:text-slate-800 dark:hover:text-white text-sm font-bold flex items-center gap-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 px-3 py-1.5 rounded-full transition-all border border-slate-200 dark:border-slate-700 cursor-pointer"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                                         חזרה לקטלוג
@@ -2822,33 +2822,33 @@
                                         {/* Profile Card */}
                                         <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-premium space-y-4">
                                             <div className="flex flex-col items-center text-center space-y-2 pb-4 border-b border-slate-100 dark:border-slate-800">
-                                                <div className="w-16 h-16 rounded-full bg-cta/10 flex items-center justify-center text-cta font-black text-2xl border border-cta/30">
+                                                <div className="w-16 h-16 rounded-full bg-cta/10 flex items-center justify-center text-cta font-black text-3xl border border-cta/30">
                                                     {currentUser.name ? currentUser.name[0].toUpperCase() : 'U'}
                                                 </div>
-                                                <h3 className="font-heebo font-black text-slate-900 text-lg leading-tight">{currentUser.name}</h3>
-                                                <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                                                <h3 className="font-heebo font-black text-slate-900 text-xl leading-tight">{currentUser.name}</h3>
+                                                <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-sm font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                                                     {currentUser.role === 'admin' ? 'מנהל' : 'לקוח'}
                                                 </span>
                                             </div>
 
-                                            <div className="space-y-3 text-xs text-right">
+                                            <div className="space-y-3 text-sm text-right">
                                                 <div>
                                                     <span className="text-slate-400 block">כתובת אימייל</span>
                                                     <strong className="text-slate-700 dark:text-slate-300 block select-all">{currentUser.email}</strong>
                                                 </div>
                                                 <div>
                                                     <span className="text-slate-400 block">מזהה לקוח</span>
-                                                    <code className="text-[10px] bg-slate-50 dark:bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded block select-all truncate">{currentUser.id}</code>
+                                                    <code className="text-sm bg-slate-50 dark:bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded block select-all truncate">{currentUser.id}</code>
                                                 </div>
                                             </div>
                                         </div>
 
                                         {/* Dangerous Zone (Delete Account) */}
                                         <div className="bg-red-50/50 dark:bg-red-950/20 rounded-2xl p-6 border border-red-100 dark:border-red-900/50 space-y-4">
-                                            <h4 className="font-heebo font-black text-red-700 dark:text-red-400 text-sm flex items-center gap-1.5 justify-end">
+                                            <h4 className="font-heebo font-black text-red-700 dark:text-red-400 text-base flex items-center gap-1.5 justify-end">
                                                 אזור מסוכן <Icon name={"alert-octagon"} className={"w-4 h-4"} />
                                             </h4>
-                                            <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed text-right">
+                                            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed text-right">
                                                 מחיקת החשבון היא פעולה סופית ולא הפיכה. מחיקת החשבון תסיר מיד את כל המידע האישי שלך, פרופיל המשתמש והיסטוריית ההזמנות מבסיס הנתונים.
                                             </p>
                                             <button
@@ -2872,7 +2872,7 @@
                                                         }
                                                     }
                                                 }}
-                                                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm shadow-red-200 dark:shadow-none"
+                                                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm shadow-red-200 dark:shadow-none"
                                             >
                                                 <Icon name={"trash-2"} className={"w-4 h-4"} />
                                                 מחק את החשבון שלי
@@ -2883,22 +2883,22 @@
                                     {/* Right column: Purchase History */}
                                     <div className="md:col-span-2 bg-white rounded-2xl p-6 border border-slate-100 shadow-premium space-y-6">
                                         <div className="border-b border-slate-100 dark:border-slate-800 pb-4 text-right">
-                                            <h2 className="text-xl font-heebo font-black text-slate-900">היסטוריית רכישות</h2>
-                                            <p className="text-xs text-slate-500 mt-1">צפייה ומעקב אחר כל ההזמנות שביצעת בחנות</p>
+                                            <h2 className="text-2xl font-heebo font-black text-slate-900">היסטוריית רכישות</h2>
+                                            <p className="text-sm text-slate-500 mt-1">צפייה ומעקב אחר כל ההזמנות שביצעת בחנות</p>
                                         </div>
 
                                         {userOrders.length > 0 ? (
                                             <div className="space-y-4">
                                                 {(Array.isArray(userOrders) ? userOrders : []).map(order => (
                                                     <div key={order.id} className="border border-slate-100 dark:border-slate-800 rounded-xl p-4 space-y-4 bg-slate-50/50 dark:bg-slate-800/30">
-                                                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2 text-xs text-right">
+                                                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2 text-sm text-right">
                                                             <div className="flex items-center gap-1 text-slate-500 justify-end">
                                                                 <span>תאריך:</span>
                                                                 <strong className="text-slate-800 dark:text-slate-300">{order.date || new Date(order.created_at).toLocaleDateString('he-IL')}</strong>
                                                             </div>
                                                             <div className="flex items-center gap-1 text-slate-500 justify-end">
                                                                 <span>קוד הזמנה:</span>
-                                                                <strong className="text-primary font-mono text-[10px] select-all bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-1.5 py-0.5 rounded">{order.id}</strong>
+                                                                <strong className="text-primary font-mono text-sm select-all bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-1.5 py-0.5 rounded">{order.id}</strong>
                                                             </div>
                                                         </div>
 
@@ -2910,7 +2910,7 @@
                                                                     items = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
                                                                 } catch (e) {}
                                                                 if (!Array.isArray(items)) items = []; return items.map((item, idx) => (
-                                                                    <div key={idx} className="flex items-center justify-between text-xs gap-4 flex-row-reverse">
+                                                                    <div key={idx} className="flex items-center justify-between text-sm gap-4 flex-row-reverse">
                                                                         <span className="text-slate-600 dark:text-slate-400 truncate">{item.name}</span>
                                                                         <span className="text-slate-800 dark:text-slate-200 font-bold shrink-0">
                                                                             {item.quantity} x {(Number(item.price) || 0).toLocaleString('he-IL')} ₪
@@ -2921,9 +2921,9 @@
                                                         </div>
 
                                                         {/* Total price */}
-                                                        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-xs font-bold flex-row-reverse">
+                                                        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-sm font-bold flex-row-reverse">
                                                             <span className="text-slate-500">סה"כ שולם:</span>
-                                                            <span className="text-cta text-sm font-extrabold">{(Number(order.total) || 0).toLocaleString('he-IL')} ₪</span>
+                                                            <span className="text-cta text-base font-extrabold">{(Number(order.total) || 0).toLocaleString('he-IL')} ₪</span>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -2931,7 +2931,7 @@
                                         ) : (
                                             <div className="text-center py-12 text-slate-400 space-y-3">
                                                 <Icon name={"receipt"} className={"w-12 h-12 text-slate-300 mx-auto"} />
-                                                <p className="text-sm">עדיין לא ביצעת רכישות בחנות</p>
+                                                <p className="text-base">עדיין לא ביצעת רכישות בחנות</p>
                                             </div>
                                         )}
                                     </div>
@@ -2945,7 +2945,7 @@
                                 <div className="flex items-center gap-2">
                                     <button 
                                         onClick={() => setView('home')}
-                                        className="text-slate-500 hover:text-slate-800 text-xs font-bold flex items-center gap-1 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full transition-all"
+                                        className="text-slate-500 hover:text-slate-800 text-sm font-bold flex items-center gap-1 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full transition-all"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                                         חזרה לקטלוג
@@ -2956,18 +2956,18 @@
                                     {/* Checkout Form */}
                                     <div className="md:col-span-2 bg-white rounded-2xl p-6 border border-slate-100 shadow-premium space-y-6">
                                         <div className="border-b border-slate-100 pb-4">
-                                            <h2 className="text-xl font-heebo font-black text-slate-900">פרטי משלוח והזמנה</h2>
-                                            <p className="text-xs text-slate-500 mt-1">השלימו את הפרטים מטה כדי לאשר את ההזמנה המדומה שלכם.</p>
+                                            <h2 className="text-2xl font-heebo font-black text-slate-900">פרטי משלוח והזמנה</h2>
+                                            <p className="text-sm text-slate-500 mt-1">השלימו את הפרטים מטה כדי לאשר את ההזמנה המדומה שלכם.</p>
                                         </div>
 
                                         {/* Guest / account banner (KSP / Ivory style — buy without an account) */}
                                         {currentUser ? (
-                                            <div className="bg-cta-light border border-cta/30 rounded-xl p-3 flex items-center gap-2.5 text-xs text-slate-700">
+                                            <div className="bg-cta-light border border-cta/30 rounded-xl p-3 flex items-center gap-2.5 text-sm text-slate-700">
                                                 <Icon name={"user-check"} className={"w-4 h-4 text-cta-hover shrink-0"} />
                                                 מחובר/ת כ־<strong className="text-primary">{currentUser.name}</strong>. הפרטים מולאו עבורך אוטומטית.
                                             </div>
                                         ) : (
-                                            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                                            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm">
                                                 <div className="flex items-center gap-2 text-slate-600">
                                                     <Icon name={"user-round"} className={"w-4 h-4 text-slate-400 shrink-0"} />
                                                     ממשיכים כאורח — אפשר לסיים את הרכישה גם בלי חשבון.
@@ -2981,70 +2981,70 @@
                                         <form onSubmit={handlePlaceOrder} className="space-y-4">
                                             {/* Name */}
                                             <div className="space-y-1">
-                                                <label className="block text-xs font-bold text-slate-700">שם מלא *</label>
+                                                <label className="block text-sm font-bold text-slate-700">שם מלא *</label>
                                                 <input 
                                                     type="text"
                                                     value={formName}
                                                     onChange={(e) => setFormName(e.target.value)}
                                                     placeholder="ישראל ישראלי"
-                                                    className={`w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 ${
+                                                    className={`w-full px-4 py-2.5 rounded-lg border text-base focus:outline-none focus:ring-2 ${
                                                         formErrors.name ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'
                                                     }`}
                                                 />
-                                                {formErrors.name && <p className="text-red-500 text-xs font-semibold">{formErrors.name}</p>}
+                                                {formErrors.name && <p className="text-red-500 text-sm font-semibold">{formErrors.name}</p>}
                                             </div>
 
                                             {/* Phone */}
                                             <div className="space-y-1">
-                                                <label className="block text-xs font-bold text-slate-700">מספר טלפון *</label>
+                                                <label className="block text-sm font-bold text-slate-700">מספר טלפון *</label>
                                                 <input 
                                                     type="tel"
                                                     value={formPhone}
                                                     onChange={(e) => setFormPhone(e.target.value)}
                                                     placeholder="050-0000000"
-                                                    className={`w-full px-4 py-2.5 rounded-lg border text-sm text-left focus:outline-none focus:ring-2 ${
+                                                    className={`w-full px-4 py-2.5 rounded-lg border text-base text-left focus:outline-none focus:ring-2 ${
                                                         formErrors.phone ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'
                                                     }`}
                                                     dir="ltr"
                                                 />
-                                                {formErrors.phone && <p className="text-red-500 text-xs font-semibold">{formErrors.phone}</p>}
+                                                {formErrors.phone && <p className="text-red-500 text-sm font-semibold">{formErrors.phone}</p>}
                                             </div>
 
                                             {/* Email (for order confirmation) */}
                                             <div className="space-y-1">
-                                                <label className="block text-xs font-bold text-slate-700">אימייל לאישור הזמנה</label>
+                                                <label className="block text-sm font-bold text-slate-700">אימייל לאישור הזמנה</label>
                                                 <input 
                                                     type="email"
                                                     value={formEmail}
                                                     onChange={(e) => setFormEmail(e.target.value)}
                                                     placeholder="name@example.com"
                                                     dir="ltr"
-                                                    className={`w-full px-4 py-2.5 rounded-lg border text-sm text-left focus:outline-none focus:ring-2 ${
+                                                    className={`w-full px-4 py-2.5 rounded-lg border text-base text-left focus:outline-none focus:ring-2 ${
                                                         formErrors.email ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'
                                                     }`}
                                                 />
-                                                {formErrors.email && <p className="text-red-500 text-xs font-semibold">{formErrors.email}</p>}
+                                                {formErrors.email && <p className="text-red-500 text-sm font-semibold">{formErrors.email}</p>}
                                             </div>
 
                                             {/* Address */}
                                             <div className="space-y-1">
-                                                <label className="block text-xs font-bold text-slate-700">כתובת למשלוח *</label>
+                                                <label className="block text-sm font-bold text-slate-700">כתובת למשלוח *</label>
                                                 <input 
                                                     type="text"
                                                     value={formAddress}
                                                     onChange={(e) => setFormAddress(e.target.value)}
                                                     placeholder="רחוב, מספר בית, עיר"
-                                                    className={`w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 ${
+                                                    className={`w-full px-4 py-2.5 rounded-lg border text-base focus:outline-none focus:ring-2 ${
                                                         formErrors.address ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'
                                                     }`}
                                                 />
-                                                {formErrors.address && <p className="text-red-500 text-xs font-semibold">{formErrors.address}</p>}
+                                                {formErrors.address && <p className="text-red-500 text-sm font-semibold">{formErrors.address}</p>}
                                             </div>
 
                                             {/* Info alert */}
                                             <div className="bg-cta-light border border-cta/30 rounded-xl p-4 flex gap-3 text-slate-700">
                                                 <div className="text-cta shrink-0"><Icon name={"info"} className={"w-5 h-5"} /></div>
-                                                <div className="text-xs space-y-1 leading-relaxed">
+                                                <div className="text-sm space-y-1 leading-relaxed">
                                                     <strong className="text-primary block">הזמנת סימולציה (Mock Checkout)</strong>
                                                     רכישה זו היא סימולציה בלבד לצרכי פיתוח. לא תתבקשו להזין פרטי אשראי והזמנה זו לא תחויב באמת.
                                                 </div>
@@ -3053,7 +3053,7 @@
                                             {/* Submit Button */}
                                             <button 
                                                 type="submit"
-                                                className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl shadow-md transition-all text-sm flex items-center justify-center gap-2 transform active:scale-[0.98]"
+                                                className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl shadow-md transition-all text-base flex items-center justify-center gap-2 transform active:scale-[0.98]"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                                                 אישור והשלמת הזמנה
@@ -3074,12 +3074,12 @@
                                                         className="w-10 h-10 object-cover rounded-lg border border-slate-100"
                                                     />
                                                     <div className="min-w-0 flex-1">
-                                                        <h4 className="font-bold text-xs text-slate-800 truncate leading-tight">{item.name}</h4>
-                                                        <div className="text-xs text-slate-500 mt-0.5">
+                                                        <h4 className="font-bold text-sm text-slate-800 truncate leading-tight">{item.name}</h4>
+                                                        <div className="text-sm text-slate-500 mt-0.5">
                                                             {item.quantity} x {(Number(item.price) || 0).toLocaleString('he-IL')} ₪
                                                         </div>
                                                     </div>
-                                                    <div className="font-heebo font-extrabold text-xs text-slate-800">
+                                                    <div className="font-heebo font-extrabold text-sm text-slate-800">
                                                         {(Number((item.price * item.quantity)) || 0).toLocaleString('he-IL')} ₪
                                                     </div>
                                                 </div>
@@ -3087,15 +3087,15 @@
                                         </div>
 
                                         <div className="border-t border-slate-100 pt-3 space-y-2">
-                                            <div className="flex justify-between text-xs text-slate-500">
+                                            <div className="flex justify-between text-sm text-slate-500">
                                                 <span>פריטים:</span>
                                                 <span>{cartCount}</span>
                                             </div>
-                                            <div className="flex justify-between text-xs text-slate-500">
+                                            <div className="flex justify-between text-sm text-slate-500">
                                                 <span>משלוח:</span>
                                                 <span className="text-cta font-bold">חינם</span>
                                             </div>
-                                            <div className="flex justify-between font-heebo font-black text-sm text-primary pt-1.5 border-t border-dashed border-slate-200">
+                                            <div className="flex justify-between font-heebo font-black text-base text-primary pt-1.5 border-t border-dashed border-slate-200">
                                                 <span>סה"כ לתשלום:</span>
                                                 <span>{(Number(cartTotal) || 0).toLocaleString('he-IL')} ₪</span>
                                             </div>
@@ -3118,15 +3118,15 @@
                                 </div>
 
                                 <div className="space-y-2">
-                                    <h2 className="text-2xl font-heebo font-black text-slate-900">תודה, ההזמנה התקבלה!</h2>
-                                    <p className="text-sm text-slate-500">ההזמנה המדומה שלך נוצרה בהצלחה ונשמרה במערכת.</p>
+                                    <h2 className="text-3xl font-heebo font-black text-slate-900">תודה, ההזמנה התקבלה!</h2>
+                                    <p className="text-base text-slate-500">ההזמנה המדומה שלך נוצרה בהצלחה ונשמרה במערכת.</p>
                                 </div>
 
                                 {/* Order details card */}
-                                <div className="bg-slate-50 rounded-xl p-5 text-right text-xs space-y-3.5 border border-slate-100">
+                                <div className="bg-slate-50 rounded-xl p-5 text-right text-sm space-y-3.5 border border-slate-100">
                                     <div className="flex justify-between items-center border-b border-slate-200 pb-2">
                                         <span className="font-bold text-slate-600">מספר הזמנה:</span>
-                                        <span className="font-heebo font-extrabold text-primary bg-slate-200/70 px-2.5 py-0.5 rounded text-[11px]">{completedOrder.id}</span>
+                                        <span className="font-heebo font-extrabold text-primary bg-slate-200/70 px-2.5 py-0.5 rounded text-base">{completedOrder.id}</span>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
@@ -3142,16 +3142,16 @@
                                         <span className="font-bold text-slate-500 block">כתובת למשלוח:</span>
                                         <span className="text-slate-800 font-semibold">{completedOrder.customerAddress}</span>
                                     </div>
-                                    <div className="pt-2 border-t border-slate-200 flex justify-between items-center text-sm">
+                                    <div className="pt-2 border-t border-slate-200 flex justify-between items-center text-base">
                                         <span className="font-bold text-primary">סה"כ בעסקה:</span>
-                                        <span className="font-heebo font-black text-primary text-base">{(Number(completedOrder.total) || 0).toLocaleString('he-IL')} ₪</span>
+                                        <span className="font-heebo font-black text-primary text-lg">{(Number(completedOrder.total) || 0).toLocaleString('he-IL')} ₪</span>
                                     </div>
                                 </div>
 
                                 <div className="pt-2">
                                     <button 
                                         onClick={() => setView('home')}
-                                        className="w-full bg-primary hover:bg-primary-light text-white font-bold py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2"
+                                        className="w-full bg-primary hover:bg-primary-light text-white font-bold py-3 rounded-xl transition-all text-base flex items-center justify-center gap-2"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                                         חזרה לחנות
@@ -3162,10 +3162,10 @@
                     </main>
 
                     {/* Footer */}
-                    <footer className="bg-primary-dark text-slate-400 text-xs border-t border-slate-800 py-6 mt-12">
+                    <footer className="bg-primary-dark text-slate-400 text-sm border-t border-slate-800 py-6 mt-12">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                             <div className="text-right space-y-1">
-                                <span className="font-heebo font-bold text-white text-sm">Not<span className="text-cta">KSP</span></span>
+                                <span className="font-heebo font-bold text-white text-base">Not<span className="text-cta">KSP</span></span>
                                 <p>© 2026. כל הזכויות שמורות לחנות הדגמה NotKSP.</p>
                             </div>
                             <div className="flex items-center gap-4 text-slate-500">
@@ -3205,7 +3205,7 @@
                                         className="w-full h-full object-cover max-h-56 md:max-h-full"
                                     />
                                     <div className="absolute top-4 right-4">
-                                        <span className="bg-primary/95 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+                                        <span className="bg-primary/95 text-white text-sm font-bold uppercase tracking-wider px-3 py-1 rounded-full">
                                             {CATEGORIES.find(c => c.id === activeProduct.category)?.name}
                                         </span>
                                     </div>
@@ -3215,31 +3215,31 @@
                                 <div className="w-full md:w-1/2 p-6 overflow-y-auto custom-scrollbar flex flex-col justify-between space-y-6">
                                     <div className="space-y-4">
                                         <div>
-                                            <h2 className="text-xl sm:text-2xl font-heebo font-black text-slate-900 leading-tight">
+                                            <h2 className="text-2xl sm:text-3xl font-heebo font-black text-slate-900 leading-tight">
                                                 {activeProduct.name}
                                             </h2>
                                             
                                             {/* Price Badge */}
                                             <div className="mt-2.5 flex items-baseline gap-2">
-                                                <span className="text-slate-400 text-xs font-light">מחיר לצרכן:</span>
-                                                <span className="text-2xl font-heebo font-black text-primary">
+                                                <span className="text-slate-400 text-sm font-light">מחיר לצרכן:</span>
+                                                <span className="text-3xl font-heebo font-black text-primary">
                                                     {(Number(activeProduct.price) || 0).toLocaleString('he-IL')} ₪
                                                 </span>
                                             </div>
                                         </div>
 
-                                        <p className="text-slate-600 text-sm leading-relaxed">
+                                        <p className="text-slate-600 text-base leading-relaxed">
                                             {activeProduct.description}
                                         </p>
 
                                         {/* Technical Specifications */}
                                         {activeProduct.specifications && (
                                             <div className="space-y-2">
-                                                <h3 className="font-heebo font-bold text-slate-800 text-sm border-b border-slate-100 pb-1 flex items-center gap-1.5">
+                                                <h3 className="font-heebo font-bold text-slate-800 text-base border-b border-slate-100 pb-1 flex items-center gap-1.5">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-slate-500"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                                                     מפרט טכני מלא
                                                 </h3>
-                                                <div className="space-y-1.5 text-xs text-slate-700">
+                                                <div className="space-y-1.5 text-sm text-slate-700">
                                                     {Object.entries(activeProduct.specifications || {}).map(([key, val]) => (
                                                         <div key={key} className="flex justify-between py-1 border-b border-dashed border-slate-100 gap-4">
                                                             <span className="font-semibold text-slate-500 shrink-0">{key}</span>
@@ -3253,7 +3253,7 @@
                                         {/* Recommended / Similar Products (Bonus feature) */}
                                         {similarProducts.length > 0 && (
                                             <div className="space-y-2 pt-2">
-                                                <h3 className="font-heebo font-bold text-slate-800 text-sm border-b border-slate-100 pb-1">
+                                                <h3 className="font-heebo font-bold text-slate-800 text-base border-b border-slate-100 pb-1">
                                                     אולי יעניין אותך גם
                                                 </h3>
                                                 <div className="grid grid-cols-3 gap-2">
@@ -3268,8 +3268,8 @@
                                                                 alt={prod.name}
                                                                 className="w-10 h-10 object-cover rounded"
                                                             />
-                                                            <span className="text-[10px] font-semibold text-slate-700 truncate w-full mt-1">{prod.name}</span>
-                                                            <span className="text-[11px] font-extrabold text-primary mt-0.5">{(Number(prod.price) || 0).toLocaleString('he-IL')} ₪</span>
+                                                            <span className="text-sm font-semibold text-slate-700 truncate w-full mt-1">{prod.name}</span>
+                                                            <span className="text-base font-extrabold text-primary mt-0.5">{(Number(prod.price) || 0).toLocaleString('he-IL')} ₪</span>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -3280,9 +3280,9 @@
                                     {/* Action button */}
                                     <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
                                         <div className="text-right space-y-1">
-                                            <span className="block text-[10px] text-slate-400">אחריות יבואן רשמי</span>
+                                            <span className="block text-sm text-slate-400">אחריות יבואן רשמי</span>
                                             {(() => { const q = stockOf(activeProduct.id); const m = stockMeta(q); return (
-                                                <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2 py-0.5 rounded-full border ${m.cls}`}>
+                                                <span className={`inline-flex items-center gap-1.5 text-sm font-bold px-2 py-0.5 rounded-full border ${m.cls}`}>
                                                     <span className={`w-1.5 h-1.5 rounded-full ${m.dot}`}></span>{m.label}
                                                 </span>
                                             ); })()}
@@ -3298,7 +3298,7 @@
                                             {stockOf(activeProduct.id) > 0 ? (
                                                 <button 
                                                     onClick={() => { addToCart(activeProduct); setActiveProduct(null); }}
-                                                    className="bg-cta hover:bg-cta-hover text-primary font-bold text-sm px-6 py-2.5 rounded-full flex items-center gap-2 transition-all transform active:scale-95 shadow-md shadow-cta/15"
+                                                    className="bg-cta hover:bg-cta-hover text-primary font-bold text-base px-6 py-2.5 rounded-full flex items-center gap-2 transition-all transform active:scale-95 shadow-md shadow-cta/15"
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
                                                     הוסף לסל
@@ -3306,7 +3306,7 @@
                                             ) : (
                                                 <button 
                                                     onClick={() => { setRequestProduct(activeProduct.name); setActiveProduct(null); }}
-                                                    className="bg-primary hover:bg-primary-light text-white font-bold text-sm px-6 py-2.5 rounded-full flex items-center gap-2 transition-all transform active:scale-95 shadow-md"
+                                                    className="bg-primary hover:bg-primary-light text-white font-bold text-base px-6 py-2.5 rounded-full flex items-center gap-2 transition-all transform active:scale-95 shadow-md"
                                                 >
                                                     <Icon name={"bell"} className={"w-5 h-5"} />
                                                     עדכנו אותי כשחוזר
@@ -3335,8 +3335,8 @@
                                     <div className="px-6 py-5 bg-primary text-white flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-cta"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-                                            <h2 className="font-heebo font-black text-lg">סל הקניות שלך</h2>
-                                            <span className="bg-cta text-primary font-bold text-xs rounded-full px-2 py-0.5">{cartCount}</span>
+                                            <h2 className="font-heebo font-black text-xl">סל הקניות שלך</h2>
+                                            <span className="bg-cta text-primary font-bold text-sm rounded-full px-2 py-0.5">{cartCount}</span>
                                         </div>
                                         <button 
                                             onClick={() => setIsCartOpen(false)}
@@ -3361,10 +3361,10 @@
                                                     
                                                     {/* Info */}
                                                     <div className="min-w-0 flex-1 space-y-1">
-                                                        <h3 className="font-bold text-xs text-slate-800 line-clamp-2 leading-tight">
+                                                        <h3 className="font-bold text-sm text-slate-800 line-clamp-2 leading-tight">
                                                             {item.name}
                                                         </h3>
-                                                        <div className="font-heebo font-black text-xs text-primary">
+                                                        <div className="font-heebo font-black text-sm text-primary">
                                                             {(Number(item.price) || 0).toLocaleString('he-IL')} ₪
                                                         </div>
                                                         
@@ -3372,14 +3372,14 @@
                                                         <div className="flex items-center gap-2 pt-1">
                                                             <button 
                                                                 onClick={() => updateCartQuantity(item.id, -1)}
-                                                                className="w-6 h-6 rounded-full border border-slate-300 hover:bg-slate-100 flex items-center justify-center text-xs font-bold transition-colors"
+                                                                className="w-6 h-6 rounded-full border border-slate-300 hover:bg-slate-100 flex items-center justify-center text-sm font-bold transition-colors"
                                                             >
                                                                 -
                                                             </button>
-                                                            <span className="text-xs font-bold w-5 text-center">{item.quantity}</span>
+                                                            <span className="text-sm font-bold w-5 text-center">{item.quantity}</span>
                                                             <button 
                                                                 onClick={() => updateCartQuantity(item.id, 1)}
-                                                                className="w-6 h-6 rounded-full border border-slate-300 hover:bg-slate-100 flex items-center justify-center text-xs font-bold transition-colors"
+                                                                className="w-6 h-6 rounded-full border border-slate-300 hover:bg-slate-100 flex items-center justify-center text-sm font-bold transition-colors"
                                                             >
                                                                 +
                                                             </button>
@@ -3395,7 +3395,7 @@
                                                         >
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4.5 h-4.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                                                         </button>
-                                                        <span className="font-heebo font-extrabold text-xs text-slate-800 mt-1">
+                                                        <span className="font-heebo font-extrabold text-sm text-slate-800 mt-1">
                                                             {(Number((item.price * item.quantity)) || 0).toLocaleString('he-IL')} ₪
                                                         </span>
                                                     </div>
@@ -3407,12 +3407,12 @@
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
                                                 </div>
                                                 <h3 className="font-heebo font-bold text-slate-800">עגלת הקניות שלך ריקה</h3>
-                                                <p className="text-xs text-slate-400 max-w-xs mx-auto">
+                                                <p className="text-sm text-slate-400 max-w-xs mx-auto">
                                                     מוצרים שתוסיפו לעגלה יופיעו כאן. חזרו לקטלוג כדי למצוא אלקטרוניקה מעולה.
                                                 </p>
                                                 <button 
                                                     onClick={() => setIsCartOpen(false)}
-                                                    className="bg-primary hover:bg-primary-light text-white text-xs font-bold px-5 py-2 rounded-full transition-all"
+                                                    className="bg-primary hover:bg-primary-light text-white text-sm font-bold px-5 py-2 rounded-full transition-all"
                                                 >
                                                     המשך בקניות
                                                 </button>
@@ -3424,27 +3424,27 @@
                                     {cart.length > 0 && (
                                         <div className="border-t border-slate-200 px-6 py-5 bg-slate-50 space-y-4">
                                             <div className="space-y-1.5">
-                                                <div className="flex justify-between text-xs text-slate-500">
+                                                <div className="flex justify-between text-sm text-slate-500">
                                                     <span>סה"כ פריטים:</span>
                                                     <span>{cartCount}</span>
                                                 </div>
-                                                <div className="flex justify-between font-heebo font-black text-sm text-primary">
+                                                <div className="flex justify-between font-heebo font-black text-base text-primary">
                                                     <span>סה"כ לתשלום:</span>
-                                                    <span className="text-base">{(Number(cartTotal) || 0).toLocaleString('he-IL')} ₪</span>
+                                                    <span className="text-lg">{(Number(cartTotal) || 0).toLocaleString('he-IL')} ₪</span>
                                                 </div>
                                             </div>
                                             
                                             <div className="grid grid-cols-2 gap-3">
                                                 <button 
                                                     onClick={() => { setIsCartOpen(false); setView('checkout'); }}
-                                                    className="bg-cta hover:bg-cta-hover text-primary font-bold py-2.5 rounded-xl text-center text-xs shadow-md transition-all flex items-center justify-center gap-1"
+                                                    className="bg-cta hover:bg-cta-hover text-primary font-bold py-2.5 rounded-xl text-center text-sm shadow-md transition-all flex items-center justify-center gap-1"
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect width="18" height="12" x="3" y="6" rx="2"/><path d="M3 10h18"/></svg>
                                                     המשך לתשלום
                                                 </button>
                                                 <button 
                                                     onClick={clearCart}
-                                                    className="border border-slate-300 hover:bg-slate-100 text-slate-600 font-bold py-2.5 rounded-xl text-xs transition-all"
+                                                    className="border border-slate-300 hover:bg-slate-100 text-slate-600 font-bold py-2.5 rounded-xl text-sm transition-all"
                                                 >
                                                     ריקון סל
                                                 </button>
@@ -3464,8 +3464,8 @@
                                     <div className="px-6 py-5 bg-primary text-white flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <Icon name={"heart"} className={"w-5 h-5 text-cta"} />
-                                            <h2 className="font-heebo font-black text-lg">רשימת המשאלות</h2>
-                                            <span className="bg-cta text-primary font-bold text-xs rounded-full px-2 py-0.5">{wishlistProducts.length}</span>
+                                            <h2 className="font-heebo font-black text-xl">רשימת המשאלות</h2>
+                                            <span className="bg-cta text-primary font-bold text-sm rounded-full px-2 py-0.5">{wishlistProducts.length}</span>
                                         </div>
                                         <button onClick={() => setIsWishlistOpen(false)} className="text-slate-300 hover:text-white p-1.5" aria-label="סגור">
                                             <Icon name={"x"} className={"w-5 h-5"} />
@@ -3477,18 +3477,18 @@
                                                 <div key={item.id} className="py-4 flex gap-4 items-center">
                                                     <img src={`${item.image_url}?auto=format&fit=crop&w=150&q=80`} alt={item.name} className="w-16 h-16 object-cover rounded-lg border border-slate-100 flex-shrink-0 cursor-pointer" onClick={() => { setIsWishlistOpen(false); openProductDetails(item); }} />
                                                     <div className="min-w-0 flex-1 space-y-1">
-                                                        <h3 className="font-bold text-xs text-slate-800 line-clamp-2 leading-tight">{item.name}</h3>
-                                                        <div className="font-heebo font-black text-xs text-primary">{(Number(item.price) || 0).toLocaleString('he-IL')} ₪</div>
-                                                        <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${m.cls}`}><span className={`w-1.5 h-1.5 rounded-full ${m.dot}`}></span>{m.label}</span>
+                                                        <h3 className="font-bold text-sm text-slate-800 line-clamp-2 leading-tight">{item.name}</h3>
+                                                        <div className="font-heebo font-black text-sm text-primary">{(Number(item.price) || 0).toLocaleString('he-IL')} ₪</div>
+                                                        <span className={`inline-flex items-center gap-1 text-sm font-bold px-2 py-0.5 rounded-full border ${m.cls}`}><span className={`w-1.5 h-1.5 rounded-full ${m.dot}`}></span>{m.label}</span>
                                                     </div>
                                                     <div className="flex flex-col items-end gap-2 shrink-0">
                                                         <button onClick={() => toggleWishlist(item.id)} className="text-slate-400 hover:text-red-500 p-1" aria-label="הסר">
                                                             <Icon name={"trash-2"} className={"w-4 h-4"} />
                                                         </button>
                                                         {item.stock_quantity > 0 ? (
-                                                            <button onClick={() => addToCart(item)} className="bg-cta hover:bg-cta-hover text-primary font-bold text-[11px] px-3 py-1.5 rounded-full transition-all">הוסף לסל</button>
+                                                            <button onClick={() => addToCart(item)} className="bg-cta hover:bg-cta-hover text-primary font-bold text-base px-3 py-1.5 rounded-full transition-all">הוסף לסל</button>
                                                         ) : (
-                                                            <button onClick={() => { setIsWishlistOpen(false); setRequestProduct(item.name); }} className="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[11px] px-3 py-1.5 rounded-full transition-all">עדכנו אותי</button>
+                                                            <button onClick={() => { setIsWishlistOpen(false); setRequestProduct(item.name); }} className="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-base px-3 py-1.5 rounded-full transition-all">עדכנו אותי</button>
                                                         )}
                                                     </div>
                                                 </div>
@@ -3499,8 +3499,8 @@
                                                     <Icon name={"heart"} className={"w-8 h-8"} />
                                                 </div>
                                                 <h3 className="font-heebo font-bold text-slate-800">רשימת המשאלות ריקה</h3>
-                                                <p className="text-xs text-slate-400 max-w-xs mx-auto">לחצו על הלב שעל מוצר כדי לשמור אותו לכאן לזמן אחר.</p>
-                                                <button onClick={() => setIsWishlistOpen(false)} className="bg-primary hover:bg-primary-light text-white text-xs font-bold px-5 py-2 rounded-full transition-all">חזרה לקטלוג</button>
+                                                <p className="text-sm text-slate-400 max-w-xs mx-auto">לחצו על הלב שעל מוצר כדי לשמור אותו לכאן לזמן אחר.</p>
+                                                <button onClick={() => setIsWishlistOpen(false)} className="bg-primary hover:bg-primary-light text-white text-sm font-bold px-5 py-2 rounded-full transition-all">חזרה לקטלוג</button>
                                             </div>
                                         )}
                                     </div>
@@ -3520,30 +3520,30 @@
                                 <div className="bg-primary text-white px-6 pt-6 pb-4 text-right">
                                     <div className="flex items-center gap-2 mb-1">
                                         <Icon name={"database"} className={"w-5 h-5 text-cta"} />
-                                        <span className="font-heebo font-black text-lg">הגדרות חיבור Supabase</span>
+                                        <span className="font-heebo font-black text-xl">הגדרות חיבור Supabase</span>
                                     </div>
-                                    <p className="text-xs text-slate-300">חברו את NotKSP לבסיס הנתונים של Supabase לסנכרון מלא של מוצרים, מלאי, משתמשים והזמנות.</p>
+                                    <p className="text-sm text-slate-300">חברו את NotKSP לבסיס הנתונים של Supabase לסנכרון מלא של מוצרים, מלאי, משתמשים והזמנות.</p>
                                 </div>
                                 <div className="p-6 space-y-4 text-right">
                                     <div className="space-y-1">
-                                        <label className="block text-xs font-bold text-slate-700">Supabase URL</label>
+                                        <label className="block text-sm font-bold text-slate-700">Supabase URL</label>
                                         <input 
                                             value={supabaseUrl} 
                                             onChange={e => setSupabaseUrl(e.target.value)} 
                                             placeholder="https://xxxxxx.supabase.co" 
                                             dir="ltr"
-                                            className="w-full px-4 py-2.5 rounded-lg border text-sm border-slate-300 focus:border-primary focus:ring-primary/10 text-left" 
+                                            className="w-full px-4 py-2.5 rounded-lg border text-base border-slate-300 focus:border-primary focus:ring-primary/10 text-left" 
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <label className="block text-xs font-bold text-slate-700">Supabase Anon Key</label>
+                                        <label className="block text-sm font-bold text-slate-700">Supabase Anon Key</label>
                                         <input 
                                             type="password"
                                             value={supabaseKey} 
                                             onChange={e => setSupabaseKey(e.target.value)} 
                                             placeholder="eyJhbGciOi..." 
                                             dir="ltr"
-                                            className="w-full px-4 py-2.5 rounded-lg border text-sm border-slate-300 focus:border-primary focus:ring-primary/10 text-left" 
+                                            className="w-full px-4 py-2.5 rounded-lg border text-base border-slate-300 focus:border-primary focus:ring-primary/10 text-left" 
                                         />
                                     </div>
 
@@ -3565,7 +3565,7 @@
                                                 showToast('ההגדרות נשמרו. האתר נטען מחדש...', 'cta');
                                                 setTimeout(() => window.location.reload(), 1000);
                                             }}
-                                            className="flex-1 bg-primary hover:bg-primary-light text-white font-bold py-2.5 rounded-xl text-xs transition-all"
+                                            className="flex-1 bg-primary hover:bg-primary-light text-white font-bold py-2.5 rounded-xl text-sm transition-all"
                                         >
                                             שמירה וחיבור
                                         </button>
@@ -3580,7 +3580,7 @@
                                                 showToast('החיבור נמחק. האתר נטען מחדש...', 'slate');
                                                 setTimeout(() => window.location.reload(), 1000);
                                             }}
-                                            className="bg-red-50 hover:bg-red-100 text-red-600 font-bold px-4 py-2.5 rounded-xl text-xs transition-all border border-red-200"
+                                            className="bg-red-50 hover:bg-red-100 text-red-600 font-bold px-4 py-2.5 rounded-xl text-sm transition-all border border-red-200"
                                         >
                                             ניתוק
                                         </button>
@@ -3588,7 +3588,7 @@
 
                                     {isSupabaseConnected && (
                                         <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
-                                            <div className="text-xs font-bold text-slate-700">כלים למפתחים</div>
+                                            <div className="text-sm font-bold text-slate-700">כלים למפתחים</div>
                                             <button 
                                                 disabled={seedingStatus === 'seeding'}
                                                 onClick={async () => {
@@ -3619,11 +3619,11 @@
                                                         showToast('שגיאה בסיד: ' + err.message, 'amber');
                                                     }
                                                 }}
-                                                className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-2 rounded-lg text-xs transition-all disabled:opacity-50"
+                                                className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-2 rounded-lg text-sm transition-all disabled:opacity-50"
                                             >
                                                 {seedingStatus === 'seeding' ? 'מעלה מוצרים...' : seedingStatus === 'success' ? 'הועלה בהצלחה ✓' : 'העלאת מוצרי ברירת מחדל ל-Supabase'}
                                             </button>
-                                            <p className="text-[10px] text-slate-400">
+                                            <p className="text-sm text-slate-400">
                                                 * כפתור זה מעלה את 8 מוצרי הברירת מחדל לטבלת `products` ב-Supabase במידה והיא ריקה.
                                             </p>
                                         </div>
@@ -3655,23 +3655,23 @@
                                 <div className="bg-primary text-white px-6 pt-6 pb-4 text-right">
                                     <div className="flex items-center gap-2 mb-1">
                                         <Icon name={"package-search"} className={"w-5 h-5 text-cta"} />
-                                        <span className="font-heebo font-black text-lg">בקשת מוצר</span>
+                                        <span className="font-heebo font-black text-xl">בקשת מוצר</span>
                                     </div>
-                                    <p className="text-xs text-slate-300">נשמח לדעת איזה מוצר תרצו — נעדכן אתכם כשהוא זמין.</p>
+                                    <p className="text-sm text-slate-300">נשמח לדעת איזה מוצר תרצו — נעדכן אתכם כשהוא זמין.</p>
                                 </div>
                                 <div className="p-6 space-y-4">
                                     <div className="space-y-1">
-                                        <label className="block text-xs font-bold text-slate-700">שם המוצר המבוקש *</label>
-                                        <input value={reqName} onChange={e => { setReqName(e.target.value); setReqError(''); }} placeholder="לדוגמה: מקרן 4K לבית" className={`w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 ${reqError ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'}`} />
-                                        {reqError && <p className="text-red-500 text-xs font-semibold">{reqError}</p>}
+                                        <label className="block text-sm font-bold text-slate-700">שם המוצר המבוקש *</label>
+                                        <input value={reqName} onChange={e => { setReqName(e.target.value); setReqError(''); }} placeholder="לדוגמה: מקרן 4K לבית" className={`w-full px-4 py-2.5 rounded-lg border text-base focus:outline-none focus:ring-2 ${reqError ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'}`} />
+                                        {reqError && <p className="text-red-500 text-sm font-semibold">{reqError}</p>}
                                     </div>
                                     <div className="space-y-1">
-                                        <label className="block text-xs font-bold text-slate-700">פרטים נוספים (אופציונלי)</label>
-                                        <textarea value={reqNote} onChange={e => setReqNote(e.target.value)} rows="2" placeholder="דגם מסוים, טווח מחירים, כמות..." className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"></textarea>
+                                        <label className="block text-sm font-bold text-slate-700">פרטים נוספים (אופציונלי)</label>
+                                        <textarea value={reqNote} onChange={e => setReqNote(e.target.value)} rows="2" placeholder="דגם מסוים, טווח מחירים, כמות..." className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-base focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"></textarea>
                                     </div>
                                     <div className="space-y-1">
-                                        <label className="block text-xs font-bold text-slate-700">אימייל ליצירת קשר (אופציונלי)</label>
-                                        <input value={reqEmail} onChange={e => setReqEmail(e.target.value)} placeholder="name@example.com" dir="ltr" className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm text-left focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10" />
+                                        <label className="block text-sm font-bold text-slate-700">אימייל ליצירת קשר (אופציונלי)</label>
+                                        <input value={reqEmail} onChange={e => setReqEmail(e.target.value)} placeholder="name@example.com" dir="ltr" className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-base text-left focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10" />
                                     </div>
                                     <button
                                         onClick={() => {
@@ -3679,7 +3679,7 @@
                                             submitRequest({ productName: reqName, note: reqNote, email: reqEmail });
                                             setRequestProduct(null);
                                         }}
-                                        className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-sm shadow-md transition-all flex items-center justify-center gap-2"
+                                        className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-base shadow-md transition-all flex items-center justify-center gap-2"
                                     >
                                         <Icon name={"send"} className={"w-4 h-4"} /> שליחת הבקשה
                                     </button>
@@ -3705,8 +3705,8 @@
                                 <div className="fixed inset-0 z-40" onClick={() => setAccOpen(false)}></div>
                                 <div className="absolute bottom-14 right-0 w-[calc(100vw-2rem)] max-w-xs sm:w-80 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 rounded-2xl shadow-premium-hover p-5 z-50 fade-in text-right">
                                     <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
-                                        <button onClick={resetAccessibility} className="text-[10px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold px-2 py-1 rounded-lg transition-colors cursor-pointer">אפס הגדרות</button>
-                                        <h3 className="font-heebo font-black text-slate-800 dark:text-white text-sm flex items-center gap-1.5 justify-end">
+                                        <button onClick={resetAccessibility} className="text-sm bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold px-2 py-1 rounded-lg transition-colors cursor-pointer">אפס הגדרות</button>
+                                        <h3 className="font-heebo font-black text-slate-800 dark:text-white text-base flex items-center gap-1.5 justify-end">
                                             נגישות אתר (IS 5568 AA) <Icon name={"accessibility"} className={"w-4 h-4 text-primary"} />
                                         </h3>
                                     </div>
@@ -3714,23 +3714,23 @@
                                     <div className="space-y-4">
                                         {/* Color contrast */}
                                         <div className="space-y-1.5">
-                                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">ניגודיות צבעים</label>
+                                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">ניגודיות צבעים</label>
                                             <div className="grid grid-cols-3 gap-2">
                                                 <button 
                                                     onClick={() => setAccContrast('normal')}
-                                                    className={`px-3 py-2 rounded-lg text-xs font-bold transition-all border cursor-pointer ${accContrast === 'normal' ? 'bg-primary text-white border-primary' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}
+                                                    className={`px-3 py-2 rounded-lg text-sm font-bold transition-all border cursor-pointer ${accContrast === 'normal' ? 'bg-primary text-white border-primary' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}
                                                 >
                                                     רגיל
                                                 </button>
                                                 <button 
                                                     onClick={() => setAccContrast('high')}
-                                                    className={`px-3 py-2 rounded-lg text-xs font-bold transition-all border cursor-pointer ${accContrast === 'high' ? 'bg-primary text-white border-primary' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}
+                                                    className={`px-3 py-2 rounded-lg text-sm font-bold transition-all border cursor-pointer ${accContrast === 'high' ? 'bg-primary text-white border-primary' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}
                                                 >
                                                     ניגודיות גבוהה
                                                 </button>
                                                 <button 
                                                     onClick={() => setAccContrast('grayscale')}
-                                                    className={`px-3 py-2 rounded-lg text-xs font-bold transition-all border cursor-pointer ${accContrast === 'grayscale' ? 'bg-primary text-white border-primary' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}
+                                                    className={`px-3 py-2 rounded-lg text-sm font-bold transition-all border cursor-pointer ${accContrast === 'grayscale' ? 'bg-primary text-white border-primary' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}
                                                 >
                                                     מונוכרום
                                                 </button>
@@ -3739,13 +3739,13 @@
 
                                         {/* Font size */}
                                         <div className="space-y-1.5">
-                                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">גודל גופן</label>
+                                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">גודל גופן</label>
                                             <div className="grid grid-cols-4 gap-2">
                                                 {[100, 110, 120, 130].map(sz => (
                                                     <button 
                                                         key={sz}
                                                         onClick={() => setAccFontSize(sz)}
-                                                        className={`px-2 py-2 rounded-lg text-xs font-bold transition-all border cursor-pointer ${accFontSize === sz ? 'bg-primary text-white border-primary' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}
+                                                        className={`px-2 py-2 rounded-lg text-sm font-bold transition-all border cursor-pointer ${accFontSize === sz ? 'bg-primary text-white border-primary' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}
                                                     >
                                                         {sz}%
                                                     </button>
@@ -3757,7 +3757,7 @@
                                         <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                                             <button 
                                                 onClick={() => setAccReadableFont(!accReadableFont)}
-                                                className={`w-full px-3 py-2 rounded-lg text-xs font-bold border transition-all flex items-center justify-between cursor-pointer ${accReadableFont ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'}`}
+                                                className={`w-full px-3 py-2 rounded-lg text-sm font-bold border transition-all flex items-center justify-between cursor-pointer ${accReadableFont ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'}`}
                                             >
                                                 <span className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${accReadableFont ? 'border-primary bg-primary' : 'border-slate-400'}`}>
                                                     {accReadableFont && <span className="w-1.5 h-1.5 bg-white rounded-full"></span>}
@@ -3767,7 +3767,7 @@
 
                                             <button 
                                                 onClick={() => setAccHighlightLinks(!accHighlightLinks)}
-                                                className={`w-full px-3 py-2 rounded-lg text-xs font-bold border transition-all flex items-center justify-between cursor-pointer ${accHighlightLinks ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'}`}
+                                                className={`w-full px-3 py-2 rounded-lg text-sm font-bold border transition-all flex items-center justify-between cursor-pointer ${accHighlightLinks ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'}`}
                                             >
                                                 <span className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${accHighlightLinks ? 'border-primary bg-primary' : 'border-slate-400'}`}>
                                                     {accHighlightLinks && <span className="w-1.5 h-1.5 bg-white rounded-full"></span>}
@@ -3777,7 +3777,7 @@
 
                                             <button 
                                                 onClick={() => setAccStopAnimations(!accStopAnimations)}
-                                                className={`w-full px-3 py-2 rounded-lg text-xs font-bold border transition-all flex items-center justify-between cursor-pointer ${accStopAnimations ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'}`}
+                                                className={`w-full px-3 py-2 rounded-lg text-sm font-bold border transition-all flex items-center justify-between cursor-pointer ${accStopAnimations ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'}`}
                                             >
                                                 <span className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${accStopAnimations ? 'border-primary bg-primary' : 'border-slate-400'}`}>
                                                     {accStopAnimations && <span className="w-1.5 h-1.5 bg-white rounded-full"></span>}
@@ -3794,7 +3794,7 @@
                     {/* 9. Toast */}
                     {toast && (
                         <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-[70] fade-in">
-                            <div className={`px-5 py-3 rounded-full shadow-premium-hover text-xs font-bold flex items-center gap-2 ${toast.tone === 'amber' ? 'bg-amber-500 text-white' : toast.tone === 'slate' ? 'bg-slate-800 text-white' : 'bg-cta text-primary'}`}>
+                            <div className={`px-5 py-3 rounded-full shadow-premium-hover text-sm font-bold flex items-center gap-2 ${toast.tone === 'amber' ? 'bg-amber-500 text-white' : toast.tone === 'slate' ? 'bg-slate-800 text-white' : 'bg-cta text-primary'}`}>
                                 <Icon name={toast.tone === 'amber' ? 'alert-triangle' : 'check-circle'} className={"w-4 h-4"} />
                                 {toast.text}
                             </div>
