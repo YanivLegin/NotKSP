@@ -1242,7 +1242,7 @@
                                 <>
                                     {!resetInfo ? (
                                         <>
-                                            <p className="text-sm text-slate-500 leading-relaxed">נשלח קישור לאיפוס סיסמה לכתובת האימייל שלך (באמצעות Brevo).</p>
+                                            <p className="text-sm text-slate-500 leading-relaxed">נשלח קישור לאיפוס סיסמה לכתובת האימייל שלך.</p>
                                             <button onClick={submitReset} disabled={loading} className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-base shadow-md transition-all disabled:opacity-60">
                                                 {loading ? 'שולח...' : 'שליחת קישור איפוס'}
                                             </button>
@@ -1250,18 +1250,10 @@
                                         </>
                                     ) : (
                                         <div className="space-y-3">
-                                            {resetInfo.sent ? (
-                                                <div className="bg-cta-light border border-cta/30 rounded-lg p-4 text-sm text-slate-700 flex items-start gap-2">
-                                                    <Icon name={"mail-check"} className={"w-5 h-5 text-cta-hover shrink-0"} />
-                                                    <span>מייל איפוס נשלח דרך Brevo לכתובת <strong dir="ltr">{email}</strong>. בדוק/בדקי את תיבת הדואר.</span>
-                                                </div>
-                                            ) : (
-                                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-slate-700 space-y-2">
-                                                    <div className="flex items-center gap-2 font-bold text-amber-700"><Icon name={"info"} className={"w-4 h-4"} /> מצב הדגמה (Backend של Brevo לא מחובר עדיין)</div>
-                                                    <p>לאחר חיבור ה-Backend, מייל אמיתי יישלח דרך Brevo. בינתיים, קוד האיפוס שלך:</p>
-                                                    <div className="bg-white border border-amber-200 rounded px-3 py-2 font-heebo font-black text-center text-xl tracking-widest text-primary">{resetInfo.token}</div>
-                                                </div>
-                                            )}
+                                            <div className="bg-cta-light border border-cta/30 rounded-lg p-4 text-sm text-slate-700 flex items-start gap-2">
+                                                <Icon name={"mail-check"} className={"w-5 h-5 text-cta-hover shrink-0"} />
+                                                <span>מייל לאיפוס סיסמה נשלח בהצלחה לכתובת <strong dir="ltr">{email}</strong>. בדוק/בדקי את תיבת הדואר הנכנס.</span>
+                                            </div>
                                             <button onClick={() => switchTab('login')} className="w-full bg-primary hover:bg-primary-light text-white font-bold py-2.5 rounded-xl text-sm transition-all">חזרה להתחברות</button>
                                         </div>
                                     )}
@@ -1905,32 +1897,28 @@
                 showToast('התנתקת מהחשבון', 'slate');
             };
 
-            // Password reset via Brevo. Returns a dev token if no backend is wired yet.
+            // Password reset via Supabase (connected to Brevo SMTP)
             const requestPasswordReset = async (email) => {
                 email = email.trim().toLowerCase();
                 if (!EMAIL_RE.test(email)) return { ok: false, error: "כתובת אימייל אינה תקינה" };
-                const token = Math.random().toString(36).slice(2, 8).toUpperCase();
-                const tokens = LS.get('notksp_reset_tokens', {});
-                tokens[email] = { token, expires: Date.now() + 1000 * 60 * 30 };
-                LS.set('notksp_reset_tokens', tokens);
-
-                const resetLink = `${location.origin}${location.pathname}?reset=${token}&email=${encodeURIComponent(email)}`;
-
-                if (BREVO_CONFIG.endpoint) {
+                
+                if (isSupabaseConnected && supabaseClient) {
                     try {
-                        const res = await fetch(BREVO_CONFIG.endpoint, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email, token, resetLink })
+                        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                            redirectTo: `${location.origin}${location.pathname}`
                         });
-                        if (!res.ok) throw new Error('bad status');
+                        if (error) throw error;
                         return { ok: true, sent: true };
-                    } catch (e) {
-                        return { ok: false, error: "שליחת המייל נכשלה. בדוק את הגדרות ה-Backend של Brevo." };
+                    } catch (error) {
+                        console.error('Reset error:', error);
+                        if (error.message.includes('rate limit')) {
+                            return { ok: false, error: "נשלחו יותר מדי בקשות לאיפוס סיסמה. אנא נסה שוב בעוד כשעה." };
+                        }
+                        return { ok: false, error: "שגיאה בשליחת קישור האיפוס: " + error.message };
                     }
                 }
-                // No backend configured yet -> simulate and surface the token for the demo
-                return { ok: true, sent: false, token, resetLink };
+                
+                return { ok: false, error: "החיבור למסד הנתונים אינו פעיל. לא ניתן לאפס סיסמה." };
             };
 
             const isWishlisted = (id) => wishlist.includes(id);
