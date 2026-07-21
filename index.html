@@ -511,7 +511,7 @@
         // ============================================================
         
         
-        const BrandLogo = ({ size = "text-2xl", iconSize = "w-8 h-8", showSub = true, className = "" }) => (
+        const BrandLogo = ({ size = "text-2xl", iconSize = "w-14 h-14", showSub = true, className = "" }) => (
             <div className={`flex items-center gap-2.5 group cursor-pointer ${className}`}>
                 <div className={`relative flex items-center justify-center ${iconSize} transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-3`}>
                     <div className="absolute inset-0 bg-cta/40 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -2103,7 +2103,7 @@
                             
                             {/* Logo */}
                             <a href="#" onClick={(e) => { e.preventDefault(); setView('home'); }} className="flex items-center gap-2 select-none group">
-                                <BrandLogo size="text-3xl" iconSize="w-10 h-10" />
+                                <BrandLogo size="text-3xl" iconSize="w-16 h-16" />
                             </a>
 
                             {/* Search bar */}
