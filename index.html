@@ -439,7 +439,7 @@
                 name: "רמקול חכם עם מסך מגע",
                 price: 450,
                 category: "smart_home",
-                image_url: "https://images.unsplash.com/photo-1584282361665-27a3c77d612f",
+                image_url: "https://images.unsplash.com/photo-1543512214-318c7553f230",
                 description: "מרכז השליטה של הבית החכם שלכם - רמקול איכותי משולב מסך מגע להצגת מתכונים, וידאו, ותפעול מוצרי חשמל חכמים.",
                 in_stock: true,
                 specifications: {
@@ -467,7 +467,7 @@
                 name: "ראוטר Mesh Wi-Fi 6 חכם",
                 price: 950,
                 category: "computer_accessories",
-                image_url: "https://images.unsplash.com/photo-1544186595-df6329c3d4a6",
+                image_url: "https://images.unsplash.com/photo-1606904825846-647eb07f5be2",
                 description: "כיסוי אינטרנט מושלם לכל חלקי הבית ללא נקודות מתות, התקנה פשוטה באפליקציה ויכולת חיבור לעשרות מכשירים בו זמנית.",
                 in_stock: true,
                 specifications: {
@@ -495,7 +495,7 @@
                 name: "מצלמת רשת 4K למחשב",
                 price: 650,
                 category: "computer_accessories",
-                image_url: "https://images.unsplash.com/photo-1623862660142-b91c964177d7",
+                image_url: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04",
                 description: "לשיחות וידאו וישיבות זום באיכות הגבוהה ביותר עם פוקוס אוטומטי מהיר וחיישן אור מובנה.",
                 in_stock: true,
                 specifications: {
@@ -2099,16 +2099,16 @@
                 <div className="flex flex-col min-h-screen">
                     {/* Header */}
                     <header className="sticky top-0 z-40 bg-primary text-white shadow-md">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
                             
                             {/* Logo */}
                             <a href="#" onClick={(e) => { e.preventDefault(); setView('home'); }} className="flex items-center gap-2 select-none group">
-                                <BrandLogo size="text-3xl" iconSize="w-20 h-20" />
+                                <BrandLogo size="text-3xl" iconSize="w-12 h-12 sm:w-20 sm:h-20" />
                             </a>
 
                             {/* Search bar */}
                             {view === 'home' && (
-                                <div className="flex-1 max-w-lg relative group">
+                                <div className="order-3 w-full basis-full sm:order-none sm:w-auto sm:basis-auto flex-1 max-w-none sm:max-w-lg relative group">
                                     <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-cta transition-colors">
                                         <Icon name={"search"} className={"w-5 h-5"} />
                                     </div>
@@ -2131,7 +2131,7 @@
                             )}
 
                             {/* Actions */}
-                            <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
                                 {/* Dark Mode Toggle */}
                                 <button
                                     onClick={() => setIsDarkMode(!isDarkMode)}
@@ -2144,7 +2144,7 @@
                                 {currentUser?.role === 'admin' && (
                                     <button
                                         onClick={() => setIsSupabaseModalOpen(true)}
-                                        className={`flex items-center gap-1 text-[10px] font-bold px-2.5 py-1.5 rounded-full transition-all border ${
+                                        className={`hidden md:flex items-center gap-1 text-[10px] font-bold px-2.5 py-1.5 rounded-full transition-all border ${
                                             isSupabaseConnected
                                                 ? 'bg-cta/10 text-cta border-cta/30 hover:bg-cta/20'
                                                 : 'bg-amber-500/10 text-amber-500 border-amber-500/30 hover:bg-amber-500/20'
@@ -2320,18 +2320,18 @@
                                 </div>
 
                                 {/* Catalog grid header */}
-                                <div id="catalog" className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+                                <div id="catalog" className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-700 pb-4">
                                     <div>
-                                        <h2 className="text-xl sm:text-2xl font-heebo font-black text-slate-900">
+                                        <h2 className="text-xl sm:text-2xl font-heebo font-black text-slate-900 dark:text-slate-100">
                                             {selectedCategory === 'all' 
                                                 ? 'הקטלוג שלנו' 
                                                 : CATEGORIES.find(c => c.id === selectedCategory)?.name
                                             }
                                         </h2>
-                                        <p className="text-xs text-slate-500 mt-1">מציג {filteredProducts.length} מוצרים</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">מציג {filteredProducts.length} מוצרים</p>
                                     </div>
                                     {searchQuery && (
-                                        <div className="bg-slate-100 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 text-slate-600">
+                                        <div className="bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
                                             תוצאות חיפוש עבור: <strong className="text-primary">"{searchQuery}"</strong>
                                             <button onClick={() => setSearchQuery('')} className="hover:text-primary"><Icon name={"x"} className={"w-3.5 h-3.5"} /></button>
                                         </div>
@@ -3419,7 +3419,7 @@
 
                     
                     {/* Floating Accessibility AA Button & Widget */}
-                    <div className="fixed bottom-6 right-6 z-50">
+                    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
                         <button 
                             onClick={() => setAccOpen(!accOpen)}
                             className="w-12 h-12 bg-primary hover:bg-primary-light text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all cursor-pointer border border-primary/20"
@@ -3432,7 +3432,7 @@
                         {accOpen && (
                             <>
                                 <div className="fixed inset-0 z-40" onClick={() => setAccOpen(false)}></div>
-                                <div className="absolute bottom-14 right-0 w-80 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 rounded-2xl shadow-premium-hover p-5 z-50 fade-in text-right">
+                                <div className="absolute bottom-14 right-0 w-[calc(100vw-2rem)] max-w-xs sm:w-80 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 rounded-2xl shadow-premium-hover p-5 z-50 fade-in text-right">
                                     <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
                                         <button onClick={resetAccessibility} className="text-[10px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold px-2 py-1 rounded-lg transition-colors cursor-pointer">אפס הגדרות</button>
                                         <h3 className="font-heebo font-black text-slate-800 dark:text-white text-sm flex items-center gap-1.5 justify-end">
@@ -3522,7 +3522,7 @@
     
                     {/* 9. Toast */}
                     {toast && (
-                        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] fade-in">
+                        <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-[70] fade-in">
                             <div className={`px-5 py-3 rounded-full shadow-premium-hover text-xs font-bold flex items-center gap-2 ${toast.tone === 'amber' ? 'bg-amber-500 text-white' : toast.tone === 'slate' ? 'bg-slate-800 text-white' : 'bg-cta text-primary'}`}>
                                 <Icon name={toast.tone === 'amber' ? 'alert-triangle' : 'check-circle'} className={"w-4 h-4"} />
                                 {toast.text}
