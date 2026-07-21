@@ -1258,6 +1258,7 @@
             const [authTab, setAuthTab] = useState('login');            // 'login' | 'register' | 'forgot'
             const [accountMenuOpen, setAccountMenuOpen] = useState(false);
             const [adminTab, setAdminTab] = useState('dashboard');
+            const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
             const [isDarkMode, setIsDarkMode] = useState(() => LS.get('notksp_dark_mode', false));
 
             // ===== Accessibility states =====
@@ -2130,8 +2131,17 @@
                                 </div>
                             )}
 
+                            {/* Mobile Menu Toggle */}
+                            <button
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                className="sm:hidden p-2 text-slate-200 hover:text-white bg-primary-light hover:bg-primary-dark border border-slate-600 rounded-lg flex items-center justify-center transition-colors mr-auto"
+                                aria-label="תפריט"
+                            >
+                                <Icon name={isMobileMenuOpen ? "x" : "menu"} className={"w-5 h-5"} />
+                            </button>
+
                             {/* Actions */}
-                            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+                            <div className={`${isMobileMenuOpen ? 'flex w-full order-4 flex-wrap justify-center gap-3 pt-3 mt-2 border-t border-slate-700/50' : 'hidden'} sm:flex sm:w-auto sm:order-none sm:pt-0 sm:mt-0 sm:border-0 items-center gap-1.5 sm:gap-3 shrink-0 transition-all`}>
                                 {/* Dark Mode Toggle */}
                                 <button
                                     onClick={() => setIsDarkMode(!isDarkMode)}
