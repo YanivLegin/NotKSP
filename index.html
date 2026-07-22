@@ -768,18 +768,7 @@
         // Two products (3, 6) start out of stock to demo the "request" flow.
         const STOCK_DEFAULTS = { "1": 5, "2": 3, "3": 0, "4": 12, "6": 0, "7": 2, "8": 15, "9": 10, "10": 4, "11": 7, "12": 1, "13": 8, "14": 5, "15": 3, "16": 9 };
 
-        // ============================================================
-        //  NEW: Brevo config for password-reset emails.
-        //  The API key is a SECRET and must live on a backend, never here.
-        //  Set `endpoint` to your serverless URL (see brevo-reset-password.js).
-        //  While empty, the app simulates the reset and shows the token on screen.
-        // ============================================================
-        const BREVO_CONFIG = {
-            endpoint: "",                       // e.g. "https://your-site.vercel.app/api/reset-password"
-            fromName: "NotKSP",
-            fromEmail: "no-reply@notksp.co.il"
-        };
-
+        
         // ============================================================
         //  NEW: Lightweight (NON-secure, prototype only) password hashing.
         //  Real auth must hash+salt on a server. This only avoids storing
@@ -1338,7 +1327,7 @@
                                 <>
                                     {!resetInfo ? (
                                         <>
-                                            <p className="text-sm text-slate-500 leading-relaxed">נשלח קישור לאיפוס סיסמה לכתובת האימייל שלך (באמצעות Brevo).</p>
+                                            <p className="text-sm text-slate-500 leading-relaxed">נשלח קישור לאיפוס סיסמה לכתובת האימייל שלך באמצעות Supabase.</p>
                                             <button onClick={submitReset} disabled={loading} className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-base shadow-md transition-all disabled:opacity-60">
                                                 {loading ? 'שולח...' : 'שליחת קישור איפוס'}
                                             </button>
@@ -1351,18 +1340,19 @@
                                                     <Icon name={"mail-check"} className={"w-5 h-5 text-cta-hover shrink-0"} />
                                                     <span>מייל איפוס סיסמה נשלח מ-Supabase לכתובת <strong dir="ltr">{email}</strong>. לחץ/י על הקישור במייל לבחירת סיסמה חדשה.</span>
                                                 </div>
-                                            ) : resetInfo.sent ? (
-                                                <div className="bg-cta-light border border-cta/30 rounded-lg p-4 text-sm text-slate-700 flex items-start gap-2">
-                                                    <Icon name={"mail-check"} className={"w-5 h-5 text-cta-hover shrink-0"} />
-                                                    <span>מייל איפוס נשלח דרך Brevo לכתובת <strong dir="ltr">{email}</strong>. בדוק/בדקי את תיבת הדואר.</span>
-                                                </div>
                                             ) : (
-                                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-slate-700 space-y-2">
-                                                    <div className="flex items-center gap-2 font-bold text-amber-700"><Icon name={"info"} className={"w-4 h-4"} /> מצב הדגמה (Backend של Brevo לא מחובר עדיין)</div>
-                                                    <p>לאחר חיבור ה-Backend, מייל אמיתי יישלח דרך Brevo. בינתיים, קוד האיפוס שלך:</p>
+                                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-slate-700 space-y-3">
+                                                    <div className="flex items-center gap-2 font-bold text-amber-700"><Icon name={"info"} className={"w-4 h-4"} /> מצב הדגמה מקומית (Supabase AnonKey לא מחובר)</div>
+                                                    <p>כדי לשלוח מייל איפוס אמיתי מ-Supabase, יש לחבר את המפתח בחיבור Supabase. בינתיים, קוד האיפוס להדגמה שלך:</p>
                                                     <div className="bg-white border border-amber-200 rounded px-3 py-2 font-heebo font-black text-center text-xl tracking-widest text-primary">{resetInfo.token}</div>
+                                                    <button onClick={() => switchTab('new_password')} className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-2 rounded-lg text-sm shadow transition-all">
+                                                        המשך להגדרת סיסמה חדשה
+                                                    </button>
                                                 </div>
                                             )}
+                                            <button onClick={() => switchTab('login')} className="w-full bg-primary hover:bg-primary-light text-white font-bold py-2.5 rounded-xl text-sm transition-all">חזרה להתחברות</button>
+                                        </div>
+                                    )}
                                             <button onClick={() => switchTab('login')} className="w-full bg-primary hover:bg-primary-light text-white font-bold py-2.5 rounded-xl text-sm transition-all">חזרה להתחברות</button>
                                         </div>
                                     )}
@@ -2023,7 +2013,7 @@
                 showToast('התנתקת מהחשבון', 'slate');
             };
 
-            // Password reset via Supabase or local / Brevo fallback.
+            // Password reset via Supabase Auth (or local demo fallback).
             const requestPasswordReset = async (email) => {
                 email = email.trim().toLowerCase();
                 if (!EMAIL_RE.test(email)) return { ok: false, error: "כתובת אימייל אינה תקינה" };
@@ -2046,19 +2036,7 @@
 
                 const resetLink = `${location.origin}${location.pathname}?reset=${token}&email=${encodeURIComponent(email)}`;
 
-                if (BREVO_CONFIG.endpoint) {
-                    try {
-                        const res = await fetch(BREVO_CONFIG.endpoint, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email, token, resetLink })
-                        });
-                        if (!res.ok) throw new Error('bad status');
-                        return { ok: true, sent: true };
-                    } catch (e) {
-                        return { ok: false, error: "שליחת המייל נכשלה. בדוק את הגדרות ה-Backend של Brevo." };
-                    }
-                }
+
                 return { ok: true, sent: false, token, resetLink };
             };
 
