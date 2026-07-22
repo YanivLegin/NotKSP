@@ -271,16 +271,42 @@
             { id: 'bat_yam', name: 'בת ים', city: 'בת ים', phone: '04-8123410', hours: 'א-ה 09:30-22:00, ו 09:00-14:30' }
         ];
 
-        // Pseudo-random generator based on string to generate deterministic branch stock
-        const getBranchStockStatus = (productId, branchId) => {
-            let hash = 0;
-            const str = productId + "_" + branchId;
-            for (let i = 0; i < str.length; i++) {
-                hash = ((hash << 5) - hash) + str.charCodeAt(i);
-                hash |= 0;
+        const getBranchStockStatus = (product, branchId) => {
+            if (!product || product.stock_quantity <= 0) return false;
+            
+            // Generate a unique score for each branch for this product
+            const getScore = (bId) => {
+                let h = 0;
+                const str = product.id + "_" + bId;
+                for (let i = 0; i < str.length; i++) {
+                    h = ((h << 5) - h) + str.charCodeAt(i);
+                    h |= 0;
+                }
+                return Math.abs(h);
+            };
+            
+            const branchesWithScores = BRANCHES.map(b => ({
+                id: b.id,
+                score: getScore(b.id)
+            }));
+            
+            // Sort deterministically by score
+            branchesWithScores.sort((a, b) => b.score - a.score);
+            
+            // Calculate how many branches should have it (based on product id)
+            let pHash = 0;
+            const pStr = String(product.id);
+            for (let i = 0; i < pStr.length; i++) {
+                pHash = ((pHash << 5) - pHash) + pStr.charCodeAt(i);
+                pHash |= 0;
             }
-            // Give ~30% chance to be in stock for a branch
-            return (Math.abs(hash) % 100) < 30;
+            const randomCount = (Math.abs(pHash) % 5) + 1; // 1 to 5
+            
+            // Cap to the actual stock quantity
+            const numBranches = Math.min(Number(product.stock_quantity) || 0, randomCount);
+            
+            const topBranches = branchesWithScores.slice(0, numBranches).map(b => b.id);
+            return topBranches.includes(branchId);
         };
 
         const PRODUCTS = [
@@ -1065,7 +1091,7 @@
                                                             onClick={() => onViewBranchStock(p)}
                                                             className="text-xs text-primary/80 font-semibold mt-0.5 hover:underline cursor-pointer flex items-center gap-1" dir="rtl"
                                                         >
-                                                            זמין ב-{BRANCHES.filter(b => getBranchStockStatus(p.id, b.id)).length} סניפים
+                                                            זמין ב-{BRANCHES.filter(b => getBranchStockStatus(p, b.id)).length} סניפים
                                                             <Icon name="chevron-left" className="w-3 h-3" />
                                                         </button>
                                                     </div>
@@ -1295,7 +1321,7 @@
                         <div className="p-6 overflow-y-auto flex-grow bg-slate-50">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {BRANCHES.map(branch => {
-                                    const inStock = getBranchStockStatus(product.id, branch.id);
+                                    const inStock = getBranchStockStatus(product, branch.id);
                                     return (
                                         <div key={branch.id} className="bg-white p-4 rounded-xl border shadow-sm flex items-center gap-4 hover:border-slate-300 transition-all">
                                             <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${inStock ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
