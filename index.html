@@ -222,10 +222,10 @@
 
         // Supabase configuration
         let initialUrl = 'https://ykoallfmckyoiwmtbvjp.supabase.co';
-        let initialKey = '';
+        let initialKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlrb2FsbGZtY2t5b2l3bXRidmpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NjQ5MjUsImV4cCI6MjEwMDA0MDkyNX0.bbpy43BESi5rvdRStHxcZQwy1F1UE6o1gkhhBkzxVyo';
         try {
             initialUrl = localStorage.getItem('notksp_supabase_url') || 'https://ykoallfmckyoiwmtbvjp.supabase.co';
-            initialKey = localStorage.getItem('notksp_supabase_anon_key') || '';
+            initialKey = localStorage.getItem('notksp_supabase_anon_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlrb2FsbGZtY2t5b2l3bXRidmpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NjQ5MjUsImV4cCI6MjEwMDA0MDkyNX0.bbpy43BESi5rvdRStHxcZQwy1F1UE6o1gkhhBkzxVyo';
         } catch (e) {
             console.warn("localStorage read failed:", e);
         }
