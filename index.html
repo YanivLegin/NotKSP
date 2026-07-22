@@ -2058,18 +2058,29 @@
 
             // ===== NEW: merged catalog (base + admin products) with effective stock =====
             const catalog = useMemo(() => {
+                let resolvedProducts = [];
                 if (isSupabaseConnected && Array.isArray(dbProducts) && dbProducts.length > 0) {
-                    return dbProducts;
+                    resolvedProducts = dbProducts;
+                } else {
+                    const base = PRODUCTS.map(p => ({
+                        ...p,
+                        stock_quantity: stockMap[p.id] !== undefined ? stockMap[p.id] : (STOCK_DEFAULTS[p.id] ?? 0)
+                    }));
+                    const custom = customProducts.map(p => ({
+                        ...p,
+                        stock_quantity: stockMap[p.id] !== undefined ? stockMap[p.id] : (p.stock_quantity ?? 0)
+                    }));
+                    resolvedProducts = [...base, ...custom];
                 }
-                const base = PRODUCTS.map(p => ({
-                    ...p,
-                    stock_quantity: stockMap[p.id] !== undefined ? stockMap[p.id] : (STOCK_DEFAULTS[p.id] ?? 0)
-                }));
-                const custom = customProducts.map(p => ({
-                    ...p,
-                    stock_quantity: stockMap[p.id] !== undefined ? stockMap[p.id] : (p.stock_quantity ?? 0)
-                }));
-                return [...base, ...custom];
+                
+                // Force base products to use the hardcoded images in case of broken DB/cache links
+                return resolvedProducts.map(p => {
+                    const baseProd = PRODUCTS.find(bp => bp.id === p.id);
+                    if (baseProd && baseProd.image_url) {
+                        return { ...p, image_url: baseProd.image_url };
+                    }
+                    return p;
+                });
             }, [customProducts, stockMap, dbProducts, isSupabaseConnected]);
 
             const getProduct = (id) => catalog.find(p => p.id === id);
