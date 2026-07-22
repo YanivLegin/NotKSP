@@ -1592,7 +1592,7 @@
                         .from('profiles')
                         .select('*')
                         .eq('id', authUser.id)
-                        .single();
+                        .maybeSingle();
                     
                     if (profile) {
                         setCurrentUser({
@@ -1636,7 +1636,7 @@
                         .from('wishlists')
                         .select('product_ids')
                         .eq('user_id', userId)
-                        .single();
+                        .maybeSingle();
                     if (!error && data) {
                         const list = Array.isArray(data.product_ids) ? data.product_ids : [];
                         setWishlistMap(prev => ({ ...prev, [wishlistKey]: list }));
