@@ -257,8 +257,115 @@
         ];
 
         // Constants - Product catalog with full specs as requested in the PRD
+        
+        const BRANCHES = [
+            { id: 'eilat_malkot', name: 'אילת מלכות שבא', city: 'אילת', phone: '04-8123401', hours: 'א-ה 09:30-22:00, ו 09:00-14:30' },
+            { id: 'eilat_tzafon', name: 'אילת צפון', city: 'אילת', phone: '04-8123402', hours: 'א-ה 09:00-21:00, ו 09:00-14:00' },
+            { id: 'eilat_tarshish', name: 'אילת תרשיש', city: 'אילת', phone: '04-8123403', hours: 'א-ה 10:00-22:00, ו 09:30-15:00' },
+            { id: 'ashdod_merkaz', name: 'אשדוד מרכז', city: 'אשדוד', phone: '04-8123404', hours: 'א-ה 09:30-21:30, ו 09:00-14:00' },
+            { id: 'ashdod_ad_halom', name: 'אשדוד עד הלום', city: 'אשדוד', phone: '04-8123405', hours: 'א-ה 10:00-22:00, ו 09:30-14:30' },
+            { id: 'ashkelon', name: 'אשקלון', city: 'אשקלון', phone: '04-8123406', hours: 'א-ה 09:30-21:00, ו 09:00-14:00' },
+            { id: 'b7_grand', name: 'באר שבע גרנד', city: 'באר שבע', phone: '04-8123407', hours: 'א-ה 09:30-22:00, ו 09:00-15:00' },
+            { id: 'b7_ramot', name: 'באר שבע רמות', city: 'באר שבע', phone: '04-8123408', hours: 'א-ה 10:00-21:30, ו 09:30-14:00' },
+            { id: 'beit_shemesh', name: 'בית שמש', city: 'בית שמש', phone: '04-8123409', hours: 'א-ה 09:30-21:00, ו 09:00-13:30' },
+            { id: 'bat_yam', name: 'בת ים', city: 'בת ים', phone: '04-8123410', hours: 'א-ה 09:30-22:00, ו 09:00-14:30' }
+        ];
+
+        // Pseudo-random generator based on string to generate deterministic branch stock
+        const getBranchStockStatus = (productId, branchId) => {
+            let hash = 0;
+            const str = productId + "_" + branchId;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash |= 0;
+            }
+            // Give ~30% chance to be in stock for a branch
+            return (Math.abs(hash) % 100) < 30;
+        };
+
         const PRODUCTS = [
+
             { 
+                id: "16", 
+                name: "שואב אבק אלחוטי Dyson V15 Detect Absolute", 
+                price: 2990, 
+                category: "smart_home", 
+                image_url: "https://images.unsplash.com/photo-1558317374-067fb5f30001", 
+                description: "שואב האבק האלחוטי והעוצמתי ביותר מבית דייסון. בעל טכנולוגיית לייזר המגלה אבק בלתי נראה לעין, וחיישן המודד וסופר חלקיקי אבק באופן רציף. מנוע Hyperdymium חזק מספק שאיבה עוצמתית לאורך זמן.", 
+                in_stock: true,
+                specifications: {
+                    "כוח שאיבה": "240AW",
+                    "זמן עבודה": "עד 60 דקות (במצב Eco)",
+                    "זמן טעינה": "4.5 שעות",
+                    "נפח מיכל": "0.76 ליטר",
+                    "משקל": "3.1 ק"ג",
+                    "טכנולוגיית סינון": "מערכת סינון מלאה לאטימות מושלמת",
+                    "אביזרים כלולים": "מברשת Fluffy Optic, מברשת Digital Motorbar, אביזר לפינות, מברשת מיני ממונעת, ועוד",
+                    "אחריות": "שנתיים יבואן רשמי"
+                }
+            },
+            { 
+                id: "17", 
+                name: "סמארטפון Samsung Galaxy S24 Ultra 5G 256GB", 
+                price: 4999, 
+                category: "smartphones", 
+                image_url: "https://images.unsplash.com/photo-1610945265064-3234dac153ac", 
+                description: "מכשיר הדגל החדש של סמסונג עם Galaxy AI. מגיע עם מסך Dynamic AMOLED 2X מרהיב, מעבד Snapdragon 8 Gen 3 עוצמתי במיוחד, ומערך צילום מקצועי עם חיישן 200MP וזום אופטי 5x. כולל עט S-Pen מובנה.", 
+                in_stock: true,
+                specifications: {
+                    "מסך": "6.8 אינץ' Dynamic LTPO AMOLED 2X, 120Hz, 2600 nits",
+                    "רזולוציה": "1440x3120 פיקסלים (QHD+)",
+                    "מעבד": "Qualcomm Snapdragon 8 Gen 3 (4 nm)",
+                    "זיכרון RAM": "12GB",
+                    "אחסון": "256GB UFS 4.0",
+                    "מצלמה ראשית": "200MP + 50MP (Telephoto 5x) + 10MP (Telephoto 3x) + 12MP (Ultrawide)",
+                    "מצלמת סלפי": "12MP",
+                    "סוללה": "5000mAh, טעינה מהירה 45W",
+                    "עמידות": "IP68 (מים ואבק), מסגרת טיטניום",
+                    "אחריות": "שנה יבואן רשמי"
+                }
+            },
+            { 
+                id: "18", 
+                name: "טלוויזיה חכמה LG OLED 65\" C3 4K", 
+                price: 8490, 
+                category: "tv_audio", 
+                image_url: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1", 
+                description: "חוויית צפייה אולטימטיבית עם טכנולוגיית OLED EVO מבית LG. צבעים שחורים מוחלטים, ניגודיות אינסופית ומעבד α9 AI מהדור השישי המשפר את התמונה והשמע בזמן אמת. תומכת בגיימינג בקצב ריענון 120Hz ו-VRR.", 
+                in_stock: true,
+                specifications: {
+                    "גודל מסך": "65 אינץ'",
+                    "טכנולוגיית פאנל": "OLED evo",
+                    "רזולוציה": "4K Ultra HD (3840x2160)",
+                    "קצב רענון": "120Hz",
+                    "מעבד תמונה": "α9 AI Processor Gen6",
+                    "מערכת הפעלה": "webOS 23",
+                    "שמע": "2.2 ערוצים, 40W, תמיכה ב-Dolby Atmos",
+                    "חיבורים": "4x HDMI 2.1, 3x USB, LAN, אופטי, Wi-Fi 6, Bluetooth 5.0",
+                    "תכונות גיימינג": "G-Sync, FreeSync Premium, VRR, ALLM",
+                    "אחריות": "3 שנים יבואן רשמי (מותנה ברישום)"
+                }
+            },
+            { 
+                id: "19", 
+                name: "מכונת גלידה Ninja Creami NC300", 
+                price: 999, 
+                category: "small_appliances", 
+                image_url: "https://images.unsplash.com/photo-1570197781417-0a82375c9371", 
+                description: "מכונת הגלידה המהפכנית של נינג'ה, המאפשרת לכם להכין בבית גלידות, סורבה, מילקשייק וקערות סמודי במרקם מושלם. טכנולוגיית Creamify חותכת וטוחנת רכיבים קפואים בצורה אחידה וחלקה.", 
+                in_stock: true,
+                specifications: {
+                    "הספק": "800W",
+                    "נפח מיכל": "473 מ\"ל (לכל מיכל)",
+                    "מספר תוכניות": "7 תוכניות חכמות (גלידה, גלידת לייט, סורבה, גלידה ללא סוכר, סמודי בול, מילקשייק, תוספות)",
+                    "חלקים כלולים": "3 מיכלים עם מכסים, להב Creamerizer, קערה חיצונית עם מכסה",
+                    "ניקוי": "החלקים מתאימים לשטיפה במדיח כלים (במדף העליון)",
+                    "מידות": "גובה 40.5 ס\"מ, רוחב 16.5 ס\"מ, עומק 30.5 ס\"מ",
+                    "אחריות": "שנה יבואן רשמי"
+                }
+            },
+            {
+ 
                 id: "1", 
                 name: "מחשב נייד Lenovo IdeaPad 15.6\" i5/16GB/512GB", 
                 price: 3499, 
@@ -1159,6 +1266,55 @@
         // ============================================================
         //  Auth modal — login / register / forgot password
         // ============================================================
+        
+        const BranchAvailabilityModal = ({ isOpen, onClose, product }) => {
+            if (!isOpen || !product) return null;
+
+            return (
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                        
+                        {/* Header */}
+                        <div className="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
+                            <button onClick={onClose} className="text-slate-400 hover:text-slate-700 transition-colors p-2 rounded-full hover:bg-slate-200">
+                                <i data-lucide="x" className="w-6 h-6"></i>
+                            </button>
+                            <h3 className="text-xl font-bold text-slate-800">בדיקת זמינות מלאי בסניפי KSP</h3>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-6 overflow-y-auto flex-grow bg-slate-50">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {BRANCHES.map(branch => {
+                                    const inStock = getBranchStockStatus(product.id, branch.id);
+                                    return (
+                                        <div key={branch.id} className="bg-white p-4 rounded-xl border shadow-sm flex items-center gap-4 hover:border-slate-300 transition-all">
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${inStock ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                                                <i data-lucide={inStock ? 'check' : 'x'} className="w-5 h-5"></i>
+                                            </div>
+                                            <div className="flex-grow text-right">
+                                                <h4 className="font-bold text-slate-800 text-lg mb-1">{branch.name}</h4>
+                                                <p className={`text-sm font-medium ${inStock ? 'text-green-600' : 'text-red-600'}`}>
+                                                    {inStock ? 'זמין במלאי הסניף • ניתן לאיסוף' : 'לא בסניף כעת • קיים במחסן מרכזי'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="px-6 py-4 border-t bg-white flex justify-end">
+                            <button onClick={onClose} className="px-6 py-2 text-primary font-medium hover:bg-slate-100 rounded-lg transition-colors">
+                                סגירה
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         const AuthModal = ({ initialTab, onClose, onLogin, onRegister, onReset, onUpdatePassword }) => {
             const [tab, setTab] = useState(initialTab || 'login');
             const [name, setName] = useState('');
@@ -3287,6 +3443,7 @@
                             </div>
                         )}
                     </main>
+                    <BranchAvailabilityModal isOpen={isBranchModalOpen} onClose={() => setIsBranchModalOpen(false)} product={product} />
 
                     {/* Footer */}
                     <footer className="bg-primary-dark text-slate-400 text-sm border-t border-slate-800 py-6 mt-12">
