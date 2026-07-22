@@ -1531,7 +1531,7 @@
                                 <>
                                     {!resetInfo ? (
                                         <>
-                                            <p className="text-sm text-slate-500 leading-relaxed">נשלח קישור לאיפוס סיסמה לכתובת האימייל שלך באמצעות Supabase.</p>
+                                            <p className="text-sm text-slate-500 leading-relaxed">נשלח קישור לאיפוס סיסמה לכתובת האימייל שלך.</p>
                                             <button onClick={submitReset} disabled={loading} className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-base shadow-md transition-all disabled:opacity-60">
                                                 {loading ? 'שולח...' : 'שליחת קישור איפוס'}
                                             </button>
@@ -1542,7 +1542,7 @@
                                             {resetInfo.supabaseSent ? (
                                                 <div className="bg-cta-light border border-cta/30 rounded-lg p-4 text-sm text-slate-700 flex items-start gap-2">
                                                     <Icon name={"mail-check"} className={"w-5 h-5 text-cta-hover shrink-0"} />
-                                                    <span>מייל איפוס סיסמה נשלח מ-Supabase לכתובת <strong dir="ltr">{email}</strong>. לחץ/י על הקישור במייל לבחירת סיסמה חדשה.</span>
+                                                    <span>מייל איפוס סיסמה נשלח לכתובת <strong dir="ltr">{email}</strong>. לחץ/י על הקישור במייל לבחירת סיסמה חדשה.</span>
                                                 </div>
                                             ) : (
                                                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-slate-700 space-y-3">
