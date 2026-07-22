@@ -221,9 +221,18 @@
         const { useState, useEffect, useMemo, useRef } = React;
 
         // Supabase configuration
+        let initialUrl = 'https://ykoallfmckyoiwmtbvjp.supabase.co';
+        let initialKey = '';
+        try {
+            initialUrl = localStorage.getItem('notksp_supabase_url') || 'https://ykoallfmckyoiwmtbvjp.supabase.co';
+            initialKey = localStorage.getItem('notksp_supabase_anon_key') || '';
+        } catch (e) {
+            console.warn("localStorage read failed:", e);
+        }
+
         const SUPABASE_CONFIG = {
-            url: 'https://ykoallfmckyoiwmtbvjp.supabase.co',
-            anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlrb2FsbGZtY2t5b2l3bXRidmpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0NjQ5MjUsImV4cCI6MjEwMDA0MDkyNX0.bbpy43BESi5rvdRStHxcZQwy1F1UE6o1gkhhBkzxVyo'
+            url: initialUrl,
+            anonKey: initialKey
         };
 
         let supabaseClient = null;
@@ -859,6 +868,7 @@
             const outOfStock = catalog.filter(p => p.stock_quantity <= 0).length;
             const lowStock = catalog.filter(p => p.stock_quantity > 0 && p.stock_quantity <= 3).length;
             const revenue = (Array.isArray(orders) ? orders : []).reduce((s, o) => s + o.total, 0);
+            const openReq = requests.filter(r => r.status === 'open').length;
             const customerCount = users.filter(u => u.role === 'customer').length;
 
             // Wishlist popularity across all users
@@ -893,6 +903,7 @@
                         <StatCard label="הכנסות (מדומה)" value={`${(Number(revenue) || 0).toLocaleString('he-IL')} ₪`} sub={`${orders.length} הזמנות`} icon="trending-up" tone="cta" />
                         <StatCard label="שווי מלאי" value={`${(Number(inventoryValue) || 0).toLocaleString('he-IL')} ₪`} sub={`${(Number(totalUnits) || 0).toLocaleString('he-IL')} יחידות`} icon="wallet" tone="primary" />
                         <StatCard label="מוצרים בקטלוג" value={catalog.length} sub={`${outOfStock} אזלו · ${lowStock} מלאי נמוך`} icon="package" tone="slate" />
+                        <StatCard label="בקשות מוצרים" value={openReq} sub="ממתינות לטיפול" icon="inbox" tone="amber" />
                     </div>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         <StatCard label="לקוחות רשומים" value={customerCount} icon="users" tone="primary" />
@@ -1072,6 +1083,45 @@
             );
         };
 
+        const AdminRequests = ({ requests, onStatus }) => (
+            <div className="space-y-5">
+                <div>
+                    <h2 className="text-3xl font-heebo font-black text-slate-900">בקשות מוצרים מלקוחות</h2>
+                    <p className="text-sm text-slate-500 mt-1">מוצרים שלקוחות ביקשו — כולל מוצרים שאזלו מהמלאי.</p>
+                </div>
+                {requests.length === 0 ? (
+                    <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-10 text-center text-slate-400 text-base">
+                        <Icon name={"inbox"} className={"w-8 h-8 mx-auto mb-2 opacity-50"} />
+                        עדיין אין בקשות מלקוחות.
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {requests.map(r => (
+                            <div key={r.id} className={`bg-white rounded-2xl border shadow-premium p-4 space-y-2 ${r.status === 'open' ? 'border-cta/40' : 'border-slate-100 opacity-70'}`}>
+                                <div className="flex items-start justify-between gap-2">
+                                    <div>
+                                        <h4 className="font-heebo font-black text-slate-800 text-base">{r.productName || '(ללא שם מוצר)'}</h4>
+                                        <p className="text-sm text-slate-400">{r.id} · {r.date}</p>
+                                    </div>
+                                    <span className={`text-sm font-bold px-2 py-0.5 rounded-full ${r.status === 'open' ? 'bg-cta-light text-cta-hover' : 'bg-slate-100 text-slate-500'}`}>
+                                        {r.status === 'open' ? 'ממתין' : 'טופל'}
+                                    </span>
+                                </div>
+                                {r.note && <p className="text-sm text-slate-600 bg-slate-50 rounded-lg p-2">{r.note}</p>}
+                                {r.email && <p className="text-base text-slate-500" dir="ltr">✉ {r.email}</p>}
+                                <div className="pt-1">
+                                    {r.status === 'open' ? (
+                                        <button onClick={() => onStatus(r.id, 'handled')} className="text-sm font-bold text-primary hover:underline flex items-center gap-1"><Icon name={"check"} className={"w-3.5 h-3.5"} /> סמן כטופל</button>
+                                    ) : (
+                                        <button onClick={() => onStatus(r.id, 'open')} className="text-sm font-bold text-slate-400 hover:underline">החזר לממתין</button>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
 
         const AdminOrders = ({ orders }) => (
             <div className="space-y-5">
@@ -1120,7 +1170,7 @@
         // ============================================================
         //  Auth modal — login / register / forgot password
         // ============================================================
-        const AuthModal = ({ initialTab, onClose, onLogin, onRegister, onReset }) => {
+        const AuthModal = ({ initialTab, onClose, onLogin, onRegister, onReset, onUpdatePassword }) => {
             const [tab, setTab] = useState(initialTab || 'login');
             const [name, setName] = useState('');
             const [email, setEmail] = useState('');
@@ -1158,12 +1208,27 @@
                 if (!res.ok) setFormError(res.error);
                 else onClose();
             };
+            const submitNewPassword = async () => {
+                reset();
+                const e = {};
+                if (!password || password.length < 6) e.password = "הסיסמה חייבת להכיל לפחות 6 תווים";
+                if (password !== confirm) e.confirm = "הסיסמאות אינן תואמות";
+                setErrors(e);
+                if (Object.keys(e).length) return;
+                setLoading(true);
+                const res = await onUpdatePassword({ newPassword: password, email });
+                setLoading(false);
+                if (!res.ok) setFormError(res.error);
+                else setResetInfo({ success: true });
+            };
+
             const submitReset = async () => {
                 reset(); setLoading(true);
                 const res = await onReset(email);
                 setLoading(false);
                 if (!res.ok) { setFormError(res.error); return; }
-                if (res.sent) setResetInfo({ sent: true });
+                if (res.supabaseSent) setResetInfo({ supabaseSent: true });
+                else if (res.sent) setResetInfo({ sent: true });
                 else setResetInfo({ token: res.token, link: res.resetLink });
             };
 
@@ -1177,17 +1242,19 @@
                             <Icon name={"x"} className={"w-4 h-4"} />
                         </button>
                         <div className="bg-primary text-white px-6 pt-6 pb-4 text-right">
-                            <div className="flex items-center justify-start gap-2 mb-1">
-                                <BrandLogo size="text-2xl" iconSize="w-8 h-8" showSub={false} />
+                            <div className="flex items-center gap-2 mb-1">
+                                <div className="bg-cta p-1.5 rounded-lg text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg></div>
+                                <span className="font-heebo font-black text-xl">Not<span className="text-cta">KSP</span></span>
                             </div>
                             <p className="text-sm text-slate-300">
                                 {tab === 'login' && 'התחברות לחשבון שלך'}
                                 {tab === 'register' && 'הרשמה — פתיחת חשבון חדש'}
                                 {tab === 'forgot' && 'שחזור סיסמה'}
+                                {tab === 'new_password' && 'הגדרת סיסמה חדשה'}
                             </p>
                         </div>
 
-                        {tab !== 'forgot' && (
+                        {tab !== 'forgot' && tab !== 'new_password' && (
                             <div className="flex border-b border-slate-100">
                                 <button onClick={() => switchTab('login')} className={`flex-1 py-3 text-sm font-bold transition-colors ${tab === 'login' ? 'text-primary border-b-2 border-cta' : 'text-slate-400'}`}>התחברות</button>
                                 <button onClick={() => switchTab('register')} className={`flex-1 py-3 text-sm font-bold transition-colors ${tab === 'register' ? 'text-primary border-b-2 border-cta' : 'text-slate-400'}`}>הרשמה</button>
@@ -1238,11 +1305,40 @@
                                 <button onClick={submitRegister} className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-base shadow-md transition-all">יצירת חשבון</button>
                             )}
 
+                            {tab === 'new_password' && (
+                                <>
+                                    {!resetInfo?.success ? (
+                                        <>
+                                            <p className="text-sm text-slate-500 leading-relaxed">הזן/י סיסמה חדשה לחשבון שלך.</p>
+                                            <AuthField label="סיסמה חדשה *" err={errors.password}>
+                                                <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="לפחות 6 תווים" dir="ltr" className={inputCls(errors.password) + ' text-left'} />
+                                            </AuthField>
+                                            <AuthField label="אימות סיסמה חדשה *" err={errors.confirm}>
+                                                <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="הקלד/י שוב את הסיסמה" dir="ltr" className={inputCls(errors.confirm) + ' text-left'} />
+                                            </AuthField>
+                                            <button onClick={submitNewPassword} disabled={loading} className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-base shadow-md transition-all disabled:opacity-60">
+                                                {loading ? 'מעדכן...' : 'עדכון סיסמה'}
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            <div className="bg-cta-light border border-cta/30 rounded-lg p-4 text-sm text-slate-700 flex items-start gap-2">
+                                                <Icon name={"check-circle-2"} className={"w-5 h-5 text-cta-hover shrink-0"} />
+                                                <span>הסיסמה עודכנה בהצלחה! ניתן להתחבר כעת עם הסיסמה החדשה.</span>
+                                            </div>
+                                            <button onClick={() => switchTab('login')} className="w-full bg-primary hover:bg-primary-light text-white font-bold py-3 rounded-xl text-base shadow-md transition-all">
+                                                חזרה להתחברות
+                                            </button>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
                             {tab === 'forgot' && (
                                 <>
                                     {!resetInfo ? (
                                         <>
-                                            <p className="text-sm text-slate-500 leading-relaxed">נשלח קישור לאיפוס סיסמה לכתובת האימייל שלך.</p>
+                                            <p className="text-sm text-slate-500 leading-relaxed">נשלח קישור לאיפוס סיסמה לכתובת האימייל שלך (באמצעות Brevo).</p>
                                             <button onClick={submitReset} disabled={loading} className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-base shadow-md transition-all disabled:opacity-60">
                                                 {loading ? 'שולח...' : 'שליחת קישור איפוס'}
                                             </button>
@@ -1250,10 +1346,23 @@
                                         </>
                                     ) : (
                                         <div className="space-y-3">
-                                            <div className="bg-cta-light border border-cta/30 rounded-lg p-4 text-sm text-slate-700 flex items-start gap-2">
-                                                <Icon name={"mail-check"} className={"w-5 h-5 text-cta-hover shrink-0"} />
-                                                <span>מייל לאיפוס סיסמה נשלח בהצלחה לכתובת <strong dir="ltr">{email}</strong>. בדוק/בדקי את תיבת הדואר הנכנס.</span>
-                                            </div>
+                                            {resetInfo.supabaseSent ? (
+                                                <div className="bg-cta-light border border-cta/30 rounded-lg p-4 text-sm text-slate-700 flex items-start gap-2">
+                                                    <Icon name={"mail-check"} className={"w-5 h-5 text-cta-hover shrink-0"} />
+                                                    <span>מייל איפוס סיסמה נשלח מ-Supabase לכתובת <strong dir="ltr">{email}</strong>. לחץ/י על הקישור במייל לבחירת סיסמה חדשה.</span>
+                                                </div>
+                                            ) : resetInfo.sent ? (
+                                                <div className="bg-cta-light border border-cta/30 rounded-lg p-4 text-sm text-slate-700 flex items-start gap-2">
+                                                    <Icon name={"mail-check"} className={"w-5 h-5 text-cta-hover shrink-0"} />
+                                                    <span>מייל איפוס נשלח דרך Brevo לכתובת <strong dir="ltr">{email}</strong>. בדוק/בדקי את תיבת הדואר.</span>
+                                                </div>
+                                            ) : (
+                                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-slate-700 space-y-2">
+                                                    <div className="flex items-center gap-2 font-bold text-amber-700"><Icon name={"info"} className={"w-4 h-4"} /> מצב הדגמה (Backend של Brevo לא מחובר עדיין)</div>
+                                                    <p>לאחר חיבור ה-Backend, מייל אמיתי יישלח דרך Brevo. בינתיים, קוד האיפוס שלך:</p>
+                                                    <div className="bg-white border border-amber-200 rounded px-3 py-2 font-heebo font-black text-center text-xl tracking-widest text-primary">{resetInfo.token}</div>
+                                                </div>
+                                            )}
                                             <button onClick={() => switchTab('login')} className="w-full bg-primary hover:bg-primary-light text-white font-bold py-2.5 rounded-xl text-sm transition-all">חזרה להתחברות</button>
                                         </div>
                                     )}
@@ -1289,14 +1398,14 @@
             const [users, setUsers] = useState([]);                     // registered users
             const [currentUser, setCurrentUser] = useState(null);       // logged-in user or null (guest)
             const [orders, setOrders] = useState([]);                   // all placed orders
-
+            const [requests, setRequests] = useState([]);               // out-of-stock product requests
             const [wishlistMap, setWishlistMap] = useState({});         // { userKey: [productId,...] }
 
             // ===== Supabase Connection State =====
             const [supabaseUrl, setSupabaseUrl] = useState(SUPABASE_CONFIG.url);
             const [supabaseKey, setSupabaseKey] = useState(SUPABASE_CONFIG.anonKey);
             const [isSupabaseConnected, setIsSupabaseConnected] = useState(!!supabaseClient);
-
+            const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
             const [seedingStatus, setSeedingStatus] = useState('');     // '', 'seeding', 'success', 'error'
             const [dbProducts, setDbProducts] = useState([]);           // Products from Supabase
 
@@ -1329,7 +1438,7 @@
 
             const [userOrders, setUserOrders] = useState([]);           // user purchase history
     
-
+            const [requestProduct, setRequestProduct] = useState(null); // null = closed; string = open (prefilled name)
             const [toast, setToast] = useState(null);                   // { text, tone }
             const [reqName, setReqName] = useState('');
             const [reqNote, setReqNote] = useState('');
@@ -1458,7 +1567,12 @@
                         .order('created_at', { ascending: false });
                     if (!ordErr && ordData) setOrders(ordData);
 
-
+                    // Fetch requests
+                    const { data: reqData, error: reqErr } = await supabaseClient
+                        .from('requests')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+                    if (!reqErr && reqData) setRequests(reqData);
                 } catch (e) {
                     console.error("Error fetching Supabase data:", e);
                 }
@@ -1541,8 +1655,12 @@
                     }
                 });
 
-                const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_event, session) => {
-                    if (session) {
+                const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((event, session) => {
+                    if (event === 'PASSWORD_RECOVERY') {
+                        setAuthTab('new_password');
+                        setAuthOpen(true);
+                        showToast('מאומת! הזן/י סיסמה חדשה', 'cta');
+                    } else if (session) {
                         handleSupabaseUserSession(session.user);
                     } else {
                         setCurrentUser(null);
@@ -1557,7 +1675,7 @@
                 setCustomProducts(LS.get('notksp_custom_products', []));
                 setStockMap(LS.get('notksp_stock', {}));
                 setOrders(LS.get('notksp_orders', []));
-
+                setRequests(LS.get('notksp_requests', []));
                 setWishlistMap(LS.get('notksp_wishlist', {}));
 
                 const ADMIN_SEED = {
@@ -1607,6 +1725,14 @@
 
             
 
+            useEffect(() => {
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('reset') && params.get('email')) {
+                    setAuthTab('new_password');
+                    setAuthOpen(true);
+                }
+            }, []);
+
             // Prefill checkout fields for logged-in users
             useEffect(() => {
                 if (view === 'checkout' && currentUser) {
@@ -1616,7 +1742,14 @@
             }, [view, currentUser]);
 
             // Sync the product-request form when it opens
-
+            useEffect(() => {
+                if (requestProduct !== null) {
+                    setReqName(requestProduct);
+                    setReqNote('');
+                    setReqEmail(currentUser ? currentUser.email : '');
+                    setReqError('');
+                }
+            }, [requestProduct]);
 
             // Save cart to localStorage when it changes
             const saveCart = (newCart) => {
@@ -1649,7 +1782,7 @@
             const addToCart = (product) => {
                 const available = stockOf(product.id);
                 if (available <= 0) {
-                    showToast('המוצר אזל מהמלאי', 'amber');
+                    setRequestProduct(product.name);
                     return;
                 }
                 const existing = cart.find(item => item.id === product.id);
@@ -1727,7 +1860,7 @@
             const persistCustom = (list) => { setCustomProducts(list); LS.set('notksp_custom_products', list); };
             const persistUsers = (list) => { setUsers(list); LS.set('notksp_users', list); };
             const persistOrders = (list) => { setOrders(list); LS.set('notksp_orders', list); };
-
+            const persistRequests = (list) => { setRequests(list); LS.set('notksp_requests', list); };
             const persistWishlist = (map) => { setWishlistMap(map); LS.set('notksp_wishlist', map); };
 
             // ---- Inventory management (admin) ----
@@ -1816,12 +1949,7 @@
                         showToast('נרשמת בהצלחה!');
                         return { ok: true };
                     } catch (e) {
-                        let msg = e.message || "ההרשמה נכשלה";
-                        if (msg.toLowerCase().includes('rate limit'))
-                            msg = 'חרגת ממגבלת הניסיונות של מערכת האבטחה. נסה שוב בעוד כשעה, או פנה למנהל האתר להסרת המגבלה ב-Supabase (Rate Limits).';
-                        else if (msg.includes('Email logins are disabled'))
-                            msg = 'התחברות באמצעות אימייל כבויה במערכת!';
-                        return { ok: false, error: msg };
+                        return { ok: false, error: e.message || "ההרשמה נכשלה" };
                     }
                 }
                 // Offline fallback
@@ -1856,8 +1984,6 @@
                             msg = 'האימייל לא אושר — אשר אותו ב-Supabase Dashboard או בטל את חובת האישור';
                         else if (msg.includes('Too many requests'))
                             msg = 'יותר מדי ניסיונות — נסה שוב בעוד מספר דקות';
-                        else if (msg.toLowerCase().includes('rate limit'))
-                            msg = 'חרגת ממגבלת הניסיונות (Rate Limit) של המערכת. נסה שוב בעוד כשעה.';
                         else if (msg.includes('Email logins are disabled'))
                             msg = 'התחברות באמצעות אימייל כבויה ב-Supabase! אנא הדלק את האפשרות "Enable Email provider" בהגדרות.';
 
@@ -1897,29 +2023,68 @@
                 showToast('התנתקת מהחשבון', 'slate');
             };
 
-            // Password reset via Supabase (connected to Brevo SMTP)
+            // Password reset via Supabase or local / Brevo fallback.
             const requestPasswordReset = async (email) => {
                 email = email.trim().toLowerCase();
                 if (!EMAIL_RE.test(email)) return { ok: false, error: "כתובת אימייל אינה תקינה" };
-                
+
                 if (isSupabaseConnected && supabaseClient) {
                     try {
-                        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-                            redirectTo: `${location.origin}${location.pathname}`
-                        });
-                        if (error) throw error;
-                        return { ok: true, sent: true };
-                    } catch (error) {
-                        console.error('Reset error:', error);
-                        const msg = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
-                        if (msg.includes('rate limit')) {
-                            return { ok: false, error: "נשלחו יותר מדי בקשות לאיפוס סיסמה. אנא נסה שוב בעוד כשעה." };
-                        }
-                        return { ok: false, error: "שגיאה בשליחת קישור האיפוס: " + msg };
+                        const redirectTo = window.location.origin + window.location.pathname;
+                        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo });
+                        if (error) return { ok: false, error: error.message || "שליחת מייל האיפוס מול Supabase נכשלה" };
+                        return { ok: true, supabaseSent: true };
+                    } catch (e) {
+                        return { ok: false, error: "אירעה שגיאה בתקשורת מול Supabase" };
                     }
                 }
-                
-                return { ok: false, error: "החיבור למסד הנתונים אינו פעיל. לא ניתן לאפס סיסמה." };
+
+                const token = Math.random().toString(36).slice(2, 8).toUpperCase();
+                const tokens = LS.get('notksp_reset_tokens', {});
+                tokens[email] = { token, expires: Date.now() + 1000 * 60 * 30 };
+                LS.set('notksp_reset_tokens', tokens);
+
+                const resetLink = `${location.origin}${location.pathname}?reset=${token}&email=${encodeURIComponent(email)}`;
+
+                if (BREVO_CONFIG.endpoint) {
+                    try {
+                        const res = await fetch(BREVO_CONFIG.endpoint, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, token, resetLink })
+                        });
+                        if (!res.ok) throw new Error('bad status');
+                        return { ok: true, sent: true };
+                    } catch (e) {
+                        return { ok: false, error: "שליחת המייל נכשלה. בדוק את הגדרות ה-Backend של Brevo." };
+                    }
+                }
+                return { ok: true, sent: false, token, resetLink };
+            };
+
+            const updatePassword = async ({ newPassword, email }) => {
+                if (isSupabaseConnected && supabaseClient) {
+                    try {
+                        const { data, error } = await supabaseClient.auth.updateUser({ password: newPassword });
+                        if (error) return { ok: false, error: error.message || "עדכון הסיסמה נכשל מול Supabase" };
+                        return { ok: true };
+                    } catch (e) {
+                        return { ok: false, error: "אירעה שגיאה בתקשורת מול Supabase" };
+                    }
+                }
+
+                let loadedUsers = LS.get('notksp_users', []);
+                const targetEmail = email || (currentUser ? currentUser.email : null);
+                if (targetEmail) {
+                    const uIdx = loadedUsers.findIndex(u => u.email === targetEmail);
+                    if (uIdx !== -1) {
+                        loadedUsers[uIdx].passwordHash = pseudoHash(newPassword);
+                        LS.set('notksp_users', loadedUsers);
+                        setUsers(loadedUsers);
+                        return { ok: true };
+                    }
+                }
+                return { ok: false, error: "לא נמצא חשבון מתאים לעדכון" };
             };
 
             const isWishlisted = (id) => wishlist.includes(id);
@@ -1949,7 +2114,53 @@
                 [wishlist, catalog]
             );
 
+            // ---- Out-of-stock / unavailable product requests ----
+            const submitRequest = async ({ productName, note, email }) => {
+                const req = {
+                    id: 'REQ-' + Date.now().toString().slice(-6),
+                    productName: productName.trim(),
+                    note: (note || '').trim(),
+                    email: (email || (currentUser && currentUser.email) || '').trim(),
+                    date: new Date().toLocaleDateString('he-IL', { year: 'numeric', month: 'long', day: 'numeric' }),
+                    ts: Date.now(),
+                    status: 'open'
+                };
 
+                if (isSupabaseConnected && supabaseClient) {
+                    try {
+                        const { error } = await supabaseClient.from('requests').insert({
+                            id: req.id,
+                            product_name: req.productName,
+                            note: req.note,
+                            email: req.email,
+                            status: req.status
+                        });
+                        if (error) throw error;
+                        fetchSupabaseData();
+                        showToast('הבקשה נשלחה ונשמרה ב-Supabase!');
+                        return;
+                    } catch (e) {
+                        showToast('שגיאה בשמירת הבקשה ב-Supabase: ' + e.message, 'amber');
+                    }
+                }
+
+                persistRequests([req, ...requests]);
+                showToast('הבקשה נשלחה! נעדכן אותך כשהמוצר יהיה זמין.');
+            };
+            const setRequestStatus = async (id, status) => {
+                if (isSupabaseConnected && supabaseClient) {
+                    try {
+                        const { error } = await supabaseClient.from('requests').update({ status }).eq('id', id);
+                        if (error) throw error;
+                        fetchSupabaseData();
+                        showToast('סטטוס הבקשה עודכן ב-Supabase');
+                        return;
+                    } catch (e) {
+                        showToast('שגיאה בעדכון סטטוס הבקשה: ' + e.message, 'amber');
+                    }
+                }
+                persistRequests(requests.map(r => r.id === id ? { ...r, status } : r));
+            };
 
             // Filtered Products
             const filteredProducts = useMemo(() => {
@@ -2144,7 +2355,20 @@
                                 >
                                     <Icon name={isDarkMode ? "sun" : "moon"} className={"w-5 h-5"} />
                                 </button>
-
+                                {/* Supabase Status Badge — admin only */}
+                                {currentUser?.role === 'admin' && (
+                                    <button
+                                        onClick={() => setIsSupabaseModalOpen(true)}
+                                        className={`hidden md:flex items-center gap-1 text-sm font-bold px-2.5 py-1.5 rounded-full transition-all border ${
+                                            isSupabaseConnected
+                                                ? 'bg-cta/10 text-cta border-cta/30 hover:bg-cta/20'
+                                                : 'bg-amber-500/10 text-amber-500 border-amber-500/30 hover:bg-amber-500/20'
+                                        }`}
+                                    >
+                                        <span className={`w-1.5 h-1.5 rounded-full ${isSupabaseConnected ? 'bg-cta' : 'bg-amber-500'} animate-pulse`}></span>
+                                        {isSupabaseConnected ? 'מחובר ל-Supabase' : 'מצב אופליין'}
+                                    </button>
+                                )}
                                 {/* Admin area link (managers only) */}
                                 {currentUser && currentUser.role === 'admin' && view !== 'admin' && (
                                     <button
@@ -2560,10 +2784,11 @@
                                                             </button>
                                                         ) : (
                                                             <button 
-                                                                className="bg-slate-100 text-slate-400 font-bold text-sm px-4 py-2.5 rounded-full flex items-center gap-1.5 cursor-not-allowed border border-slate-200"
-                                                                disabled
+                                                                onClick={() => setRequestProduct(product.name)}
+                                                                className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-all transform active:scale-95 border border-slate-200"
                                                             >
-                                                                אזל מהמלאי
+                                                                <Icon name={"bell"} className={"w-4 h-4"} />
+                                                                עדכנו אותי
                                                             </button>
                                                         )}
                                                     </div>
@@ -2614,7 +2839,29 @@
                                         </div>
                                     </div>
                                 )}
-
+                                {/* Request an unavailable product */}
+                                <div className="pt-6 border-t border-slate-200">
+                                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-primary-dark via-primary to-primary-light border border-slate-700 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-5 text-white">
+                                        <div className="w-56 h-40 bg-cta/10 blur-3xl absolute -left-10 -top-10 rounded-full"></div>
+                                        <div className="space-y-2 text-right z-10 max-w-xl">
+                                            <div className="inline-flex items-center gap-1.5 bg-primary-light/50 border border-slate-600/50 px-3 py-1 rounded-full text-sm text-cta font-bold">
+                                                <Icon name={"search-x"} className={"w-3.5 h-3.5"} />
+                                                לא מצאת מה שחיפשת?
+                                            </div>
+                                            <h3 className="text-2xl sm:text-3xl font-heebo font-black leading-tight">חסר לנו מוצר שרצית? <span className="text-cta">ספר/י לנו.</span></h3>
+                                            <p className="text-slate-300 text-base font-light">
+                                                כתוב/כתבי איזה מוצר תרצה/י שנביא — נעביר את הבקשה לצוות הרכש ונעדכן אותך כשהוא זמין במלאי.
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={() => setRequestProduct('')}
+                                            className="z-10 bg-cta hover:bg-cta-hover text-primary font-bold px-6 py-3 rounded-full text-base shadow-glow transition-all transform hover:scale-105 flex items-center gap-2 shrink-0"
+                                        >
+                                            <Icon name={"plus-circle"} className={"w-5 h-5"} />
+                                            שליחת בקשת מוצר
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         )}
 
@@ -2627,6 +2874,7 @@
                                         { id: 'dashboard', name: 'דשבורד', icon: 'layout-dashboard' },
                                         { id: 'inventory', name: 'ניהול מלאי', icon: 'boxes' },
                                         { id: 'add', name: 'הוספת מוצר', icon: 'plus-square' },
+                                        { id: 'requests', name: 'בקשות מוצרים', icon: 'inbox' },
                                         { id: 'orders', name: 'הזמנות', icon: 'receipt' }
                                     ].map(t => (
                                         <button
@@ -2636,14 +2884,17 @@
                                         >
                                             <Icon name={t.icon} className={"w-4 h-4"} />
                                             {t.name}
+                                            {t.id === 'requests' && requests.filter(r => r.status === 'open').length > 0 && (
+                                                <span className="bg-cta text-primary rounded-full text-sm font-black px-1.5">{requests.filter(r => r.status === 'open').length}</span>
+                                            )}
                                         </button>
                                     ))}
                                 </div>
 
-                                {adminTab === 'dashboard' && <AdminDashboard catalog={catalog} orders={orders} users={users} wishlistMap={wishlistMap} />}
+                                {adminTab === 'dashboard' && <AdminDashboard catalog={catalog} orders={orders} requests={requests} users={users} wishlistMap={wishlistMap} />}
                                 {adminTab === 'inventory' && <AdminInventory catalog={catalog} customProducts={customProducts} onSetStock={setStock} onAdjust={adjustStock} onDelete={deleteCustomProduct} />}
                                 {adminTab === 'add' && <AdminAddProduct categories={CATEGORIES} onAdd={addProduct} showToast={showToast} goToInventory={() => setAdminTab('inventory')} />}
-
+                                {adminTab === 'requests' && <AdminRequests requests={requests} onStatus={setRequestStatus} />}
                                 {adminTab === 'orders' && <AdminOrders orders={orders} />}
                             </div>
                         )}
@@ -3356,9 +3607,130 @@
                         </div>
                     )}
 
+                    {/* Supabase Settings Modal */}
+                    {isSupabaseModalOpen && (
+                        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                            <div onClick={() => setIsSupabaseModalOpen(false)} className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+                            <div className="relative bg-white w-full max-w-md rounded-2xl shadow-premium-hover border border-slate-100 overflow-hidden fade-in z-10">
+                                <button onClick={() => setIsSupabaseModalOpen(false)} className="absolute top-4 left-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full p-2 z-20" aria-label="סגירה">
+                                    <Icon name={"x"} className={"w-4 h-4"} />
+                                </button>
+                                <div className="bg-primary text-white px-6 pt-6 pb-4 text-right">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Icon name={"database"} className={"w-5 h-5 text-cta"} />
+                                        <span className="font-heebo font-black text-xl">הגדרות חיבור Supabase</span>
+                                    </div>
+                                    <p className="text-sm text-slate-300">חברו את NotKSP לבסיס הנתונים של Supabase לסנכרון מלא של מוצרים, מלאי, משתמשים והזמנות.</p>
+                                </div>
+                                <div className="p-6 space-y-4 text-right">
+                                    <div className="space-y-1">
+                                        <label className="block text-sm font-bold text-slate-700">Supabase URL</label>
+                                        <input 
+                                            value={supabaseUrl} 
+                                            onChange={e => setSupabaseUrl(e.target.value)} 
+                                            placeholder="https://xxxxxx.supabase.co" 
+                                            dir="ltr"
+                                            className="w-full px-4 py-2.5 rounded-lg border text-base border-slate-300 focus:border-primary focus:ring-primary/10 text-left" 
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="block text-sm font-bold text-slate-700">Supabase Anon Key</label>
+                                        <input 
+                                            type="password"
+                                            value={supabaseKey} 
+                                            onChange={e => setSupabaseKey(e.target.value)} 
+                                            placeholder="eyJhbGciOi..." 
+                                            dir="ltr"
+                                            className="w-full px-4 py-2.5 rounded-lg border text-base border-slate-300 focus:border-primary focus:ring-primary/10 text-left" 
+                                        />
+                                    </div>
 
+                                    <div className="flex gap-2 pt-2">
+                                        <button 
+                                            onClick={async () => {
+                                                if (!supabaseUrl.trim() || !supabaseKey.trim()) {
+                                                    try {
+                                                        localStorage.removeItem('notksp_supabase_url');
+                                                        localStorage.removeItem('notksp_supabase_anon_key');
+                                                    } catch (e) {}
+                                                    window.location.reload();
+                                                    return;
+                                                }
+                                                try {
+                                                    localStorage.setItem('notksp_supabase_url', supabaseUrl.trim());
+                                                    localStorage.setItem('notksp_supabase_anon_key', supabaseKey.trim());
+                                                } catch (e) {}
+                                                showToast('ההגדרות נשמרו. האתר נטען מחדש...', 'cta');
+                                                setTimeout(() => window.location.reload(), 1000);
+                                            }}
+                                            className="flex-1 bg-primary hover:bg-primary-light text-white font-bold py-2.5 rounded-xl text-sm transition-all"
+                                        >
+                                            שמירה וחיבור
+                                        </button>
+                                        <button 
+                                            onClick={() => {
+                                                setSupabaseUrl('');
+                                                setSupabaseKey('');
+                                                try {
+                                                    localStorage.removeItem('notksp_supabase_url');
+                                                    localStorage.removeItem('notksp_supabase_anon_key');
+                                                } catch (e) {}
+                                                showToast('החיבור נמחק. האתר נטען מחדש...', 'slate');
+                                                setTimeout(() => window.location.reload(), 1000);
+                                            }}
+                                            className="bg-red-50 hover:bg-red-100 text-red-600 font-bold px-4 py-2.5 rounded-xl text-sm transition-all border border-red-200"
+                                        >
+                                            ניתוק
+                                        </button>
+                                    </div>
 
-                    
+                                    {isSupabaseConnected && (
+                                        <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
+                                            <div className="text-sm font-bold text-slate-700">כלים למפתחים</div>
+                                            <button 
+                                                disabled={seedingStatus === 'seeding'}
+                                                onClick={async () => {
+                                                    setSeedingStatus('seeding');
+                                                    try {
+                                                        for (const p of PRODUCTS) {
+                                                            const stockVal = STOCK_DEFAULTS[p.id] ?? 0;
+                                                            const { error } = await supabaseClient
+                                                                .from('products')
+                                                                .upsert({
+                                                                    id: p.id,
+                                                                    name: p.name,
+                                                                    price: p.price,
+                                                                    category: p.category,
+                                                                    image_url: p.image_url,
+                                                                    description: p.description,
+                                                                    stock_quantity: stockVal,
+                                                                    specifications: p.specifications || {}
+                                                                });
+                                                            if (error) throw error;
+                                                        }
+                                                        setSeedingStatus('success');
+                                                        fetchSupabaseData();
+                                                        showToast('הקטלוג הועלה ל-Supabase בהצלחה!');
+                                                    } catch (err) {
+                                                        console.error(err);
+                                                        setSeedingStatus('error');
+                                                        showToast('שגיאה בסיד: ' + err.message, 'amber');
+                                                    }
+                                                }}
+                                                className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-2 rounded-lg text-sm transition-all disabled:opacity-50"
+                                            >
+                                                {seedingStatus === 'seeding' ? 'מעלה מוצרים...' : seedingStatus === 'success' ? 'הועלה בהצלחה ✓' : 'העלאת מוצרי ברירת מחדל ל-Supabase'}
+                                            </button>
+                                            <p className="text-sm text-slate-400">
+                                                * כפתור זה מעלה את 8 מוצרי הברירת מחדל לטבלת `products` ב-Supabase במידה והיא ריקה.
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* 7. Auth Modal */}
                     {authOpen && (
                         <AuthModal
@@ -3367,9 +3739,55 @@
                             onLogin={loginUser}
                             onRegister={registerUser}
                             onReset={requestPasswordReset}
+                            onUpdatePassword={updatePassword}
                         />
                     )}
 
+                    {/* 8. Product Request Modal */}
+                    {requestProduct !== null && (
+                        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                            <div onClick={() => setRequestProduct(null)} className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+                            <div className="relative bg-white w-full max-w-md rounded-2xl shadow-premium-hover border border-slate-100 overflow-hidden fade-in z-10">
+                                <button onClick={() => setRequestProduct(null)} className="absolute top-4 left-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full p-2 z-20" aria-label="סגירה">
+                                    <Icon name={"x"} className={"w-4 h-4"} />
+                                </button>
+                                <div className="bg-primary text-white px-6 pt-6 pb-4 text-right">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Icon name={"package-search"} className={"w-5 h-5 text-cta"} />
+                                        <span className="font-heebo font-black text-xl">בקשת מוצר</span>
+                                    </div>
+                                    <p className="text-sm text-slate-300">נשמח לדעת איזה מוצר תרצו — נעדכן אתכם כשהוא זמין.</p>
+                                </div>
+                                <div className="p-6 space-y-4">
+                                    <div className="space-y-1">
+                                        <label className="block text-sm font-bold text-slate-700">שם המוצר המבוקש *</label>
+                                        <input value={reqName} onChange={e => { setReqName(e.target.value); setReqError(''); }} placeholder="לדוגמה: מקרן 4K לבית" className={`w-full px-4 py-2.5 rounded-lg border text-base focus:outline-none focus:ring-2 ${reqError ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'}`} />
+                                        {reqError && <p className="text-red-500 text-sm font-semibold">{reqError}</p>}
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="block text-sm font-bold text-slate-700">פרטים נוספים (אופציונלי)</label>
+                                        <textarea value={reqNote} onChange={e => setReqNote(e.target.value)} rows="2" placeholder="דגם מסוים, טווח מחירים, כמות..." className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-base focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"></textarea>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="block text-sm font-bold text-slate-700">אימייל ליצירת קשר (אופציונלי)</label>
+                                        <input value={reqEmail} onChange={e => setReqEmail(e.target.value)} placeholder="name@example.com" dir="ltr" className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-base text-left focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10" />
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            if (!reqName.trim()) { setReqError('נא להזין שם מוצר'); return; }
+                                            submitRequest({ productName: reqName, note: reqNote, email: reqEmail });
+                                            setRequestProduct(null);
+                                        }}
+                                        className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl text-base shadow-md transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <Icon name={"send"} className={"w-4 h-4"} /> שליחת הבקשה
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    
                     {/* Floating Accessibility AA Button & Widget */}
                     <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
                         <button 
