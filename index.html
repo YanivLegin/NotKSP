@@ -1222,7 +1222,7 @@
             };
 
             const handleGoogleLogin = async () => {
-                if (!isSupabaseConnected || !supabaseClient) {
+                if (typeof supabaseClient === 'undefined' || !supabaseClient) {
                     setFormError('חיבור למסד הנתונים אינו פעיל');
                     return;
                 }
