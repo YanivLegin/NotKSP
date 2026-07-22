@@ -2019,7 +2019,13 @@
                     try {
                         const redirectTo = window.location.origin + window.location.pathname;
                         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo });
-                        if (error) return { ok: false, error: error.message || "שליחת מייל האיפוס מול Supabase נכשלה" };
+                        if (error) {
+                            let msg = error.message || "שליחת מייל האיפוס נכשלה מול Supabase";
+                            if (error.status === 500 || msg.toLowerCase().includes('500') || msg.toLowerCase().includes('server error')) {
+                                msg = "Supabase החזיר שגיאה (500). ודא/י שהאימייל רשום ב-Supabase, שה-Redirect URL מוגדר ב-Dashboard, ושלא חרגת ממגבלת המיילים בשעה.";
+                            }
+                            return { ok: false, error: msg };
+                        }
                         return { ok: true, supabaseSent: true };
                     } catch (e) {
                         return { ok: false, error: "אירעה שגיאה בתקשורת מול Supabase" };
