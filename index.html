@@ -4219,7 +4219,16 @@
         const root = ReactDOM.createRoot(container);
         root.render(<App />);
     </script>
-    <!-- Chatbase AI Support Chatbot Widget -->
+    <!-- Chatbase AI Support Chatbot Widget (Positioned on the Left) -->
+    <style>
+        #chatbase-bubble-button,
+        #chatbase-bubble-window,
+        #chatbase-message-container,
+        iframe[src*="chatbase.co"] {
+            left: 20px !important;
+            right: auto !important;
+        }
+    </style>
     <script>
         (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...args)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(args)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>{target(prop,...args)}}})}const onload=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id=window.CHATBOT_ID || "gVhDk4BhivVHEINfJNf6s";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onload()}else{window.addEventListener("load",onload)}})();
     </script>
