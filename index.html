@@ -2100,35 +2100,11 @@
             const catalog = useMemo(() => {
                 let resolvedProducts = [];
                 if (isSupabaseConnected && Array.isArray(dbProducts) && dbProducts.length > 0) {
-                    const dbMap = new Map(dbProducts.map(p => [String(p.id), p]));
-                    
-                    const base = PRODUCTS.map(p => {
-                        const dbItem = dbMap.get(String(p.id));
-                        if (dbItem) {
-                            return {
-                                ...p,
-                                ...dbItem,
-                                id: String(p.id),
-                                category: dbItem.category || p.category,
-                                stock_quantity: Number(dbItem.stock_quantity ?? 0),
-                                image_url: p.image_url || dbItem.image_url
-                            };
-                        }
-                        return {
-                            ...p,
-                            id: String(p.id),
-                            stock_quantity: stockMap[String(p.id)] !== undefined ? Number(stockMap[String(p.id)]) : Number(STOCK_DEFAULTS[String(p.id)] ?? 5)
-                        };
-                    });
-
-                    const baseIds = new Set(PRODUCTS.map(p => String(p.id)));
-                    const extraDb = dbProducts.filter(p => !baseIds.has(String(p.id))).map(p => ({
+                    resolvedProducts = dbProducts.map(p => ({
                         ...p,
                         id: String(p.id),
                         stock_quantity: Number(p.stock_quantity ?? 0)
                     }));
-
-                    resolvedProducts = [...base, ...extraDb];
                 } else {
                     const base = PRODUCTS.map(p => ({
                         ...p,
