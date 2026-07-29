@@ -2095,22 +2095,28 @@
             const catalog = useMemo(() => {
                 let resolvedProducts = [];
                 if (isSupabaseConnected && Array.isArray(dbProducts) && dbProducts.length > 0) {
-                    resolvedProducts = dbProducts;
+                    resolvedProducts = dbProducts.map(p => ({
+                        ...p,
+                        id: String(p.id),
+                        stock_quantity: Number(p.stock_quantity ?? 0)
+                    }));
                 } else {
                     const base = PRODUCTS.map(p => ({
                         ...p,
-                        stock_quantity: stockMap[p.id] !== undefined ? stockMap[p.id] : (STOCK_DEFAULTS[p.id] ?? 0)
+                        id: String(p.id),
+                        stock_quantity: stockMap[String(p.id)] !== undefined ? Number(stockMap[String(p.id)]) : Number(STOCK_DEFAULTS[String(p.id)] ?? 0)
                     }));
                     const custom = customProducts.map(p => ({
                         ...p,
-                        stock_quantity: stockMap[p.id] !== undefined ? stockMap[p.id] : (p.stock_quantity ?? 0)
+                        id: String(p.id),
+                        stock_quantity: stockMap[String(p.id)] !== undefined ? Number(stockMap[String(p.id)]) : Number(p.stock_quantity ?? 0)
                     }));
                     resolvedProducts = [...base, ...custom];
                 }
                 
                 // Force base products to use the hardcoded images in case of broken DB/cache links
                 return resolvedProducts.map(p => {
-                    const baseProd = PRODUCTS.find(bp => bp.id === p.id);
+                    const baseProd = PRODUCTS.find(bp => String(bp.id) === String(p.id));
                     if (baseProd && baseProd.image_url) {
                         return { ...p, image_url: baseProd.image_url };
                     }
@@ -2118,8 +2124,8 @@
                 });
             }, [customProducts, stockMap, dbProducts, isSupabaseConnected]);
 
-            const getProduct = (id) => catalog.find(p => p.id === id);
-            const stockOf = (id) => { const p = getProduct(id); return p ? p.stock_quantity : 0; };
+            const getProduct = (id) => catalog.find(p => String(p.id) === String(id));
+            const stockOf = (id) => { const p = getProduct(id); return p ? Number(p.stock_quantity) : 0; };
 
             // ---- Persistence savers ----
             const persistStock = (map) => { setStockMap(map); LS.set('notksp_stock', map); };
