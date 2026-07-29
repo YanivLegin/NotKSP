@@ -265,7 +265,8 @@
             { id: 'audio_accessories', name: 'אודיו ואביזרים', icon: 'headphones' },
             { id: 'gaming', name: 'גיימינג', icon: 'gamepad-2' },
             { id: 'small_appliances', name: 'חשמל קטן למטבח', icon: 'coffee' },
-            { id: 'computer_accessories', name: 'אביזרי מחשב', icon: 'mouse' }
+            { id: 'computer_accessories', name: 'אביזרי מחשב', icon: 'mouse' },
+            { id: 'wearables', name: 'שעונים חכמים', icon: 'watch' }
         ];
 
         // Constants - Product catalog with full specs as requested in the PRD
@@ -990,10 +991,14 @@
             return { label: `במלאי · ${qty} יח׳`, cls: "bg-cta-light text-cta-hover border-cta/30", dot: "bg-cta" };
         };
 
-        // ============================================================
-        //  NEW: Admin components (statistical dashboard, inventory, etc.)
-        // ============================================================
-        const catName = (id) => (CATEGORIES.find(c => c.id === id) || {}).name || id;
+        const CATEGORY_ALIASES = {
+            'wearables': 'שעונים חכמים',
+            'smartwatch': 'שעונים חכמים',
+            'kitchen': 'חשמל קטן למטבח',
+            'appliances': 'חשמל קטן למטבח',
+            'small_kitchen': 'חשמל קטן למטבח'
+        };
+        const catName = (id) => (CATEGORIES.find(c => c.id === id) || {}).name || CATEGORY_ALIASES[id] || id || '';
 
         const AdminDashboard = ({ catalog, orders, requests, users, wishlistMap }) => {
             const totalUnits = catalog.reduce((s, p) => s + p.stock_quantity, 0);
@@ -3022,11 +3027,13 @@
                                                         className={`w-full h-full object-cover img-hover-zoom ${product.stock_quantity <= 0 ? 'grayscale opacity-70' : ''}`}
                                                         loading="lazy"
                                                     />
-                                                    <div className="absolute top-3 right-3">
-                                                        <span className="bg-primary/90 text-white text-sm font-bold uppercase tracking-wider px-2.5 py-1 rounded-full backdrop-blur-sm">
-                                                            {CATEGORIES.find(c => c.id === product.category)?.name}
-                                                        </span>
-                                                    </div>
+                                                    {catName(product.category) ? (
+                                                        <div className="absolute top-3 right-3">
+                                                            <span className="bg-primary/90 text-white text-sm font-bold uppercase tracking-wider px-2.5 py-1 rounded-full backdrop-blur-sm">
+                                                                {catName(product.category)}
+                                                            </span>
+                                                        </div>
+                                                    ) : null}
                                                     {/* Wishlist heart */}
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }}
@@ -3646,11 +3653,13 @@
                                         alt={activeProduct.name}
                                         className="w-full h-full object-cover max-h-56 md:max-h-full"
                                     />
-                                    <div className="absolute top-4 right-4">
-                                        <span className="bg-primary/95 text-white text-sm font-bold uppercase tracking-wider px-3 py-1 rounded-full">
-                                            {CATEGORIES.find(c => c.id === activeProduct.category)?.name}
-                                        </span>
-                                    </div>
+                                    {catName(activeProduct.category) ? (
+                                        <div className="absolute top-4 right-4">
+                                            <span className="bg-primary/95 text-white text-sm font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+                                                {catName(activeProduct.category)}
+                                            </span>
+                                        </div>
+                                    ) : null}
                                 </div>
 
                                 {/* Right Side: Content and Details */}
