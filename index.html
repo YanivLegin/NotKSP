@@ -910,8 +910,7 @@
         };
 
         // Default stock quantities for the base products (id -> units).
-        // Two products (3, 6) start out of stock to demo the "request" flow.
-        const STOCK_DEFAULTS = { "1": 5, "2": 3, "3": 0, "4": 12, "6": 0, "7": 2, "8": 15, "9": 10, "10": 4, "11": 7, "12": 1, "13": 8, "14": 5, "15": 3, "16": 9 };
+        const STOCK_DEFAULTS = { "1": 5, "2": 7, "3": 6, "4": 12, "5": 8, "6": 4, "7": 2, "8": 15, "9": 10, "10": 4, "11": 7, "12": 4, "13": 8, "14": 5, "15": 3, "16": 9 };
 
         
         // ============================================================
@@ -2095,21 +2094,34 @@
             const catalog = useMemo(() => {
                 let resolvedProducts = [];
                 if (isSupabaseConnected && Array.isArray(dbProducts) && dbProducts.length > 0) {
-                    resolvedProducts = dbProducts.map(p => ({
+                    const dbMap = new Map(dbProducts.map(p => [String(p.id), Number(p.stock_quantity ?? 0)]));
+                    
+                    const base = PRODUCTS.map(p => ({
+                        ...p,
+                        id: String(p.id),
+                        stock_quantity: dbMap.has(String(p.id)) 
+                            ? dbMap.get(String(p.id)) 
+                            : (stockMap[String(p.id)] !== undefined ? Number(stockMap[String(p.id)]) : Number(STOCK_DEFAULTS[String(p.id)] ?? 5))
+                    }));
+
+                    const baseIds = new Set(PRODUCTS.map(p => String(p.id)));
+                    const extraDb = dbProducts.filter(p => !baseIds.has(String(p.id))).map(p => ({
                         ...p,
                         id: String(p.id),
                         stock_quantity: Number(p.stock_quantity ?? 0)
                     }));
+
+                    resolvedProducts = [...base, ...extraDb];
                 } else {
                     const base = PRODUCTS.map(p => ({
                         ...p,
                         id: String(p.id),
-                        stock_quantity: stockMap[String(p.id)] !== undefined ? Number(stockMap[String(p.id)]) : Number(STOCK_DEFAULTS[String(p.id)] ?? 0)
+                        stock_quantity: stockMap[String(p.id)] !== undefined ? Number(stockMap[String(p.id)]) : Number(STOCK_DEFAULTS[String(p.id)] ?? 5)
                     }));
                     const custom = customProducts.map(p => ({
                         ...p,
                         id: String(p.id),
-                        stock_quantity: stockMap[String(p.id)] !== undefined ? Number(stockMap[String(p.id)]) : Number(p.stock_quantity ?? 0)
+                        stock_quantity: stockMap[String(p.id)] !== undefined ? Number(stockMap[String(p.id)]) : Number(p.stock_quantity ?? 5)
                     }));
                     resolvedProducts = [...base, ...custom];
                 }
