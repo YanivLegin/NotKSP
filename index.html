@@ -1785,8 +1785,8 @@
                 }
             }, []);
 
-            // Fetch data from Supabase
-            const fetchSupabaseData = async () => {
+            // Fetch data from Supabase with auto-retry for transient connection timeouts
+            const fetchSupabaseData = async (retries = 2) => {
                 if (!supabaseClient) return;
                 try {
                     // Fetch products
@@ -1795,7 +1795,7 @@
                         .select('*')
                         .order('created_at', { ascending: true });
                     if (prodErr) throw prodErr;
-                    if (prodData) setDbProducts(prodData);
+                    if (prodData && prodData.length > 0) setDbProducts(prodData);
 
                     // Fetch orders
                     const { data: ordData, error: ordErr } = await supabaseClient
@@ -1812,6 +1812,9 @@
                     if (!reqErr && reqData) setRequests(reqData);
                 } catch (e) {
                     console.error("Error fetching Supabase data:", e);
+                    if (retries > 0) {
+                        setTimeout(() => fetchSupabaseData(retries - 1), 2000);
+                    }
                 }
             };
 
