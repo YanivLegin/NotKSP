@@ -1811,8 +1811,31 @@
             };
 
             useEffect(() => {
-                if (isSupabaseConnected) {
+                if (isSupabaseConnected && supabaseClient) {
                     fetchSupabaseData();
+
+                    // Realtime channel for live updates when products/orders change in Supabase Dashboard
+                    const channel = supabaseClient
+                        .channel('schema-db-changes')
+                        .on(
+                            'postgres_changes',
+                            { event: '*', schema: 'public', table: 'products' },
+                            () => {
+                                fetchSupabaseData();
+                            }
+                        )
+                        .on(
+                            'postgres_changes',
+                            { event: '*', schema: 'public', table: 'orders' },
+                            () => {
+                                fetchSupabaseData();
+                            }
+                        )
+                        .subscribe();
+
+                    return () => {
+                        supabaseClient.removeChannel(channel);
+                    };
                 }
             }, [isSupabaseConnected]);
 
@@ -2112,6 +2135,7 @@
                 
                 // Optimistic UI Update
                 persistStock({ ...stockMap, [id]: q });
+                setDbProducts(prev => prev.map(p => p.id === id ? { ...p, stock_quantity: q } : p));
                 
                 if (isSupabaseConnected && supabaseClient) {
                     try {
