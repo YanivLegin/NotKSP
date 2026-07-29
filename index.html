@@ -3104,29 +3104,38 @@
 
                                 {/* Recently Viewed Products Section */}
                                 {recentlyViewedProducts.length > 0 && (
-                                    <div className="pt-8 mt-8 border-t border-slate-200 dark:border-slate-800 space-y-4">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xl">👁️</span>
-                                            <h3 className="font-heebo font-black text-slate-900 dark:text-slate-100 text-xl">מוצרים שצפית בהם לאחרונה</h3>
-                                        </div>
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                            {recentlyViewedProducts.map(product => (
-                                                <div 
-                                                    key={product.id}
-                                                    onClick={() => openProductDetails(product)}
-                                                    className="bg-white p-3 rounded-xl border border-slate-100 shadow-premium hover:shadow-premium-hover cursor-pointer flex items-center gap-3 transition-all"
-                                                >
-                                                    <img 
-                                                        src={`${product.image_url}?auto=format&fit=crop&w=150&q=80`} 
-                                                        alt={product.name} 
-                                                        className="w-12 h-12 object-cover rounded-lg"
-                                                    />
-                                                    <div className="min-w-0">
-                                                        <h4 className="font-bold text-sm text-slate-800 truncate leading-tight">{product.name}</h4>
-                                                        <p className="text-sm font-extrabold text-primary mt-1">{(Number(product.price) || 0).toLocaleString('he-IL')} ₪</p>
+                                    <div className="pt-8 mt-10 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                                        <div className="bg-slate-50 dark:bg-slate-800/60 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2.5">
+                                                    <div className="w-8 h-8 rounded-lg bg-primary/10 dark:bg-cta/20 text-primary dark:text-cta flex items-center justify-center font-bold text-base shrink-0">
+                                                        <Icon name={"history"} className={"w-4.5 h-4.5"} />
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="font-heebo font-black text-slate-900 dark:text-slate-100 text-lg">מוצרים שצפית בהם לאחרונה</h3>
+                                                        <p className="text-xs text-slate-500 dark:text-slate-400">היסטוריית הצפייה האישית שלך באתר</p>
                                                     </div>
                                                 </div>
-                                            ))}
+                                            </div>
+                                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                                {recentlyViewedProducts.map(product => (
+                                                    <div 
+                                                        key={product.id}
+                                                        onClick={() => openProductDetails(product)}
+                                                        className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md cursor-pointer flex items-center gap-3 transition-all"
+                                                    >
+                                                        <img 
+                                                            src={`${product.image_url}?auto=format&fit=crop&w=150&q=80`} 
+                                                            alt={product.name} 
+                                                            className="w-12 h-12 object-cover rounded-lg shrink-0 border border-slate-100 dark:border-slate-800"
+                                                        />
+                                                        <div className="min-w-0">
+                                                            <h4 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate leading-tight">{product.name}</h4>
+                                                            <p className="text-xs sm:text-sm font-extrabold text-primary dark:text-cta mt-1">{(Number(product.price) || 0).toLocaleString('he-IL')} ₪</p>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 )}
