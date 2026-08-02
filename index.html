@@ -1063,7 +1063,10 @@
             const lowStock = catalog.filter(p => p.stock_quantity > 0 && p.stock_quantity <= 3).length;
             const revenue = (Array.isArray(orders) ? orders : []).reduce((s, o) => s + o.total, 0);
             const openReq = requests.filter(r => r.status === 'open').length;
-            const customerCount = users.filter(u => u.role === 'customer').length;
+            const customerCount = Math.max(
+                users.filter(u => u.role === 'customer').length,
+                new Set((Array.isArray(orders) ? orders : []).map(o => o.customer_email || o.customerEmail).filter(Boolean)).size
+            );
 
             // Wishlist popularity across all users
             const wishCounts = {};
@@ -1074,17 +1077,27 @@
 
             // Units sold per product (from orders)
             const soldCounts = {};
-            orders.forEach(o => o.items.forEach(it => { soldCounts[it.name] = (soldCounts[it.name] || 0) + it.quantity; }));
+            (Array.isArray(orders) ? orders : []).forEach(o => {
+                const items = o.items || [];
+                if (Array.isArray(items)) {
+                    items.forEach(it => {
+                        const label = getLocalizedProductName(it, lang) || it.name || it.title || 'Item';
+                        const qty = Number(it.quantity) || Number(it.qty) || 1;
+                        soldCounts[label] = (soldCounts[label] || 0) + qty;
+                    });
+                }
+            });
             const topSold = Object.entries(soldCounts)
                 .map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value).slice(0, 5);
+            const totalItemsSold = Object.values(soldCounts).reduce((a, b) => a + b, 0) || (Array.isArray(orders) ? orders : []).reduce((acc, o) => acc + (Array.isArray(o.items) ? o.items.length : 0), 0);
 
             // Revenue by category
             const catRev = {};
-            orders.forEach(o => o.items.forEach(it => { const c = catName(it.category); catRev[c] = (catRev[c] || 0) + it.price * it.quantity; }));
+            orders.forEach(o => (o.items || []).forEach(it => { const c = catName(it.category, lang); catRev[c] = (catRev[c] || 0) + (Number(it.price) || 0) * (Number(it.quantity) || 1); }));
             const revByCat = Object.entries(catRev).map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value);
 
             const stockByProduct = [...catalog].sort((a, b) => a.stock_quantity - b.stock_quantity).slice(0, 8)
-                .map(p => ({ label: p.name, value: p.stock_quantity }));
+                .map(p => ({ label: getLocalizedProductName(p, lang), value: p.stock_quantity }));
 
             return (
                 <div className="space-y-6">
@@ -1101,7 +1114,7 @@
                     </div>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         <StatCard label="לקוחות רשומים" value={customerCount} icon="users" tone="primary" />
-                        <StatCard label="פריטים שנמכרו" value={Object.values(soldCounts).reduce((a, b) => a + b, 0)} icon="shopping-cart" tone="slate" />
+                        <StatCard label="פריטים שנמכרו" value={totalItemsSold} icon="shopping-cart" tone="slate" />
                         <StatCard label="שמירות ברשימת משאלות" value={Object.values(wishCounts).reduce((a, b) => a + b, 0)} icon="heart" tone="cta" />
                         <StatCard label="מוצרים אזלו" value={outOfStock} icon="alert-triangle" tone="amber" />
                     </div>
@@ -2354,6 +2367,8 @@
             // ---- Auth ----
             const registerUser = async ({ name, email, password }) => {
                 email = email.trim().toLowerCase();
+                const newUser = { id: 'u' + Date.now(), name: name.trim(), email, passwordHash: pseudoHash(password), role: 'customer', createdAt: Date.now() };
+
                 if (isSupabaseConnected && supabaseClient) {
                     try {
                         const { data, error } = await supabaseClient.auth.signUp({
@@ -2364,22 +2379,19 @@
                             }
                         });
                         if (error) throw error;
-                        showToast('נרשמת בהצלחה!');
-                        return { ok: true };
+                        if (data?.user?.id) newUser.id = data.user.id;
                     } catch (e) {
                         return { ok: false, error: e.message || "ההרשמה נכשלה" };
                     }
                 }
-                // Offline fallback
-                if (users.some(u => u.email === email)) {
-                    return { ok: false, error: "כתובת האימייל כבר רשומה במערכת" };
-                }
-                const user = { id: 'u' + Date.now(), name: name.trim(), email, passwordHash: pseudoHash(password), role: 'customer', createdAt: Date.now() };
-                const updated = [...users, user];
-                persistUsers(updated);
-                setCurrentUser(user);
-                LS.set('notksp_session', user.email);
-                return { ok: true, user };
+
+                // Save user to state & localStorage for admin dashboard & session tracking
+                const updatedUsers = [...users.filter(u => u.email !== email), newUser];
+                persistUsers(updatedUsers);
+                setCurrentUser(newUser);
+                LS.set('notksp_session', newUser.email);
+                showToast(lang === 'en' ? 'Registered successfully!' : 'נרשמת בהצלחה!');
+                return { ok: true, user: newUser };
             };
 
             const loginUser = async ({ email, password }) => {
@@ -2649,6 +2661,9 @@
                     date: new Date().toLocaleDateString('he-IL', { year: 'numeric', month: 'long', day: 'numeric' })
                 };
 
+                // Always update orders in state & localStorage immediately for real-time dashboard updates
+                persistOrders([orderData, ...orders]);
+
                 if (isSupabaseConnected && supabaseClient) {
                     try {
                         const { error: ordErr } = await supabaseClient.from('orders').insert({
@@ -2676,14 +2691,13 @@
                         fetchSupabaseData();
                         setCompletedOrder(orderData);
                         clearCart();
-                        showToast('ההזמנה נקלטה ב-Supabase!');
+                        showToast(lang === 'en' ? 'Order placed & synced with Supabase!' : 'ההזמנה נקלטה וסונכרנה מול Supabase!');
                     } catch (err) {
                         showToast('שגיאה בביצוע ההזמנה ב-Supabase: ' + err.message, 'amber');
                         return;
                     }
                 } else {
-                    // Offline fallback
-                    persistOrders([orderData, ...orders]);
+                    // Offline fallback stock update
                     const newStock = { ...stockMap };
                     cart.forEach(item => {
                         const current = newStock[item.id] !== undefined ? newStock[item.id] : (STOCK_DEFAULTS[item.id] ?? (getProduct(item.id)?.stock_quantity ?? 0));
