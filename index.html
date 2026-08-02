@@ -3531,7 +3531,7 @@
                                                                 className="bg-cta hover:bg-cta-hover text-primary font-bold text-sm px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-all transform active:scale-95 shadow-md shadow-cta/10"
                                                             >
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-                                                                {t(addToCart)}
+                                                                {t('addToCart')}
                                                             </button>
                                                         ) : (
                                                             <button 
@@ -4510,7 +4510,7 @@
                                                             <Icon name={"trash-2"} className={"w-4 h-4"} />
                                                         </button>
                                                         {item.stock_quantity > 0 ? (
-                                                            <button onClick={() => addToCart(item)} className="bg-cta hover:bg-cta-hover text-primary font-bold text-base px-3 py-1.5 rounded-full transition-all">הוסף לסל</button>
+                                                            <button onClick={() => addToCart(item)} className="bg-cta hover:bg-cta-hover text-primary font-bold text-base px-3 py-1.5 rounded-full transition-all">{t('addToCart')}</button>
                                                         ) : (
                                                             <button onClick={() => { setIsWishlistOpen(false); setRequestProduct(item.name); }} className="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-base px-3 py-1.5 rounded-full transition-all">עדכנו אותי</button>
                                                         )}
