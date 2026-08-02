@@ -2561,10 +2561,10 @@
                         });
                         if (error) throw error;
                         fetchSupabaseData();
-                        showToast('הבקשה נשלחה ונשמרה ב-Supabase!');
+                        showToast('הבקשה נשלחה בהצלחה!');
                         return;
                     } catch (e) {
-                        showToast('שגיאה בשמירת הבקשה ב-Supabase: ' + e.message, 'amber');
+                        showToast('שגיאה בשמירת הבקשה: ' + e.message, 'amber');
                     }
                 }
 
@@ -2691,9 +2691,9 @@
                         fetchSupabaseData();
                         setCompletedOrder(orderData);
                         clearCart();
-                        showToast(lang === 'en' ? 'Order placed & synced with Supabase!' : 'ההזמנה נקלטה וסונכרנה מול Supabase!');
+                        showToast(lang === 'en' ? 'Order placed successfully!' : 'ההזמנה נקלטה בהצלחה!');
                     } catch (err) {
-                        showToast('שגיאה בביצוע ההזמנה ב-Supabase: ' + err.message, 'amber');
+                        showToast('שגיאה בביצוע ההזמנה: ' + err.message, 'amber');
                         return;
                     }
                 } else {
