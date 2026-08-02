@@ -448,6 +448,7 @@
             let desc = (product.description || '').trim();
 
             const descMap = {
+                "מכשיר אנדרואיד טהור מבית גוגל עם טכנולוגיית Google AI ומצלמות מהטובות בעולם, מעבד Tensor G3 מתקדמת.": "Pure Android smartphone from Google featuring Google AI technology, world-class cameras, and advanced Tensor G3 processor.",
                 "מחשב נייד עוצמתי ואיכותי מבית Lenovo, מתאים לסטודנטים, עבודה משרדית ושימוש יומיומי. מציע שילוב מנצח של מעבד i5 מתקדם, זיכרון עבודה נדיב ואחסון מהיר במיוחד, כל זאת בעיצוב דק וקל משקל.": "Powerful and high-quality Lenovo laptop, ideal for students, office work, and daily use. Offers a winning combination of advanced i5 processor, generous RAM, and ultra-fast storage in a sleek, lightweight design.",
                 "חוויית צפייה קולנועית בסלון שלכם. טלוויזיה חכמה ברזולוציית 4K UHD מדהימה, תומכת בטכנולוגיית HDR לצבעים עשירים וניגודיות עמוקה. כוללת מערכת הפעלה חכמה עם גישה מהירה לכל אפליקציות הסטרימינג הפופולריות.": "A cinematic viewing experience in your living room. 55-inch 4K UHD Smart TV with HDR support for rich colors and deep contrast. Features a smart OS with fast access to all popular streaming apps.",
                 "שואב אבק ושוטף רובוטי חכם המצויד במערכת ניווט לייזר LDS מתקדמת למיפוי מדויק של הבית. מציע שאיבה עוצמתית, שטיפה אקטיבית ושליטה מלאה מהנייד. המכשיר מתאים את עצמו לסוגי משטחים שונים ומבצע ניקוי יעיל ויסודי.": "Smart robot vacuum and mop equipped with advanced LDS laser navigation for precise home mapping. Features powerful suction, active mopping, and full smartphone app control.",
@@ -476,12 +477,72 @@
                 "אוזניות אלחוטיות עם סינון רעשים משופר ושמע מרחבי.": "Next-level Active Noise Cancellation, Adaptive Transparency, and personalized Spatial Audio powered by the H2 chip.",
                 "רמקול בלוטות' קומפקטי עם סאונד חזק ובס עמוק.": "Compact IP67 waterproof Bluetooth speaker delivering bold JBL Original Pro Sound with deep bass.",
                 "מסך מקצועי לגרפיקאים ומתכנתים ברזולוציית 4K.": "Professional 27-inch 4K UHD monitor engineered for color accuracy, graphic designers, and programmers.",
-                "בלנדר חכם ועוצמתי להכנת שייקים בריאים בקלות.": "Powerful 1000W personal blender with intelligent Auto-iQ programs for effortless healthy smoothies."
+                "בלנדר חכם ועוצמתי להכנת שייקים בריאים בקלות.": "Powerful 1000W personal blender with intelligent Auto-iQ programs for effortless healthy smoothies.",
+                "נורת LED חכמה מחליפת צבעים לשליטה מאפליקציה.": "Smart color-changing LED bulb with smartphone app control."
             };
 
             if (descMap[desc]) return descMap[desc];
 
-            return desc;
+            // Fallback word replacement for dynamic Hebrew descriptions
+            return desc
+                .replace(/מכשיר אנדרואיד טהור מבית גוגל/g, "Pure Android device from Google")
+                .replace(/עם טכנולוגיית Google AI/g, "featuring Google AI technology")
+                .replace(/ומצלמות מהטובות בעולם/g, "and world-class cameras")
+                .replace(/מעבד Tensor G3 מתקדמת/g, "advanced Tensor G3 processor")
+                .replace(/מעבד Tensor G3/g, "Tensor G3 processor")
+                .replace(/נורת LED חכמה מחליפת צבעים לשליטה מאפליקציה\./g, "Smart color-changing LED bulb with smartphone app control.")
+                .replace(/מחשב נייד עוצמתי/g, "Powerful laptop")
+                .replace(/ואיכותי מבית/g, "and high-quality from")
+                .replace(/מתאים לסטודנטים/g, "suitable for students")
+                .replace(/עבודה משרדית ושימוש יומיומי/g, "office work and daily use")
+                .replace(/מציע שילוב מנצח של/g, "offers a winning combination of")
+                .replace(/מעבד i5 מתקדם/g, "advanced i5 processor")
+                .replace(/זיכרון עבודה נדיב/g, "generous RAM")
+                .replace(/ואחסון מהיר במיוחד/g, "and ultra-fast storage")
+                .replace(/כל זאת בעיצוב דק וקל משקל/g, "all in a sleek, lightweight design")
+                .replace(/חוויית צפייה קולנועית/g, "Cinematic viewing experience")
+                .replace(/בסלון שלכם/g, "in your living room")
+                .replace(/טלוויזיה חכמה ברזולוציית/g, "Smart TV with resolution of")
+                .replace(/מדהימה/g, "stunning")
+                .replace(/תומכת בטכנולוגיית HDR/g, "HDR support")
+                .replace(/לצבעים עשירים וניגודיות עמוקה/g, "for rich colors and deep contrast")
+                .replace(/כוללת מערכת הפעלה חכמה/g, "includes smart OS")
+                .replace(/עם גישה מהירה לכל אפליקציות הסטרימינג הפופולריות/g, "with fast access to popular streaming apps")
+                .replace(/שואב אבק ושוטף רובוטי חכם/g, "Smart robot vacuum and mop")
+                .replace(/המצויד במערכת ניווט לייזר/g, "equipped with laser navigation")
+                .replace(/מתקדמת למיפוי מדויק של הבית/g, "advanced for precise home mapping")
+                .replace(/מציע שאיבה עוצמתית/g, "offers powerful suction")
+                .replace(/שטיפה אקטיבית ושליטה מלאה מהנייד/g, "active mopping and full mobile app control")
+                .replace(/המכשיר מתאים את עצמו לסוגי משטחים שונים/g, "adapts to various surface types")
+                .replace(/ומבצע ניקוי יעיל ויסודי/g, "and performs thorough cleaning")
+                .replace(/סמארטפון דגל/g, "Flagship smartphone")
+                .replace(/עם מצלמת/g, "with camera")
+                .replace(/מדהימה וביצועים ללא פשרות/g, "stunning with uncompromised performance")
+                .replace(/מכונת קפה חדשנית/g, "Innovative coffee machine")
+                .replace(/שמפיקה קפה מושלם בלחיצת כפתור אחת/g, "producing perfect coffee at the touch of a button")
+                .replace(/השעון החכם המתקדם ביותר/g, "The most advanced smartwatch")
+                .replace(/עם חיישני בריאות מתקדמים/g, "with advanced health sensors")
+                .replace(/אוזניות פרימיום/g, "Premium headphones")
+                .replace(/עם סינון רעשים אקטיבי מוביל בתעשייה/g, "with industry-leading active noise cancellation")
+                .replace(/מערכת Mesh לכיסוי Wi-Fi מושלם בכל הבית/g, "Mesh system for seamless home Wi-Fi coverage")
+                .replace(/המיקרופון הפופולרי ביותר לפודקאסטים, שידורים והקלטות/g, "The most popular USB microphone for podcasting, streaming, and recording")
+                .replace(/מקלדת מכנית מתקדמת לגיימרים/g, "Advanced mechanical gaming keyboard")
+                .replace(/עם תאורת RGB מלאה/g, "with full RGB lighting")
+                .replace(/הקונסולה החזקה ביותר בעולם/g, "The world's most powerful console")
+                .replace(/לחוויית גיימינג מדהימה/g, "for an incredible gaming experience")
+                .replace(/שואב ושוטף מתקדם/g, "Advanced vacuum and mop")
+                .replace(/עם ניווט לייזר והימנעות ממכשולים/g, "with laser navigation and obstacle avoidance")
+                .replace(/מיקסר שולחני עוצמתי/g, "Powerful stand mixer")
+                .replace(/ואיכותי בעיצוב רטרו קלאסי/g, "and high quality in classic retro design")
+                .replace(/אוזניות אלחוטיות/g, "Wireless headphones")
+                .replace(/עם סינון רעשים משופר ושמע מרחבי/g, "with improved noise cancellation and spatial audio")
+                .replace(/רמקול בלוטות' קומפקטי/g, "Compact Bluetooth speaker")
+                .replace(/עם סאונד חזק ובס עמוק/g, "with powerful sound and deep bass")
+                .replace(/מסך מקצועי לגרפיקאים ומתכנתים/g, "Professional monitor for graphic designers and programmers")
+                .replace(/ברזולוציית/g, "with resolution")
+                .replace(/בלנדר חכם ועוצמתי/g, "Smart powerful blender")
+                .replace(/להכנת שייקים בריאים בקלות/g, "for easily making healthy smoothies")
+                .replace(/יבואן רשמי/g, "Official Importer Warranty");
         };
 
 
