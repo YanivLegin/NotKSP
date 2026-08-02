@@ -393,21 +393,73 @@
                        .replace(/מסך מחשב/g, "Computer Monitor")
                        .replace(/מקלדת אלחוטית/g, "Wireless Keyboard")
                        .replace(/עכבר אלחוטי/g, "Wireless Mouse");
+        const getLocalizedProductDescription = (product, lang = 'he') => {
+            if (!product) return '';
+            let desc = product.description || '';
+            if (lang !== 'en') return desc;
+
+            const descMap = {
+                "לצילום מקצועי, טעינה סופר- סמארטפון עוצמתי Leica בשילוב IP68. מרהיב ועמידות במים 144W, מסך 120": "Professional photography, super-fast 120W charging. Powerful Leica-partnered smartphone with IP68 water resistance, stunning 120Hz display.",
+                "מסך OLED 65 אינץ' 4K ברזולוציית UHD עם מעבד אלפא 9 דור 6 ומערכת הפעלה webOS. חווית צפייה קולנועית מושלמת.": "65-inch 4K OLED TV with Alpha 9 Gen 6 AI processor and webOS operating system. Perfect cinematic viewing experience.",
+                "קונסולת משחקים מובילה בעלת כונן דיסקים, תמיכה ב-4K 120Hz וטכנולוגיית SSD אולטרה-מהירה.": "Leading gaming console with disc drive, 4K 120Hz support, and ultra-fast custom SSD technology.",
+                "שואב אבק רובוטי מתקדם בעל עוצמת שאיבה 6000Pa, מערכת ניקוי קרקע כפולה ומיפוי לייזר תלת-ממדי.": "Advanced robotic vacuum cleaner with 6000Pa suction power, dual mop cleaning system, and 3D laser mapping.",
+                "אוזניות אלחוטיות מתקדמות עם ביטול רעשים אקטיבי עוצמתי, זמן סוללה עד 30 שעות ואיכות שמע מעולה.": "Advanced wireless over-ear headphones with powerful Active Noise Cancellation (ANC), up to 30 hours battery life, and superior audio quality.",
+                "מחשב נייד עוצמתי עם מעבד אינטל דור 13, זיכרון 16GB ותצוגת Full HD איכותית לעבודה וללימודים.": "Powerful laptop featuring 13th Gen Intel Core processor, 16GB RAM, and vibrant Full HD display for work and study.",
+                "מיקסר מקצועי בעל קערת נירוסטה 4.8 ליטר, מנוע עוצמתי ומגוון אביזרים להכנת בצקים ומאפים.": "Professional stand mixer with 4.8L stainless steel bowl, powerful motor, and versatile attachment hub."
+            };
+
+            if (descMap[desc.trim()]) return descMap[desc.trim()];
+
+            return desc.replace(/מחשב נייד עוצמתי/g, "Powerful laptop")
+                       .replace(/אוזניות אלחוטיות מתקדמות/g, "Advanced wireless headphones")
+                       .replace(/שואב אבק רובוטי/g, "Robotic vacuum cleaner")
+                       .replace(/טלוויזיה חכמה/g, "Smart TV")
+                       .replace(/קונסולת משחקים/g, "Gaming console")
+                       .replace(/מיקסר מקצועי/g, "Professional stand mixer")
+                       .replace(/רמקול נייד/g, "Portable speaker")
+                       .replace(/שעון חכם/g, "Smartwatch")
+                       .replace(/יבואן רשמי/g, "Official Importer Warranty");
+        };
+
+        const translateSpecKey = (key, lang = 'he') => {
+            if (lang !== 'en') return key;
+            const map = {
+                'מסך': 'Screen',
+                'מעבד': 'Processor',
+                'אחסון': 'Storage',
+                'טעינה': 'Charging',
+                'אחריות': 'Warranty',
+                'זיכרון': 'RAM',
+                'סוללה': 'Battery',
+                'מצלמה': 'Camera',
+                'משקל': 'Weight',
+                'צבע': 'Color'
+            };
+            return map[String(key).trim()] || key;
+        };
+
+        const translateSpecVal = (val, lang = 'he') => {
+            if (lang !== 'en') return val;
+            return String(val)
+                .replace(/אינץ/g, 'inch')
+                .replace(/שנתיים יבואן רשמי/g, '2 Years Official Importer')
+                .replace(/שנה יבואן רשמי/g, '1 Year Official Importer')
+                .replace(/שלוש שנים יבואן רשמי/g, '3 Years Official Importer');
         };
 
         // Constants - Product catalog with full specs as requested in the PRD
         
         const BRANCHES = [
-            { id: 'eilat_malkot', name: 'אילת מלכות שבא', city: 'אילת', phone: '04-8123401', hours: 'א-ה 09:30-22:00, ו 09:00-14:30' },
-            { id: 'eilat_tzafon', name: 'אילת צפון', city: 'אילת', phone: '04-8123402', hours: 'א-ה 09:00-21:00, ו 09:00-14:00' },
-            { id: 'eilat_tarshish', name: 'אילת תרשיש', city: 'אילת', phone: '04-8123403', hours: 'א-ה 10:00-22:00, ו 09:30-15:00' },
-            { id: 'ashdod_merkaz', name: 'אשדוד מרכז', city: 'אשדוד', phone: '04-8123404', hours: 'א-ה 09:30-21:30, ו 09:00-14:00' },
-            { id: 'ashdod_ad_halom', name: 'אשדוד עד הלום', city: 'אשדוד', phone: '04-8123405', hours: 'א-ה 10:00-22:00, ו 09:30-14:30' },
-            { id: 'ashkelon', name: 'אשקלון', city: 'אשקלון', phone: '04-8123406', hours: 'א-ה 09:30-21:00, ו 09:00-14:00' },
-            { id: 'b7_grand', name: 'באר שבע גרנד', city: 'באר שבע', phone: '04-8123407', hours: 'א-ה 09:30-22:00, ו 09:00-15:00' },
-            { id: 'b7_ramot', name: 'באר שבע רמות', city: 'באר שבע', phone: '04-8123408', hours: 'א-ה 10:00-21:30, ו 09:30-14:00' },
-            { id: 'beit_shemesh', name: 'בית שמש', city: 'בית שמש', phone: '04-8123409', hours: 'א-ה 09:30-21:00, ו 09:00-13:30' },
-            { id: 'bat_yam', name: 'בת ים', city: 'בת ים', phone: '04-8123410', hours: 'א-ה 09:30-22:00, ו 09:00-14:30' }
+            { id: 'eilat_malkot', name: 'אילת מלכות שבא', name_en: 'Eilat Queen of Sheba', city: 'אילת', city_en: 'Eilat', phone: '04-8123401', hours: 'א-ה 09:30-22:00, ו 09:00-14:30' },
+            { id: 'eilat_tzafon', name: 'אילת צפון', name_en: 'Eilat North', city: 'אילת', city_en: 'Eilat', phone: '04-8123402', hours: 'א-ה 09:00-21:00, ו 09:00-14:00' },
+            { id: 'eilat_tarshish', name: 'אילת תרשיש', name_en: 'Eilat Tarshish', city: 'אילת', city_en: 'Eilat', phone: '04-8123403', hours: 'א-ה 10:00-22:00, ו 09:30-15:00' },
+            { id: 'ashdod_merkaz', name: 'אשדוד מרכז', name_en: 'Ashdod Center', city: 'אשדוד', city_en: 'Ashdod', phone: '04-8123404', hours: 'א-ה 09:30-21:30, ו 09:00-14:00' },
+            { id: 'ashdod_ad_halom', name: 'אשדוד עד הלום', name_en: 'Ashdod Ad Halom', city: 'אשדוד', city_en: 'Ashdod', phone: '04-8123405', hours: 'א-ה 10:00-22:00, ו 09:30-14:30' },
+            { id: 'ashkelon', name: 'אשקלון', name_en: 'Ashkelon', city: 'אשקלון', city_en: 'Ashkelon', phone: '04-8123406', hours: 'א-ה 09:30-21:00, ו 09:00-14:00' },
+            { id: 'b7_grand', name: 'באר שבע גרנד', name_en: 'Beer Sheva Grand', city: 'באר שבע', city_en: 'Beer Sheva', phone: '04-8123407', hours: 'א-ה 09:30-22:00, ו 09:00-15:00' },
+            { id: 'b7_ramot', name: 'באר שבע רמות', name_en: 'Beer Sheva Ramot', city: 'באר שבע', city_en: 'Beer Sheva', phone: '04-8123408', hours: 'א-ה 10:00-21:30, ו 09:30-14:00' },
+            { id: 'beit_shemesh', name: 'בית שמש', name_en: 'Beit Shemesh', city: 'בית שמש', city_en: 'Beit Shemesh', phone: '04-8123409', hours: 'א-ה 09:30-21:00, ו 09:00-13:30' },
+            { id: 'bat_yam', name: 'בת ים', name_en: 'Bat Yam', city: 'בת ים', city_en: 'Bat Yam', phone: '04-8123410', hours: 'א-ה 09:30-22:00, ו 09:00-14:30' }
         ];
 
         const getBranchStockStatus = (product, branchId) => {
@@ -1387,16 +1439,18 @@
         //  Auth modal — login / register / forgot password
         // ============================================================
         
-        const BranchAvailabilityModal = ({ isOpen, onClose, product }) => {
+        const BranchAvailabilityModal = ({ isOpen, onClose, product, lang = 'he' }) => {
             if (!isOpen || !product) return null;
 
             return (
                 <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]" dir="rtl">
+                    <div className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]" dir={lang === 'en' ? 'ltr' : 'rtl'}>
                         
                         {/* Header */}
                         <div className="px-6 py-4 border-b flex justify-between items-center bg-slate-50 relative">
-                            <h3 className="text-xl font-bold text-slate-800 w-full text-center">בדיקת זמינות מלאי בסניפי KSP</h3>
+                            <h3 className="text-xl font-bold text-slate-800 w-full text-center">
+                                {lang === 'en' ? 'Check Stock Availability in Branches' : 'בדיקת זמינות מלאי בסניפי KSP'}
+                            </h3>
                             <button onClick={onClose} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors p-2 rounded-full hover:bg-slate-200">
                                 <Icon name="x" className="w-6 h-6" />
                             </button>
@@ -1413,9 +1467,9 @@
                                                 <i data-lucide={inStock ? 'check' : 'x'} className="w-5 h-5"></i>
                                             </div>
                                             <div className="flex-grow text-right">
-                                                <h4 className="font-bold text-slate-800 text-lg mb-1">{branch.name}</h4>
+                                                <h4 className="font-bold text-slate-800 text-lg mb-1">{lang === 'en' ? (branch.name_en || branch.name) : branch.name}</h4>
                                                 <p className={`text-sm font-medium ${inStock ? 'text-green-600' : 'text-red-600'}`}>
-                                                    {inStock ? 'זמין במלאי הסניף • ניתן לאיסוף' : 'לא בסניף כעת • קיים במחסן מרכזי'}
+                                                    {inStock ? (lang === 'en' ? 'In Stock at Branch · Available for pickup' : 'זמין במלאי הסניף • ניתן לאיסוף') : (lang === 'en' ? 'NotInBranchNow · Available in central warehouse' : 'לא בסניף כעת • קיים במחסן מרכזי')}
                                                 </p>
                                             </div>
                                         </div>
@@ -3290,8 +3344,8 @@
                                                         <Icon name={"history"} className={"w-4.5 h-4.5"} />
                                                     </div>
                                                     <div>
-                                                        <h3 className="font-heebo font-black text-slate-900 dark:text-slate-100 text-lg">מוצרים שצפית בהם לאחרונה</h3>
-                                                        <p className="text-xs text-slate-500 dark:text-slate-400">היסטוריית הצפייה האישית שלך באתר</p>
+                                                        <h3 className="font-heebo font-black text-slate-900 dark:text-slate-100 text-lg">{t('recentlyViewed')}</h3>
+                                                        <p className="text-xs text-slate-500 dark:text-slate-400">{lang === 'en' ? 'Your personal browsing history on the site' : 'היסטוריית הצפייה האישית שלך באתר'}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -3304,12 +3358,12 @@
                                                     >
                                                         <img 
                                                             src={`${product.image_url}?auto=format&fit=crop&w=150&q=80`} 
-                                                            alt={product.name} 
+                                                            alt={getLocalizedProductName(product, lang)} 
                                                             className="w-12 h-12 object-cover rounded-lg shrink-0 border border-slate-100 dark:border-slate-800"
                                                         />
                                                         <div className="min-w-0">
-                                                            <h4 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate leading-tight">{product.name}</h4>
-                                                            <p className="text-xs sm:text-sm font-extrabold text-primary dark:text-cta mt-1">{(Number(product.price) || 0).toLocaleString('he-IL')} ₪</p>
+                                                            <h4 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate leading-tight">{getLocalizedProductName(product, lang)}</h4>
+                                                            <p className="text-xs sm:text-sm font-extrabold text-primary dark:text-cta mt-1">{(Number(product.price) || 0).toLocaleString(lang === 'en' ? 'en-US' : 'he-IL')} {t('nis')}</p>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -3324,11 +3378,14 @@
                                         <div className="space-y-2 text-right z-10 max-w-xl">
                                             <div className="inline-flex items-center gap-1.5 bg-primary-light/50 border border-slate-600/50 px-3 py-1 rounded-full text-sm text-cta font-bold">
                                                 <Icon name={"search-x"} className={"w-3.5 h-3.5"} />
-                                                לא מצאת מה שחיפשת?
+                                                {lang === 'en' ? "Didn't find what you were looking for?" : "לא מצאת מה שחיפשת?"}
                                             </div>
-                                            <h3 className="text-2xl sm:text-3xl font-heebo font-black leading-tight">חסר לנו מוצר שרצית? <span className="text-cta">ספר/י לנו.</span></h3>
+                                            <h3 className="text-2xl sm:text-3xl font-heebo font-black leading-tight">
+                                                {lang === 'en' ? "Missing a product you wanted? " : "חסר לנו מוצר שרצית? "}
+                                                <span className="text-cta">{lang === 'en' ? "Tell us." : "ספר/י לנו."}</span>
+                                            </h3>
                                             <p className="text-slate-300 text-base font-light">
-                                                כתוב/כתבי איזה מוצר תרצה/י שנביא — נעביר את הבקשה לצוות הרכש ונעדכן אותך כשהוא זמין במלאי.
+                                                {lang === 'en' ? "Write what product you would like us to bring — we will pass the request to procurement and notify you when available." : "כתוב/כתבי איזה מוצר תרצה/י שנביא — נעביר את הבקשה לצוות הרכש ונעדכן אותך כשהוא זמין במלאי."}
                                             </p>
                                         </div>
                                         <button
@@ -3336,7 +3393,7 @@
                                             className="z-10 bg-cta hover:bg-cta-hover text-primary font-bold px-6 py-3 rounded-full text-base shadow-glow transition-all transform hover:scale-105 flex items-center gap-2 shrink-0"
                                         >
                                             <Icon name={"plus-circle"} className={"w-5 h-5"} />
-                                            שליחת בקשת מוצר
+                                            {lang === 'en' ? "Send Product Request" : "שליחת בקשת מוצר"}
                                         </button>
                                     </div>
                                 </div>
@@ -3524,14 +3581,18 @@
                                         className="text-slate-500 hover:text-slate-800 text-sm font-bold flex items-center gap-1 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full transition-all dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                                        חזרה לקטלוג
+                                        {t('backToCatalog')}
                                     </button>
                                 </div>
                                 <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-10 border border-slate-100 dark:border-slate-800 shadow-premium space-y-8">
                                     <div className="text-center space-y-2">
                                         <Icon name="map-pin" className="w-12 h-12 text-primary mx-auto mb-4" />
-                                        <h2 className="text-3xl font-heebo font-black text-slate-900 dark:text-white">סניפי הרשת</h2>
-                                        <p className="text-slate-500 dark:text-slate-400">רשימת הסניפים שלנו, שעות הפעילות ודרכי התקשרות.</p>
+                                        <h2 className="text-3xl font-heebo font-black text-slate-900 dark:text-white">
+                                            {lang === 'en' ? 'Chain Branches' : 'סניפי הרשת'}
+                                        </h2>
+                                        <p className="text-slate-500 dark:text-slate-400">
+                                            {lang === 'en' ? 'List of our store locations, operating hours, and contact info.' : 'רשימת הסניפים שלנו, שעות הפעילות ודרכי התקשרות.'}
+                                        </p>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {BRANCHES.map(branch => (
@@ -3541,14 +3602,20 @@
                                                         <Icon name="store" className="w-5 h-5" />
                                                     </div>
                                                     <div>
-                                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white leading-tight">{branch.name}</h3>
-                                                        <span className="text-sm text-slate-500 dark:text-slate-400">{branch.city}</span>
+                                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white leading-tight">
+                                                            {lang === 'en' ? (branch.name_en || branch.name) : branch.name}
+                                                        </h3>
+                                                        <span className="text-sm text-slate-500 dark:text-slate-400">
+                                                            {lang === 'en' ? (branch.city_en || branch.city) : branch.city}
+                                                        </span>
                                                     </div>
                                                 </div>
                                                 <div className="space-y-3 text-sm">
                                                     <div className="flex items-start gap-2 text-slate-600 dark:text-slate-300">
                                                         <Icon name="clock" className="w-4 h-4 shrink-0 mt-0.5" />
-                                                        <span dir="ltr" className="text-right flex-1">{branch.hours}</span>
+                                                        <span dir="ltr" className="text-right flex-1">
+                                                            {lang === 'en' ? branch.hours.replace(/א-ה/g, 'Sun-Thu').replace(/, ו/g, ', Fri') : branch.hours}
+                                                        </span>
                                                     </div>
                                                     <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
                                                         <Icon name="phone" className="w-4 h-4 shrink-0" />
@@ -3880,7 +3947,7 @@
                             </div>
                         )}
                     </main>
-                    <BranchAvailabilityModal isOpen={isBranchModalOpen} onClose={() => setIsBranchModalOpen(false)} product={activeProduct} />
+                    <BranchAvailabilityModal isOpen={isBranchModalOpen} onClose={() => setIsBranchModalOpen(false)} product={activeProduct} lang={lang} />
 
                     {/* Footer */}
                     <footer className="bg-primary-dark text-slate-400 text-sm border-t border-slate-800 py-6 mt-12">
@@ -3922,13 +3989,13 @@
                                 <div className="w-full md:w-1/2 bg-slate-50 flex items-center justify-center relative border-l border-slate-100">
                                     <img 
                                         src={`${activeProduct.image_url}?auto=format&fit=crop&w=700&q=80`} 
-                                        alt={activeProduct.name}
+                                        alt={getLocalizedProductName(activeProduct, lang)}
                                         className="w-full h-full object-cover max-h-56 md:max-h-full"
                                     />
-                                    {catName(activeProduct.category) ? (
+                                    {catName(activeProduct.category, lang) ? (
                                         <div className="absolute top-4 right-4">
                                             <span className="bg-primary/95 text-white text-sm font-bold uppercase tracking-wider px-3 py-1 rounded-full">
-                                                {catName(activeProduct.category)}
+                                                {catName(activeProduct.category, lang)}
                                             </span>
                                         </div>
                                     ) : null}
@@ -3939,20 +4006,22 @@
                                     <div className="space-y-4">
                                         <div>
                                             <h2 className="text-2xl sm:text-3xl font-heebo font-black text-slate-900 leading-tight">
-                                                {activeProduct.name}
+                                                {getLocalizedProductName(activeProduct, lang)}
                                             </h2>
                                             
                                             {/* Price Badge */}
                                             <div className="mt-2.5 flex items-baseline gap-2">
-                                                <span className="text-slate-400 text-sm font-light">מחיר לצרכן:</span>
+                                                <span className="text-slate-400 text-sm font-light">
+                                                    {lang === 'en' ? 'Retail Price:' : 'מחיר לצרכן:'}
+                                                </span>
                                                 <span className="text-3xl font-heebo font-black text-primary">
-                                                    {(Number(activeProduct.price) || 0).toLocaleString('he-IL')} ₪
+                                                    {(Number(activeProduct.price) || 0).toLocaleString(lang === 'en' ? 'en-US' : 'he-IL')} {t('nis')}
                                                 </span>
                                             </div>
                                         </div>
 
                                         <p className="text-slate-600 text-base leading-relaxed">
-                                            {activeProduct.description}
+                                            {getLocalizedProductDescription(activeProduct, lang)}
                                         </p>
 
                                         {/* Technical Specifications */}
@@ -3960,13 +4029,13 @@
                                             <div className="space-y-2">
                                                 <h3 className="font-heebo font-bold text-slate-800 text-base border-b border-slate-100 pb-1 flex items-center gap-1.5">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-slate-500"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-                                                    מפרט טכני מלא
+                                                    {t('specifications')}
                                                 </h3>
                                                 <div className="space-y-1.5 text-sm text-slate-700">
                                                     {Object.entries(activeProduct.specifications || {}).map(([key, val]) => (
                                                         <div key={key} className="flex justify-between py-1 border-b border-dashed border-slate-100 gap-4">
-                                                            <span className="font-semibold text-slate-500 shrink-0">{key}</span>
-                                                            <span className="text-slate-800 text-left">{val}</span>
+                                                            <span className="font-semibold text-slate-500 shrink-0">{translateSpecKey(key, lang)}</span>
+                                                            <span className="text-slate-800 text-left">{translateSpecVal(val, lang)}</span>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -3977,7 +4046,7 @@
                                         {similarProducts.length > 0 && (
                                             <div className="space-y-2 pt-2">
                                                 <h3 className="font-heebo font-bold text-slate-800 text-base border-b border-slate-100 pb-1">
-                                                    אולי יעניין אותך גם
+                                                    {t('similarProducts')}
                                                 </h3>
                                                 <div className="grid grid-cols-3 gap-2">
                                                     {similarProducts.map(prod => (
@@ -3988,11 +4057,11 @@
                                                         >
                                                             <img 
                                                                 src={`${prod.image_url}?auto=format&fit=crop&w=100&q=80`} 
-                                                                alt={prod.name}
+                                                                alt={getLocalizedProductName(prod, lang)}
                                                                 className="w-10 h-10 object-cover rounded"
                                                             />
-                                                            <span className="text-sm font-semibold text-slate-700 truncate w-full mt-1">{prod.name}</span>
-                                                            <span className="text-base font-extrabold text-primary mt-0.5">{(Number(prod.price) || 0).toLocaleString('he-IL')} ₪</span>
+                                                            <span className="text-sm font-semibold text-slate-700 truncate w-full mt-1">{getLocalizedProductName(prod, lang)}</span>
+                                                            <span className="text-base font-extrabold text-primary mt-0.5">{(Number(prod.price) || 0).toLocaleString(lang === 'en' ? 'en-US' : 'he-IL')} {t('nis')}</span>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -4003,8 +4072,8 @@
                                     {/* Action button */}
                                     <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
                                         <div className="text-right space-y-1">
-                                            <span className="block text-sm text-slate-400">אחריות יבואן רשמי</span>
-                                            {(() => { const q = stockOf(activeProduct.id); const m = stockMeta(q); return (
+                                            <span className="block text-sm text-slate-400">{t('warranty')}</span>
+                                            {(() => { const q = stockOf(activeProduct.id); const m = stockMeta(q, lang); return (
                                                 <span className={`inline-flex items-center gap-1.5 text-sm font-bold px-2 py-0.5 rounded-full border ${m.cls}`}>
                                                     <span className={`w-1.5 h-1.5 rounded-full ${m.dot}`}></span>{m.label}
                                                 </span>
@@ -4018,7 +4087,7 @@
                                                         className="flex-1 bg-cta hover:bg-cta-hover text-primary font-bold text-lg rounded-xl flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02] shadow-lg shadow-cta/20"
                                                     >
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-                                                        הוסף לסל
+                                                        {t('addToCart')}
                                                     </button>
                                                 ) : (
                                                     <button 
@@ -4026,13 +4095,13 @@
                                                         className="flex-1 bg-slate-200 text-slate-600 hover:bg-slate-300 font-bold text-lg rounded-xl flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02]"
                                                     >
                                                         <Icon name={"bell"} className={"w-6 h-6"} />
-                                                        עדכנו אותי כשחוזר
+                                                        {lang === 'en' ? 'Notify Me When Available' : 'עדכנו אותי כשחוזר'}
                                                     </button>
                                                 )}
                                                 <button
                                                     onClick={() => toggleWishlist(activeProduct.id)}
                                                     className={`w-14 shrink-0 rounded-xl flex items-center justify-center border-2 transition-all active:scale-90 ${isWishlisted(activeProduct.id) ? 'bg-red-50 border-red-500 text-red-500' : 'border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200'}`}
-                                                    aria-label="רשימת משאלות"
+                                                    aria-label="Wishlist"
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill={isWishlisted(activeProduct.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg>
                                                 </button>
@@ -4042,7 +4111,7 @@
                                                 className="w-full h-14 rounded-xl border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                                                בדיקת זמינות בסניפי KSP
+                                                {lang === 'en' ? 'Check Branch Stock Availability' : 'בדיקת זמינות בסניפי KSP'}
                                             </button>
                                         </div>
                                     </div>
