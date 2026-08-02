@@ -2847,15 +2847,6 @@
                                     <Icon name="map-pin" className="w-4 h-4" />
                                     {t('branches')}
                                 </button>
-                                {/* Language Toggle Button (EN / HE) */}
-                                <button
-                                    onClick={() => setLang(l => l === 'he' ? 'en' : 'he')}
-                                    className="bg-cta hover:bg-cta-hover text-primary font-black text-xs px-2.5 py-1.5 rounded-full shadow-md transition-all flex items-center gap-1 border border-cta-dark transform active:scale-95"
-                                    title={lang === 'he' ? "Switch to English" : "החלף לעברית"}
-                                >
-                                    <span className="text-sm leading-none">🌐</span>
-                                    <span>{lang === 'he' ? 'EN' : 'HE'}</span>
-                                </button>
                                 {/* Dark Mode Toggle */}
                                 <button
                                     onClick={() => setIsDarkMode(!isDarkMode)}
@@ -2975,6 +2966,16 @@
                                         <span className="hidden sm:block text-sm font-bold">{t('login')}</span>
                                     </button>
                                 )}
+
+                                {/* Language Toggle Pill Button (EN 🌐) - Placed on the far left after username */}
+                                <button
+                                    onClick={() => setLang(l => l === 'he' ? 'en' : 'he')}
+                                    className="bg-cta hover:bg-cta-hover text-primary font-extrabold text-sm px-3.5 py-1.5 rounded-full shadow-md transition-all flex items-center gap-1.5 border-2 border-white transform active:scale-95 shrink-0"
+                                    title={lang === 'he' ? "Switch to English" : "החלף לעברית"}
+                                >
+                                    <span className="font-extrabold text-sm tracking-wide">{lang === 'he' ? 'EN' : 'HE'}</span>
+                                    <span className="text-base leading-none">🌐</span>
+                                </button>
                             </div>
                         </div>
 
