@@ -401,52 +401,34 @@
 
         const getLocalizedProductDescription = (product, lang = 'he') => {
             if (!product) return '';
-            if (lang !== 'en') return product.description || '';
-
-            if (product.description_en) return product.description_en;
-
-            const orig = PRODUCTS.find(p => String(p.id) === String(product.id));
-            if (orig && orig.description_en) return orig.description_en;
-
-            let desc = (product.description || '').trim();
+            if (lang === 'en' && product.description_en) {
+                return product.description_en;
+            }
+            let desc = product.description || '';
+            if (lang !== 'en') return desc;
 
             const descMap = {
-                "מחשב נייד עוצמתי ואיכותי מבית Lenovo, מתאים לסטודנטים, עבודה משרדית ושימוש יומיומי. מציע שילוב מנצח של מעבד i5 מתקדם, זיכרון עבודה נדיב ואחסון מהיר במיוחד, כל זאת בעיצוב דק וקל משקל.": "Powerful and high-quality Lenovo laptop, ideal for students, office work, and daily use. Offers a winning combination of advanced i5 processor, generous RAM, and ultra-fast storage in a sleek, lightweight design.",
-                "חוויית צפייה קולנועית בסלון שלכם. טלוויזיה חכמה ברזולוציית 4K UHD מדהימה, תומכת בטכנולוגיית HDR לצבעים עשירים וניגודיות עמוקה. כוללת מערכת הפעלה חכמה עם גישה מהירה לכל אפליקציות הסטרימינג הפופולריות.": "A cinematic viewing experience in your living room. 55-inch 4K UHD Smart TV with HDR support for rich colors and deep contrast. Features a smart OS with fast access to all popular streaming apps.",
-                "שואב אבק ושוטף רובוטי חכם המצויד במערכת ניווט לייזר LDS מתקדמת למיפוי מדויק של הבית. מציע שאיבה עוצמתית, שטיפה אקטיבית ושליטה מלאה מהנייד. המכשיר מתאים את עצמו לסוגי משטחים שונים ומבצע ניקוי יעיל ויסודי.": "Smart robot vacuum and mop equipped with advanced LDS laser navigation for precise home mapping. Features powerful suction, active mopping, and full smartphone app control.",
-                "אוזניות אלחוטיות בתצורת Over-Ear עם טכנולוגיית ביטול רעשים אקטיבי (ANC) שמנתקת אתכם מרעשי הרקע ומאפשרת להתמקד במוזיקה. מציעות סאונד עשיר ומפורט, כריות אוזניים רכות לנוחות ממושכת וחיי סוללה יוצאי דופן.": "Wireless over-ear headphones with Active Noise Cancellation (ANC) technology that isolates background noise so you can focus on music. Offers rich audio, soft ear cushions, and exceptional battery life.",
-                "חוויית גיימינג מקצועית ללא כבלים. בקר משחק אלחוטי בעל מבנה ארגונומי המותאם לאחיזה ממושכת ונוחה. כולל כפתורים רגישים במיוחד, מנועי רטט כפולים למשוב עוצמתי ותאימות רחבה למחשבים ולקונסולות משחק.": "Professional wireless gaming experience. Ergonomically built controller designed for comfortable long sessions. Includes hyper-responsive buttons, dual rumble motors, and wide device compatibility.",
-                "להתחיל את הבוקר עם קפה טרי ואיכותי כמו בבית קפה, בלחיצת כפתור אחת. מכונת אספרסו אוטומטית לחלוטין הטוחנת את פולי הקפה במקום ומכינה מגוון משקאות. כוללת מקציף חלב איכותי לקפוצ'ינו קרמי במיוחד.": "Start your morning with fresh cafe-quality coffee at the push of a button. Fully automatic espresso machine that grinds coffee beans on the spot and prepares a variety of beverages.",
-                "שדרגו את חוויית המשחק והעבודה שלכם. מסך מחשב מתקדם בגודל 27 אינץ' ברזולוציית QHD חדה, קצב רענון מהיר במיוחד של 165Hz וזמן תגובה אפסי. פאנל IPS איכותי המציע צבעים מדויקים וזוויות צפייה רחבות במיוחד.": "Upgrade your gaming and work setup. Advanced 27-inch computer monitor with crisp QHD resolution, ultra-fast 165Hz refresh rate, and near-zero response time.",
-                "עכבר גיימינג מקצועי במשקל נוצה עם חיישן אופטי סופר-מדויק וזמן תגובה אלחוטי אפסי. אידיאלי לשחקני eSports.": "Featherlight professional gaming mouse with super-accurate optical sensor and zero wireless latency. Ideal for eSports players.",
-                "מקלדת גיימינג מכנית בעיצוב TKL (ללא משטח מספרים) עם סוויצ'ים ליניאריים שקטים ותאורת RGB מלאה לכל מקש.": "Tenkeyless (TKL) mechanical gaming keyboard featuring quiet linear switches and per-key RGB backlighting.",
-                "טאבלט עוצמתי עם מסך ענק ומרהיב, תמיכה בעט חכם וסוללה שמחזיקה כל היום. מושלם ללימודים, יצירה וצפייה.": "Powerful tablet with a large stunning display, smart stylus support, and all-day battery life. Perfect for studying, creative work, and streaming.",
-                "מרכז השליטה של הבית החכם שלכם - רמקול איכותי משולב מסך מגע להצגת מתכונים, וידאו, ותפעול מוצרי חשמל חכמים.": "The hub of your smart home — high-quality speaker combined with a touchscreen display for recipes, video calls, and smart device control.",
-                "בלנדר עוצמתי ומהיר במיוחד לטחינת קרח, פירות קפואים ואגוזים בתוך שניות למרקם חלק ומושלם.": "Powerful high-speed blender designed to crush ice, frozen fruits, and nuts in seconds for smooth, perfect textures.",
-                "כיסוי אינטרנט מושלם לכל חלקי הבית ללא נקודות מתות, התקנה פשוטה באפליקציה ויכולת חיבור לעשרות מכשירים בו זמנית.": "Seamless Wi-Fi coverage across your entire home without dead zones. Easy app setup with capacity to connect dozens of devices simultaneously.",
-                "שדרוג משמעותי לסאונד של הטלוויזיה עם בס עמוק וצליל היקפי שמרגיש כמו קולנוע.": "Significant audio upgrade for your TV with deep bass and immersive surround sound for a theater-like experience.",
-                "לשיחות וידאו וישיבות זום באיכות הגבוהה ביותר עם פוקוס אוטומטי מהיר וחיישן אור מובנה.": "For video calls and Zoom meetings in top quality with fast autofocus and built-in light optimization sensor.",
-                "סמארטפון דגל עם מצלמת 200MP מדהימה וביצועים ללא פשרות.": "Flagship smartphone featuring an incredible 200MP camera system and uncompromised performance.",
-                "מכונת קפה חדשנית שמפיקה קפה מושלם בלחיצת כפתור אחת.": "Innovative coffee maker that crafts perfect single-serve coffee at the push of a button.",
-                "השעון החכם המתקדם ביותר עם חיישני בריאות מתקדמים.": "The ultimate smartwatch featuring advanced health sensors, temperature sensing, and Always-On display.",
-                "אוזניות פרימיום עם סינון רעשים אקטיבי מוביל בתעשייה.": "Premium over-ear headphones with industry-leading active noise cancellation and crystal-clear calls.",
-                "מערכת Mesh לכיסוי Wi-Fi מושלם בכל הבית.": "Whole-home Mesh system providing seamless Wi-Fi 6 coverage for all your connected devices.",
-                "המיקרופון הפופולרי ביותר לפודקאסטים, שידורים והקלטות.": "The world's #1 USB microphone for podcasting, game streaming, YouTube videos, and music recording.",
-                "מקלדת מכנית מתקדמת לגיימרים עם תאורת RGB מלאה.": "Advanced mechanical gaming keyboard featuring tactile Razer Green switches and full Razer Chroma RGB.",
-                "הקונסולה החזקה ביותר בעולם לחוויית גיימינג מדהימה.": "The fastest, most powerful Xbox ever built for true 4K gaming and high-framerate performance.",
-                "שואב ושוטף מתקדם עם ניווט לייזר והימנעות ממכשולים.": "Advanced robot vacuum and mop featuring 6000Pa extreme suction and reactive 3D obstacle avoidance.",
-                "מיקסר שולחני עוצמתי ואיכותי בעיצוב רטרו קלאסי.": "Iconic, powerful stand mixer featuring 10 speeds and planetary mixing action in a classic retro design.",
-                "אוזניות אלחוטיות עם סינון רעשים משופר ושמע מרחבי.": "Next-level Active Noise Cancellation, Adaptive Transparency, and personalized Spatial Audio powered by the H2 chip.",
-                "רמקול בלוטות' קומפקטי עם סאונד חזק ובס עמוק.": "Compact IP67 waterproof Bluetooth speaker delivering bold JBL Original Pro Sound with deep bass.",
-                "מסך מקצועי לגרפיקאים ומתכנתים ברזולוציית 4K.": "Professional 27-inch 4K UHD monitor engineered for color accuracy, graphic designers, and programmers.",
-                "בלנדר חכם ועוצמתי להכנת שייקים בריאים בקלות.": "Powerful 1000W personal blender with intelligent Auto-iQ programs for effortless healthy smoothies."
+                "לצילום מקצועי, טעינה סופר- סמארטפון עוצמתי Leica בשילוב IP68. מרהיב ועמידות במים 144W, מסך 120": "Professional photography, super-fast 120W charging. Powerful Leica-partnered smartphone with IP68 water resistance, stunning 120Hz display.",
+                "מסך OLED 65 אינץ' 4K ברזולוציית UHD עם מעבד אלפא 9 דור 6 ומערכת הפעלה webOS. חווית צפייה קולנועית מושלמת.": "65-inch 4K OLED TV with Alpha 9 Gen 6 AI processor and webOS operating system. Perfect cinematic viewing experience.",
+                "קונסולת משחקים מובילה בעלת כונן דיסקים, תמיכה ב-4K 120Hz וטכנולוגיית SSD אולטרה-מהירה.": "Leading gaming console with disc drive, 4K 120Hz support, and ultra-fast custom SSD technology.",
+                "שואב אבק רובוטי מתקדם בעל עוצמת שאיבה 6000Pa, מערכת ניקוי קרקע כפולה ומיפוי לייזר תלת-ממדי.": "Advanced robotic vacuum cleaner with 6000Pa suction power, dual mop cleaning system, and 3D laser mapping.",
+                "אוזניות אלחוטיות מתקדמות עם ביטול רעשים אקטיבי עוצמתי, זמן סוללה עד 30 שעות ואיכות שמע מעולה.": "Advanced wireless over-ear headphones with powerful Active Noise Cancellation (ANC), up to 30 hours battery life, and superior audio quality.",
+                "מחשב נייד עוצמתי עם מעבד אינטל דור 13, זיכרון 16GB ותצוגת Full HD איכותית לעבודה וללימודים.": "Powerful laptop featuring 13th Gen Intel Core processor, 16GB RAM, and vibrant Full HD display for work and study.",
+                "מיקסר מקצועי בעל קערת נירוסטה 4.8 ליטר, מנוע עוצמתי ומגוון אביזרים להכנת בצקים ומאפים.": "Professional stand mixer with 4.8L stainless steel bowl, powerful motor, and versatile attachment hub."
             };
 
-            if (descMap[desc]) return descMap[desc];
+            if (descMap[desc.trim()]) return descMap[desc.trim()];
 
-            return desc;
+            return desc.replace(/מחשב נייד עוצמתי/g, "Powerful laptop")
+                       .replace(/אוזניות אלחוטיות מתקדמות/g, "Advanced wireless headphones")
+                       .replace(/שואב אבק רובוטי/g, "Robotic vacuum cleaner")
+                       .replace(/טלוויזיה חכמה/g, "Smart TV")
+                       .replace(/קונסולת משחקים/g, "Gaming console")
+                       .replace(/מיקסר מקצועי/g, "Professional stand mixer")
+                       .replace(/רמקול נייד/g, "Portable speaker")
+                       .replace(/שעון חכם/g, "Smartwatch")
+                       .replace(/יבואן רשמי/g, "Official Importer Warranty");
         };
-
 
         const translateSpecKey = (key, lang = 'he') => {
             if (lang !== 'en') return key;
@@ -3463,7 +3445,7 @@
                                                             {getLocalizedProductName(product, lang)}
                                                         </h3>
                                                         <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">
-                                                            {getLocalizedProductDescription(product, lang)}
+                                                            {product.description}
                                                         </p>
                                                     </div>
 
