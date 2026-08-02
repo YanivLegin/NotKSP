@@ -393,6 +393,8 @@
                        .replace(/מסך מחשב/g, "Computer Monitor")
                        .replace(/מקלדת אלחוטית/g, "Wireless Keyboard")
                        .replace(/עכבר אלחוטי/g, "Wireless Mouse");
+        };
+
         const getLocalizedProductDescription = (product, lang = 'he') => {
             if (!product) return '';
             let desc = product.description || '';
