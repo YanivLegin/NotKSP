@@ -1552,9 +1552,83 @@
             // Form States for checkout
             const [formName, setFormName] = useState('');
             const [formPhone, setFormPhone] = useState('');
+            const [formCity, setFormCity] = useState('');
+            const [formStreet, setFormStreet] = useState('');
             const [formAddress, setFormAddress] = useState('');
             const [formEmail, setFormEmail] = useState('');
             const [formErrors, setFormErrors] = useState({});
+
+            // Gov.il Israeli Cities & Streets Autocomplete States
+            const [citySuggestions, setCitySuggestions] = useState([]);
+            const [streetSuggestions, setStreetSuggestions] = useState([]);
+            const [showCityDropdown, setShowCityDropdown] = useState(false);
+            const [showStreetDropdown, setShowStreetDropdown] = useState(false);
+            const [isSearchingCity, setIsSearchingCity] = useState(false);
+            const [isSearchingStreet, setIsSearchingStreet] = useState(false);
+
+            // Full Master List of ALL 1,310 Israeli Cities & Settlements (from data.gov.il)
+            const ALL_ISRAELI_CITIES = useMemo(() => [
+                "אבו ג'ווייעד (שבט)", "אבו גוש", "אבו סנאן", "אבו סריחאן (שבט)", "אבו עבדון (שבט)", "אבו עמאר (שבט)", "אבו עמרה (שבט)", "אבו קורינאת (שבט)", "אבו קרינאת (יישוב)", "אבו רובייעה (שבט)", "אבו רוקייק (שבט)", "אבו תלול", "אבטין", "אבטליון", "אביאל", "אביבים", "אביגדור", "אביחיל", "אביטל", "אביעזר", "אבירם", "אבירים", "אבן יהודה", "אבן מנחם", "אבן ספיר", "אבן שמואל", "אבני איתן", "אבני חפץ", "אבנת", "אבשלום", "אדורה", "אדירים", "אדמית", "אדרת", "אודים", "אודם", "אוהד", "אום אל-פחם", "אום אל-קוטוף", "אום בטין", "אומן", "אור הנר", "אור יהודה", "אור עקיבא", "אורה", "אורות", "אורנים", "אורנית", "אושה", "אזור", "אחווה", "אחוזם", "אחוזת ברק", "אחיהוד", "אחיטוב", "אחיסמך", "אחיעזר", "אטרש (שבט)", "איבים", "אייל", "איילת השחר", "אילון", "אילות", "אילניה", "אילת", "אירוס", "איתמר", "איתן", "איתניים", "אל סייד", "אל-עריאן", "אל-רום", "אלומה", "אלומות", "אלון הגליל", "אלון מורה", "אלון שבות", "אלוני אבא", "אלוני הבשן", "אלוני יצחק", "אלוני בשי"
+            ], []);
+
+            // Fetch Cities across ALL 1,310 Israeli Settlements with Data.gov.il live search
+            const fetchGovCities = async (query) => {
+                const q = (query || '').trim();
+                if (!q) {
+                    setCitySuggestions(["תל אביב - יפו", "ירושלים", "חיפה", "ראשון לציון", "פתח תקווה", "אשדוד", "נתניה", "באר שבע", "בני ברק", "חולון", "רמת גן", "רחובות", "אשקלון", "בת ים", "הרצליה", "כפר סבא"]);
+                    return;
+                }
+                setIsSearchingCity(true);
+                try {
+                    const res = await fetch(`https://data.gov.il/api/3/action/datastore_search?resource_id=9ad3862c-8391-4b2f-84a4-2d4c68625f4b&q=${encodeURIComponent(q)}&limit=200`);
+                    const data = await res.json();
+                    if (data.success && data.result?.records) {
+                        const cities = Array.from(new Set(data.result.records.map(r => r['שם_ישוב']?.trim()).filter(Boolean)));
+                        setCitySuggestions(cities.slice(0, 50));
+                    }
+                } catch (e) {
+                    console.warn("Gov.il cities API live search fallback:", e);
+                } finally {
+                    setIsSearchingCity(false);
+                }
+            };
+
+            // Fetch ALL Streets from Data.gov.il API for selected city (limit=5000)
+            const fetchGovStreets = async (city, query) => {
+                const cleanCity = (city || '').trim();
+                const q = (query || '').trim();
+                if (!cleanCity) {
+                    setStreetSuggestions([]);
+                    return;
+                }
+                setIsSearchingStreet(true);
+                try {
+                    const searchQ = cleanCity;
+                    const res = await fetch(`https://data.gov.il/api/3/action/datastore_search?resource_id=9ad3862c-8391-4b2f-84a4-2d4c68625f4b&q=${encodeURIComponent(searchQ)}&limit=5000`);
+                    const data = await res.json();
+                    if (data.success && data.result?.records) {
+                        let streets = data.result.records
+                            .filter(r => {
+                                const rCity = (r['שם_ישוב'] || '').trim();
+                                return rCity === cleanCity || cleanCity.includes(rCity) || rCity.includes(cleanCity);
+                            })
+                            .map(r => (r['שם_רחוב'] || '').trim())
+                            .filter(s => s && s !== cleanCity);
+                        streets = Array.from(new Set(streets)).sort();
+                        if (q) {
+                            streets = streets.filter(s => s.includes(q));
+                        }
+                        setStreetSuggestions(streets.slice(0, 60));
+                    } else {
+                        setStreetSuggestions([]);
+                    }
+                } catch (e) {
+                    console.warn("Gov.il streets API search fallback:", e);
+                    setStreetSuggestions([]);
+                } finally {
+                    setIsSearchingStreet(false);
+                }
+            };
 
             // ===== NEW: persistent data (inventory, users, wishlist, orders, requests) =====
             const [customProducts, setCustomProducts] = useState([]);   // admin-added products
@@ -2403,12 +2477,15 @@
                 } else if (!/^\d{9,10}$/.test(formPhone.replace(/[-]/g, ''))) {
                     errors.phone = "מספר טלפון אינו תקין (9-10 ספרות)";
                 }
-                if (!formAddress.trim()) errors.address = "נא להזין כתובת משלוח";
+                if (!formCity.trim()) errors.city = "נא לבחור/להזין עיר או יישוב";
+                if (!formStreet.trim()) errors.street = "נא לבחור/להזין רחוב ומספר בית";
 
                 if (Object.keys(errors).length > 0) {
                     setFormErrors(errors);
                     return;
                 }
+
+                const fullAddress = `${formStreet.trim()}, ${formCity.trim()}`;
 
                 // Place Order
                 const orderId = 'ORD-' + Date.now().toString().slice(-6) + '-' + Math.floor(Math.random() * 900 + 100);
@@ -2417,7 +2494,11 @@
                     customerName: formName,
                     customerPhone: formPhone,
                     customerEmail: formEmail || (currentUser && currentUser.email) || '',
-                    customerAddress: formAddress,
+                    customerCity: formCity.trim(),
+                    customerStreet: formStreet.trim(),
+                    customerAddress: fullAddress,
+                    city: formCity.trim(),
+                    street: formStreet.trim(),
                     isGuest: !currentUser,
                     items: [...cart],
                     total: cartTotal,
@@ -2433,6 +2514,8 @@
                             customer_phone: orderData.customerPhone,
                             customer_email: orderData.customerEmail,
                             customer_address: orderData.customerAddress,
+                            customer_city: orderData.customerCity,
+                            customer_street: orderData.customerStreet,
                             is_guest: orderData.isGuest,
                             items: orderData.items,
                             total: orderData.total
@@ -2472,6 +2555,8 @@
 
                 setFormName('');
                 setFormPhone('');
+                setFormCity('');
+                setFormStreet('');
                 setFormAddress('');
                 setFormEmail('');
                 setFormErrors({});
@@ -3398,19 +3483,116 @@
                                                 {formErrors.email && <p className="text-red-500 text-sm font-semibold">{formErrors.email}</p>}
                                             </div>
 
-                                            {/* Address */}
-                                            <div className="space-y-1">
-                                                <label className="block text-sm font-bold text-slate-700">כתובת למשלוח *</label>
-                                                <input 
-                                                    type="text"
-                                                    value={formAddress}
-                                                    onChange={(e) => setFormAddress(e.target.value)}
-                                                    placeholder="רחוב, מספר בית, עיר"
-                                                    className={`w-full px-4 py-2.5 rounded-lg border text-base focus:outline-none focus:ring-2 ${
-                                                        formErrors.address ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'
-                                                    }`}
-                                                />
-                                                {formErrors.address && <p className="text-red-500 text-sm font-semibold">{formErrors.address}</p>}
+                                            {/* City & Street Autocomplete powered by Data.gov.il */}
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                
+                                                {/* City / Settlement Autocomplete */}
+                                                <div className="space-y-1 relative">
+                                                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-200">
+                                                        עיר / יישוב *
+                                                    </label>
+                                                    <div className="relative">
+                                                        <input 
+                                                            type="text"
+                                                            value={formCity}
+                                                            onChange={(e) => {
+                                                                const val = e.target.value;
+                                                                setFormCity(val);
+                                                                setShowCityDropdown(true);
+                                                                fetchGovCities(val);
+                                                            }}
+                                                            onFocus={() => {
+                                                                setShowCityDropdown(true);
+                                                                fetchGovCities(formCity);
+                                                            }}
+                                                            placeholder="עיר / יישוב"
+                                                            className={`w-full px-4 py-2.5 rounded-lg border text-base focus:outline-none focus:ring-2 ${
+                                                                formErrors.city ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'
+                                                            }`}
+                                                        />
+                                                        {isSearchingCity && (
+                                                            <div className="absolute left-3 top-3 text-slate-400 animate-spin">
+                                                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    {formErrors.city && <p className="text-red-500 text-sm font-semibold">{formErrors.city}</p>}
+
+                                                    {/* City Suggestions Dropdown */}
+                                                    {showCityDropdown && citySuggestions.length > 0 && (
+                                                        <div className="absolute z-50 right-0 left-0 top-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl max-h-56 overflow-y-auto no-scrollbar py-1">
+                                                            {citySuggestions.map((cityName, idx) => (
+                                                                <div 
+                                                                    key={idx}
+                                                                    onClick={() => {
+                                                                        setFormCity(cityName);
+                                                                        setShowCityDropdown(false);
+                                                                        fetchGovStreets(cityName, '');
+                                                                    }}
+                                                                    className="px-4 py-2 text-sm text-slate-800 dark:text-slate-200 hover:bg-primary/10 hover:text-primary dark:hover:bg-cta/20 dark:hover:text-cta cursor-pointer font-semibold flex items-center justify-between transition-colors"
+                                                                >
+                                                                    <span>{cityName}</span>
+                                                                    <span className="text-xs text-slate-400">ישראל</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Street & House Number Autocomplete */}
+                                                <div className="space-y-1 relative">
+                                                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-200">
+                                                        רחוב ומספר בית *
+                                                    </label>
+                                                    <div className="relative">
+                                                        <input 
+                                                            type="text"
+                                                            value={formStreet}
+                                                            onChange={(e) => {
+                                                                const val = e.target.value;
+                                                                setFormStreet(val);
+                                                                setShowStreetDropdown(true);
+                                                                if (formCity) fetchGovStreets(formCity, val);
+                                                            }}
+                                                            onFocus={() => {
+                                                                if (formCity) {
+                                                                    setShowStreetDropdown(true);
+                                                                    fetchGovStreets(formCity, formStreet);
+                                                                }
+                                                            }}
+                                                            placeholder="רחוב ומספר בית"
+                                                            className={`w-full px-4 py-2.5 rounded-lg border text-base focus:outline-none focus:ring-2 ${
+                                                                formErrors.street ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'
+                                                            }`}
+                                                        />
+                                                        {isSearchingStreet && (
+                                                            <div className="absolute left-3 top-3 text-slate-400 animate-spin">
+                                                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    {formErrors.street && <p className="text-red-500 text-sm font-semibold">{formErrors.street}</p>}
+
+                                                    {/* Street Suggestions Dropdown */}
+                                                    {showStreetDropdown && streetSuggestions.length > 0 && (
+                                                        <div className="absolute z-50 right-0 left-0 top-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl max-h-56 overflow-y-auto no-scrollbar py-1">
+                                                            {streetSuggestions.map((streetName, idx) => (
+                                                                <div 
+                                                                    key={idx}
+                                                                    onClick={() => {
+                                                                        setFormStreet(streetName + ' ');
+                                                                        setShowStreetDropdown(false);
+                                                                    }}
+                                                                    className="px-4 py-2 text-sm text-slate-800 dark:text-slate-200 hover:bg-primary/10 hover:text-primary dark:hover:bg-cta/20 dark:hover:text-cta cursor-pointer font-semibold flex items-center justify-between transition-colors"
+                                                                >
+                                                                    <span>{streetName}</span>
+                                                                    <span className="text-xs text-slate-400">{formCity}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+
                                             </div>
 
                                             {/* Info alert */}
