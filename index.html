@@ -313,9 +313,12 @@
                 placeOrder: "אישור והשלמת הזמנה",
                 orderSummary: "סיכום הזמנה",
                 subtotal: "סכום ביניים",
+                items: "פריטים",
                 shipping: "משלוח",
                 free: "חינם",
                 total: "סה\"כ לתשלום",
+                myWishlist: "רשימת המשאלות שלי",
+                store: "לחנות",
                 thankYouTitle: "תודה רבה! ההזמנה נקלטה בהצלחה",
                 continueShopping: "המשך בקניות",
                 footerRights: "כל הזכויות שמורות ל-NotKSP © 2026",
@@ -355,15 +358,41 @@
                 placeOrder: "Confirm & Complete Order",
                 orderSummary: "Order Summary",
                 subtotal: "Subtotal",
+                items: "Items",
                 shipping: "Shipping",
                 free: "Free",
                 total: "Total Amount",
+                myWishlist: "My Wishlist",
+                store: "Store",
                 thankYouTitle: "Thank You! Order Received Successfully",
                 continueShopping: "Continue Shopping",
                 footerRights: "All Rights Reserved to NotKSP © 2026",
                 guestBanner: "Continuing as Guest — You can complete purchase without an account.",
                 loginBanner: "Have an account? Sign in ←"
             }
+        };
+
+        const getLocalizedProductName = (product, lang) => {
+            if (!product) return '';
+            let name = product.name || product.title || '';
+            if (lang !== 'en') return name;
+
+            return name.replace(/מחשב נייד/g, "Laptop")
+                       .replace(/סמארטפון/g, "Smartphone")
+                       .replace(/אוזניות אלחוטיות/g, "Wireless Headphones")
+                       .replace(/אוזניות/g, "Headphones")
+                       .replace(/טלוויזיה חכמה/g, "Smart TV")
+                       .replace(/שואב אבק רובוטי/g, "Robotic Vacuum")
+                       .replace(/שואב אבק/g, "Vacuum Cleaner")
+                       .replace(/קונסולת משחקים/g, "Gaming Console")
+                       .replace(/מיקסר זקוף/g, "Stand Mixer")
+                       .replace(/מיקסר/g, "Mixer")
+                       .replace(/רמקול נייד/g, "Portable Speaker")
+                       .replace(/שעון חכם/g, "Smartwatch")
+                       .replace(/מכונת קפה/g, "Espresso Machine")
+                       .replace(/מסך מחשב/g, "Computer Monitor")
+                       .replace(/מקלדת אלחוטית/g, "Wireless Keyboard")
+                       .replace(/עכבר אלחוטי/g, "Wireless Mouse");
         };
 
         // Constants - Product catalog with full specs as requested in the PRD
@@ -1001,10 +1030,10 @@
             );
         };
 
-        const stockMeta = (qty) => {
-            if (qty <= 0) return { label: "אזל מהמלאי", cls: "bg-red-100 text-red-700 border-red-200", dot: "bg-red-500" };
-            if (qty <= 3) return { label: `מלאי נמוך · נותרו ${qty}`, cls: "bg-amber-100 text-amber-700 border-amber-200", dot: "bg-amber-500" };
-            return { label: `במלאי · ${qty} יח׳`, cls: "bg-cta-light text-cta-hover border-cta/30", dot: "bg-cta" };
+        const stockMeta = (qty, lang = 'he') => {
+            if (qty <= 0) return { label: lang === 'en' ? "Out of Stock" : "אזל מהמלאי", cls: "bg-red-100 text-red-700 border-red-200", dot: "bg-red-500" };
+            if (qty <= 3) return { label: lang === 'en' ? `Low Stock · ${qty} left` : `מלאי נמוך · נותרו ${qty}`, cls: "bg-amber-100 text-amber-700 border-amber-200", dot: "bg-amber-500" };
+            return { label: lang === 'en' ? `In Stock · ${qty} units` : `במלאי · ${qty} יח׳`, cls: "bg-cta-light text-cta-hover border-cta/30", dot: "bg-cta" };
         };
 
         const CATEGORY_ALIASES = {
@@ -1014,7 +1043,18 @@
             'appliances': 'חשמל קטן למטבח',
             'small_kitchen': 'חשמל קטן למטבח'
         };
-        const catName = (id) => (CATEGORIES.find(c => c.id === id) || {}).name || CATEGORY_ALIASES[id] || id || '';
+        const CATEGORY_ALIASES_EN = {
+            'wearables': 'Smartwatches',
+            'smartwatch': 'Smartwatches',
+            'kitchen': 'Small Kitchen Appliances',
+            'appliances': 'Small Kitchen Appliances',
+            'small_kitchen': 'Small Kitchen Appliances'
+        };
+        const catName = (id, lang = 'he') => {
+            const found = CATEGORIES.find(c => c.id === id);
+            if (lang === 'en') return (found || {}).name_en || (found || {}).name || CATEGORY_ALIASES_EN[id] || id || '';
+            return (found || {}).name || CATEGORY_ALIASES[id] || id || '';
+        };
 
         const AdminDashboard = ({ catalog, orders, requests, users, wishlistMap }) => {
             const totalUnits = catalog.reduce((s, p) => s + p.stock_quantity, 0);
@@ -2735,7 +2775,7 @@
                                     className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full font-bold text-sm transition-colors ${view === 'branches' ? 'bg-primary-light text-white' : 'text-slate-300 hover:text-white hover:bg-primary-light'}`}
                                 >
                                     <Icon name="map-pin" className="w-4 h-4" />
-                                    סניפים
+                                    {t('branches')}
                                 </button>
                                 {/* Language Toggle Button (EN / HE) */}
                                 <button
@@ -2765,7 +2805,7 @@
                                         }`}
                                     >
                                         <span className={`w-1.5 h-1.5 rounded-full ${isSupabaseConnected ? 'bg-cta' : 'bg-amber-500'} animate-pulse`}></span>
-                                        {isSupabaseConnected ? 'מחובר ל-Supabase' : 'מצב אופליין'}
+                                        {isSupabaseConnected ? (lang === 'en' ? 'Supabase Connected' : 'מחובר ל-Supabase') : (lang === 'en' ? 'Offline Mode' : 'מצב אופליין')}
                                     </button>
                                 )}
                                 {/* Admin area link (managers only) */}
@@ -2775,7 +2815,7 @@
                                         className="hidden sm:flex items-center gap-1.5 bg-cta hover:bg-cta-hover text-primary font-bold text-sm px-3 py-2 rounded-full transition-all"
                                     >
                                         <Icon name={"layout-dashboard"} className={"w-4 h-4"} />
-                                        אזור ניהול
+                                        {t('admin')}
                                     </button>
                                 )}
                                 {currentUser && currentUser.role === 'admin' && view === 'admin' && (
@@ -2784,7 +2824,7 @@
                                         className="hidden sm:flex items-center gap-1.5 bg-primary-light hover:bg-primary-dark border border-slate-600 text-white font-bold text-sm px-3 py-2 rounded-full transition-all"
                                     >
                                         <Icon name={"store"} className={"w-4 h-4"} />
-                                        לחנות
+                                        {t('store')}
                                     </button>
                                 )}
 
@@ -2792,7 +2832,7 @@
                                 <button
                                     onClick={() => setIsWishlistOpen(true)}
                                     className="relative bg-primary-light hover:bg-primary-dark border border-slate-600 hover:border-slate-500 rounded-full p-2.5 flex items-center justify-center transition-all group"
-                                    aria-label="רשימת משאלות"
+                                    aria-label={t('wishlist')}
                                 >
                                     <Icon name={"heart"} className={"w-5 h-5 text-slate-100 group-hover:text-cta transition-colors"} />
                                     {wishlist.length > 0 && (
@@ -2806,7 +2846,7 @@
                                 <button 
                                     onClick={() => setIsCartOpen(true)}
                                     className="relative bg-primary-light hover:bg-primary-dark border border-slate-600 hover:border-slate-500 rounded-full p-2.5 flex items-center justify-center transition-all group"
-                                    aria-label="עגלת קניות"
+                                    aria-label={t('cart')}
                                 >
                                     <Icon name={"shopping-bag"} className={"w-5 h-5 text-slate-100 group-hover:text-cta transition-colors"} />
                                     {cartCount > 0 && (
@@ -2838,18 +2878,18 @@
                                                         <div className="text-sm text-slate-400 truncate" dir="ltr">{currentUser.email}</div>
                                                     </div>
                                                     <button onClick={() => { setAccountMenuOpen(false); setIsWishlistOpen(true); }} className="w-full text-right px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 justify-end">
-                                                        רשימת המשאלות שלי <Icon name={"heart"} className={"w-4 h-4 text-slate-400"} />
+                                                        {t('myWishlist')} <Icon name={"heart"} className={"w-4 h-4 text-slate-400"} />
                                                     </button>
                                                     {currentUser.role === 'admin' && (
                                                         <button onClick={() => { setAccountMenuOpen(false); setView('admin'); setAdminTab('dashboard'); }} className="w-full text-right px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 justify-end">
-                                                            אזור ניהול <Icon name={"layout-dashboard"} className={"w-4 h-4 text-slate-400"} />
+                                                            {t('admin')} <Icon name={"layout-dashboard"} className={"w-4 h-4 text-slate-400"} />
                                                         </button>
                                                     )}
                                                     <button onClick={() => { setAccountMenuOpen(false); setView('profile'); }} className="w-full text-right px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 justify-end">
-                                                        אזור אישי <Icon name={"user"} className={"w-4 h-4 text-slate-400"} />
+                                                        {t('profile')} <Icon name={"user"} className={"w-4 h-4 text-slate-400"} />
                                                     </button>
                                                     <button onClick={logoutUser} className="w-full text-right px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2 justify-end">
-                                                        התנתקות <Icon name={"log-out"} className={"w-4 h-4"} />
+                                                        {t('logout')} <Icon name={"log-out"} className={"w-4 h-4"} />
                                                     </button>
                                                 </div>
                                             </>
@@ -2859,10 +2899,10 @@
                                     <button
                                         onClick={() => { setAuthTab('login'); setAuthOpen(true); }}
                                         className="flex items-center gap-1.5 bg-primary-light hover:bg-primary-dark border border-slate-600 hover:border-slate-500 rounded-full px-3 py-2.5 transition-all text-white"
-                                        aria-label="התחברות"
+                                        aria-label={t('login')}
                                     >
                                         <Icon name={"user"} className={"w-5 h-5"} />
-                                        <span className="hidden sm:block text-sm font-bold">התחברות</span>
+                                        <span className="hidden sm:block text-sm font-bold">{t('login')}</span>
                                     </button>
                                 )}
                             </div>
@@ -3101,15 +3141,17 @@
                                     <div>
                                         <h2 className="text-2xl sm:text-3xl font-heebo font-black text-slate-900 dark:text-slate-100">
                                             {selectedCategory === 'all' 
-                                                ? 'הקטלוג שלנו' 
-                                                : CATEGORIES.find(c => c.id === selectedCategory)?.name
+                                                ? (lang === 'en' ? 'Our Catalog' : 'הקטלוג שלנו') 
+                                                : (lang === 'en' ? (CATEGORIES.find(c => c.id === selectedCategory)?.name_en || CATEGORIES.find(c => c.id === selectedCategory)?.name) : CATEGORIES.find(c => c.id === selectedCategory)?.name)
                                             }
                                         </h2>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">מציג {filteredProducts.length} מוצרים</p>
+                                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                                            {lang === 'en' ? `Showing ${filteredProducts.length} products` : `מציג ${filteredProducts.length} מוצרים`}
+                                        </p>
                                     </div>
                                     {searchQuery && (
                                         <div className="bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
-                                            תוצאות חיפוש עבור: <strong className="text-primary">"{searchQuery}"</strong>
+                                            {lang === 'en' ? 'Search results for:' : 'תוצאות חיפוש עבור:'} <strong className="text-primary">"{searchQuery}"</strong>
                                             <button onClick={() => setSearchQuery('')} className="hover:text-primary"><Icon name={"x"} className={"w-3.5 h-3.5"} /></button>
                                         </div>
                                     )}
@@ -3130,14 +3172,14 @@
                                                 >
                                                     <img 
                                                         src={`${product.image_url}?auto=format&fit=crop&w=400&q=80`} 
-                                                        alt={product.name} 
+                                                        alt={getLocalizedProductName(product, lang)} 
                                                         className={`w-full h-full object-cover img-hover-zoom ${product.stock_quantity <= 0 ? 'grayscale opacity-70' : ''}`}
                                                         loading="lazy"
                                                     />
-                                                    {catName(product.category) ? (
+                                                    {catName(product.category, lang) ? (
                                                         <div className="absolute top-3 right-3">
                                                             <span className="bg-primary/90 text-white text-sm font-bold uppercase tracking-wider px-2.5 py-1 rounded-full backdrop-blur-sm">
-                                                                {catName(product.category)}
+                                                                {catName(product.category, lang)}
                                                             </span>
                                                         </div>
                                                     ) : null}
@@ -3145,13 +3187,13 @@
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }}
                                                         className={`absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm transition-all active:scale-90 ${isWishlisted(product.id) ? 'bg-red-500 text-white' : 'bg-white/85 text-slate-600 hover:text-red-500'}`}
-                                                        aria-label="רשימת משאלות"
+                                                        aria-label={t('wishlist')}
                                                     >
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill={isWishlisted(product.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4.5 h-4.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg>
                                                     </button>
                                                     {product.stock_quantity <= 0 && (
                                                         <div className="absolute inset-0 flex items-center justify-center">
-                                                            <span className="bg-slate-900/80 text-white text-sm font-heebo font-black px-4 py-1.5 rounded-full">אזל מהמלאי</span>
+                                                            <span className="bg-slate-900/80 text-white text-sm font-heebo font-black px-4 py-1.5 rounded-full">{t('outOfStock')}</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -3163,7 +3205,7 @@
                                                             onClick={() => openProductDetails(product)}
                                                             className="font-heebo font-bold text-base text-slate-800 hover:text-primary transition-colors cursor-pointer line-clamp-2 min-h-[40px] leading-tight"
                                                         >
-                                                            {product.name}
+                                                            {getLocalizedProductName(product, lang)}
                                                         </h3>
                                                         <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">
                                                             {product.description}
@@ -3171,7 +3213,7 @@
                                                     </div>
 
                                                     {/* Quantitative stock indicator (shown to customers) */}
-                                                    {(() => { const m = stockMeta(product.stock_quantity); return (
+                                                    {(() => { const m = stockMeta(product.stock_quantity, lang); return (
                                                         <div className={`inline-flex items-center gap-1.5 self-start text-sm font-bold px-2 py-0.5 rounded-full border ${m.cls}`}>
                                                             <span className={`w-1.5 h-1.5 rounded-full ${m.dot}`}></span>{m.label}
                                                         </div>
@@ -3179,9 +3221,9 @@
 
                                                     <div className="flex items-center justify-between pt-2 border-t border-slate-100">
                                                         <div className="text-right">
-                                                            <div className="text-sm text-slate-400 font-light leading-none">מחיר</div>
+                                                            <div className="text-sm text-slate-400 font-light leading-none">{t('price')}</div>
                                                             <div className="text-xl font-heebo font-extrabold text-primary leading-tight">
-                                                                {(Number(product.price) || 0).toLocaleString('he-IL')} ₪
+                                                                {(Number(product.price) || 0).toLocaleString(lang === 'en' ? 'en-US' : 'he-IL')} {t('nis')}
                                                             </div>
                                                         </div>
                                                         {product.stock_quantity > 0 ? (
@@ -3734,17 +3776,17 @@
                                                 <div key={item.id} className="py-2.5 flex gap-3 items-center">
                                                     <img 
                                                         src={`${item.image_url}?auto=format&fit=crop&w=100&q=80`} 
-                                                        alt={item.name} 
+                                                        alt={getLocalizedProductName(item, lang)} 
                                                         className="w-10 h-10 object-cover rounded-lg border border-slate-100"
                                                     />
                                                     <div className="min-w-0 flex-1">
-                                                        <h4 className="font-bold text-sm text-slate-800 truncate leading-tight">{item.name}</h4>
+                                                        <h4 className="font-bold text-sm text-slate-800 truncate leading-tight">{getLocalizedProductName(item, lang)}</h4>
                                                         <div className="text-sm text-slate-500 mt-0.5">
-                                                            {item.quantity} x {(Number(item.price) || 0).toLocaleString('he-IL')} ₪
+                                                            {item.quantity} x {(Number(item.price) || 0).toLocaleString(lang === 'en' ? 'en-US' : 'he-IL')} {t('nis')}
                                                         </div>
                                                     </div>
                                                     <div className="font-heebo font-extrabold text-sm text-slate-800">
-                                                        {(Number((item.price * item.quantity)) || 0).toLocaleString('he-IL')} ₪
+                                                        {(Number((item.price * item.quantity)) || 0).toLocaleString(lang === 'en' ? 'en-US' : 'he-IL')} {t('nis')}
                                                     </div>
                                                 </div>
                                             ))}
@@ -3752,16 +3794,16 @@
 
                                         <div className="border-t border-slate-100 pt-3 space-y-2">
                                             <div className="flex justify-between text-sm text-slate-500">
-                                                <span>פריטים:</span>
+                                                <span>{t('items')}:</span>
                                                 <span>{cartCount}</span>
                                             </div>
                                             <div className="flex justify-between text-sm text-slate-500">
-                                                <span>משלוח:</span>
-                                                <span className="text-cta font-bold">חינם</span>
+                                                <span>{t('shipping')}:</span>
+                                                <span className="text-cta font-bold">{t('free')}</span>
                                             </div>
                                             <div className="flex justify-between font-heebo font-black text-base text-primary pt-1.5 border-t border-dashed border-slate-200">
-                                                <span>סה"כ לתשלום:</span>
-                                                <span>{(Number(cartTotal) || 0).toLocaleString('he-IL')} ₪</span>
+                                                <span>{t('total')}:</span>
+                                                <span>{(Number(cartTotal) || 0).toLocaleString(lang === 'en' ? 'en-US' : 'he-IL')} {t('nis')}</span>
                                             </div>
                                         </div>
                                     </div>
