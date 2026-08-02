@@ -372,7 +372,7 @@
             }
         };
 
-        const getLocalizedProductName = (product, lang) => {
+        const getLocalizedProductName = (product, lang = 'he') => {
             if (!product) return '';
             let name = product.name || product.title || '';
             if (lang !== 'en') return name;
@@ -1056,7 +1056,7 @@
             return (found || {}).name || CATEGORY_ALIASES[id] || id || '';
         };
 
-        const AdminDashboard = ({ catalog, orders, requests, users, wishlistMap }) => {
+        const AdminDashboard = ({ catalog, orders, requests, users, wishlistMap, lang = 'he' }) => {
             const totalUnits = catalog.reduce((s, p) => s + p.stock_quantity, 0);
             const inventoryValue = catalog.reduce((s, p) => s + p.stock_quantity * p.price, 0);
             const outOfStock = catalog.filter(p => p.stock_quantity <= 0).length;
@@ -3369,7 +3369,7 @@
                                     ))}
                                 </div>
 
-                                {adminTab === 'dashboard' && <AdminDashboard catalog={catalog} orders={orders} requests={requests} users={users} wishlistMap={wishlistMap} />}
+                                {adminTab === 'dashboard' && <AdminDashboard catalog={catalog} orders={orders} requests={requests} users={users} wishlistMap={wishlistMap} lang={lang} />}
                                 {adminTab === 'inventory' && <AdminInventory catalog={catalog} customProducts={customProducts} onSetStock={setStock} onAdjust={adjustStock} onDelete={deleteCustomProduct} onViewBranchStock={(p) => { setActiveProduct(p); setIsBranchModalOpen(true); }} />}
                                 {adminTab === 'add' && <AdminAddProduct categories={CATEGORIES} onAdd={addProduct} showToast={showToast} goToInventory={() => setAdminTab('inventory')} />}
                                 {adminTab === 'requests' && <AdminRequests requests={requests} onStatus={setRequestStatus} />}
