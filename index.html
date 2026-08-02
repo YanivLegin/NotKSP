@@ -374,6 +374,10 @@
 
         const getLocalizedProductName = (product, lang = 'he') => {
             if (!product) return '';
+            if (lang === 'en') {
+                if (product.name_en) return product.name_en;
+                if (product.title_en) return product.title_en;
+            }
             let name = product.name || product.title || '';
             if (lang !== 'en') return name;
 
@@ -397,6 +401,9 @@
 
         const getLocalizedProductDescription = (product, lang = 'he') => {
             if (!product) return '';
+            if (lang === 'en' && product.description_en) {
+                return product.description_en;
+            }
             let desc = product.description || '';
             if (lang !== 'en') return desc;
 
@@ -427,23 +434,122 @@
             if (lang !== 'en') return key;
             const map = {
                 'מסך': 'Screen',
+                'גודל מסך': 'Screen Size',
                 'מעבד': 'Processor',
                 'אחסון': 'Storage',
                 'טעינה': 'Charging',
                 'אחריות': 'Warranty',
                 'זיכרון': 'RAM',
+                'זיכרון RAM': 'RAM',
                 'סוללה': 'Battery',
                 'מצלמה': 'Camera',
                 'משקל': 'Weight',
-                'צבע': 'Color'
+                'צבע': 'Color',
+                'קישוריות': 'Connectivity',
+                'מערכת הפעלה': 'Operating System',
+                'כרטיס מסך': 'Graphics Card',
+                'עוצמת שאיבה': 'Suction Power',
+                'מערכת ניווט': 'Navigation System',
+                'פעולות': 'Functions',
+                'נפח מכל אבק': 'Dust Bin Capacity',
+                'נפח מכל מים': 'Water Tank Capacity',
+                'שליטה': 'Control',
+                'תאימות בית חכם': 'Smart Home Compatibility',
+                'קוטר דרייבר': 'Driver Size',
+                'סינון רעשים': 'Noise Cancellation',
+                'גרסת קישוריות': 'Bluetooth Version',
+                'חיי סוללה': 'Battery Life',
+                'מיקרופונים': 'Microphones',
+                'אביזרים נלווים': 'Included Accessories',
+                'סוג חיבור': 'Connection Type',
+                'טווח קליטה': 'Range',
+                'תאימות': 'Compatibility',
+                'משוב': 'Feedback',
+                'מקשים': 'Buttons',
+                'תאורה': 'Lighting',
+                'רזולוציה': 'Resolution',
+                'קצב רענון': 'Refresh Rate',
+                'טכנולוגיית תמונה': 'Display Technology',
+                'שמע': 'Audio',
+                'חיבורים': 'Ports',
+                'שפת ממשק': 'Interface Languages',
+                'סוג סוויץ'': 'Switch Type',
+                'לחץ משאבה': 'Pump Pressure',
+                'מכל פולים': 'Bean Hopper',
+                'טוחן קפה': 'Grinder',
+                'מכל מים': 'Water Tank',
+                'הקצפת חלב': 'Milk Frothing',
+                'בקרת טמפרטורה': 'Temperature Control',
+                'ניקוי ותחזוקה': 'Cleaning & Maintenance',
+                'סוג פאנל': 'Panel Type',
+                'זמן תגובה': 'Response Time',
+                'יחס ניגודיות': 'Contrast Ratio',
+                'תמיכה בסנכרון': 'Sync Support',
+                'ארגונומיה': 'Ergonomics',
+                'חיישן': 'Sensor',
+                'שליטה קולית': 'Voice Control',
+                'הספק': 'Power Output',
+                'נפח קנקן': 'Pitcher Volume',
+                'מהירויות': 'Speeds',
+                'תקן': 'Standard',
+                'שטח כיסוי': 'Coverage Area',
+                'מהירות מירבית': 'Max Speed',
+                'עוצמה קולית': 'Sound Power',
+                'ערוצים': 'Channels',
+                'זוית צילום': 'Field of View',
+                'מיקרופון': 'Microphone',
+                'טכנולוגיה': 'Technology',
+                'גדלי כוס': 'Cup Sizes',
+                'חימום': 'Heat Up Time',
+                'חיישנים': 'Sensors',
+                'עמידות': 'Durability',
+                'כיסוי': 'Coverage',
+                'תבניות קליטה': 'Pickup Patterns',
+                'תדר': 'Frequency',
+                'סוג מתגים': 'Switch Type',
+                'כונן': 'Drive',
+                'ניווט': 'Navigation',
+                'נפח קערה': 'Bowl Volume',
+                'שבב': 'Chip',
+                'פאנל': 'Panel',
+                'תוכניות': 'Programs'
             };
             return map[String(key).trim()] || key;
         };
 
         const translateSpecVal = (val, lang = 'he') => {
             if (lang !== 'en') return val;
-            return String(val)
+            let s = String(val);
+            return s
+                .replace(/אינץ'/g, 'inch')
                 .replace(/אינץ/g, 'inch')
+                .replace(/ס"מ/g, 'cm')
+                .replace(/מ"ל/g, 'ml')
+                .replace(/ק"ג/g, 'kg')
+                .replace(/גרם/g, 'g')
+                .replace(/מ"מ/g, 'mm')
+                .replace(/מט/g, 'Matte')
+                .replace(/ליבות/g, 'cores')
+                .replace(/עד/g, 'Up to')
+                .replace(/שעות עבודה רציפות/g, 'hours continuous work')
+                .replace(/שעות/g, 'hours')
+                .replace(/דקות/g, 'minutes')
+                .replace(/דקות עבודה/g, 'minutes work')
+                .replace(/טעינה מהירה/g, 'fast charging')
+                .replace(/טעינה אוטומטית וחזרה לניקוי/g, 'auto charging & resume')
+                .replace(/עברית, אנגלית, רוסית, ערבית ועוד/g, 'Hebrew, English, Russian, Arabic & more')
+                .replace(/Windows 11 Home בעברית/g, 'Windows 11 Home')
+                .replace(/שאיבה, שטיפה וניגוב משולבים/g, 'Combined vacuuming, mopping & wiping')
+                .replace(/ניווט לייזר LDS בתלת-ממד למניעת התנגשויות/g, 'LDS 3D laser navigation for collision avoidance')
+                .replace(/שליטה אלקטרונית ברמות המים/g, 'Electronic water level control')
+                .replace(/אפליקציה ייעודית \(קביעת קירות וירטואליים, אזורי ניקוי ולוחות זמנים\)/g, 'Dedicated app (virtual walls, cleaning zones & scheduling)')
+                .replace(/ביטול רעשים אקטיבי \(ANC\) דינמי/g, 'Dynamic Active Noise Cancellation (ANC)')
+                .replace(/עם חיבור רב-נקודתי/g, 'with Multipoint connection')
+                .replace(/עם ANC כבוי/g, 'with ANC off')
+                .replace(/עם ANC פעיל/g, 'with ANC on')
+                .replace(/חיבור USB-C \(טעינה מהירה: 10 דקות טעינה מעניקות שעתיים שימוש\)/g, 'USB-C (Fast charge: 10 mins charge gives 2 hours use)')
+                .replace(/4 מיקרופונים מובנים לסינון רעשי רוח ושיחות ברורות/g, '4 built-in mics for wind noise cancellation & clear calls')
+                .replace(/קייס נשיאה קשיח, כבל טעינה USB-C, כבל אודיו 3.5 מ"מ/g, 'Hard carrying case, USB-C cable, 3.5mm audio cable')
                 .replace(/שנתיים יבואן רשמי/g, '2 Years Official Importer')
                 .replace(/שנה יבואן רשמי/g, '1 Year Official Importer')
                 .replace(/שלוש שנים יבואן רשמי/g, '3 Years Official Importer');
@@ -504,7 +610,9 @@
 
         const PRODUCTS = [
             {
-                id: "1", 
+                id: "1",
+                name_en: "Lenovo IdeaPad 15.6\" i5/16GB/512GB Laptop",
+                description_en: "Powerful and high-quality Lenovo laptop, ideal for students, office work, and daily use. Offers a winning combination of advanced i5 processor, generous RAM, and ultra-fast storage in a sleek, lightweight design.",
                 name: "מחשב נייד Lenovo IdeaPad 15.6\" i5/16GB/512GB", 
                 price: 3499, 
                 category: "computers", 
@@ -524,7 +632,9 @@
                 }
             },
             { 
-                id: "2", 
+                id: "2",
+                name_en: "55\" 4K UHD Smart TV",
+                description_en: "A cinematic viewing experience in your living room. 55-inch 4K UHD Smart TV with HDR support for rich colors and deep contrast. Features a smart OS with fast access to all popular streaming apps.",
                 name: "טלוויזיה חכמה 55\" 4K UHD", 
                 price: 2299, 
                 category: "tv_audio", 
@@ -543,7 +653,9 @@
                 }
             },
             { 
-                id: "3", 
+                id: "3",
+                name_en: "Smart Robotic Vacuum with Laser Mapping",
+                description_en: "Smart robot vacuum and mop equipped with advanced LDS laser navigation for precise home mapping. Features powerful suction, active mopping, and full smartphone app control.",
                 name: "שואב אבק רובוטי חכם עם מיפוי לייזר", 
                 price: 1199, 
                 category: "smart_home", 
@@ -562,7 +674,9 @@
                 }
             },
             { 
-                id: "4", 
+                id: "4",
+                name_en: "Wireless Over-Ear ANC Headphones",
+                description_en: "Wireless over-ear headphones with Active Noise Cancellation (ANC) technology that isolates background noise so you can focus on music. Offers rich audio, soft ear cushions, and exceptional battery life.",
                 name: "אוזניות אלחוטיות ANC Over-Ear", 
                 price: 349, 
                 category: "audio_accessories", 
@@ -582,7 +696,9 @@
             },
 
             { 
-                id: "6", 
+                id: "6",
+                name_en: "Wireless Gaming Controller",
+                description_en: "Professional wireless gaming experience. Ergonomically built controller designed for comfortable long sessions. Includes hyper-responsive buttons, dual rumble motors, and wide device compatibility.",
                 name: "בקר משחק אלחוטי", 
                 price: 229, 
                 category: "gaming", 
@@ -600,7 +716,9 @@
                 }
             },
             { 
-                id: "7", 
+                id: "7",
+                name_en: "Automatic Espresso Machine with Bean Grinder",
+                description_en: "Start your morning with fresh cafe-quality coffee at the push of a button. Fully automatic espresso machine that grinds coffee beans on the spot and prepares a variety of beverages.",
                 name: "מכונת אספרסו אוטומטית עם טוחנת פולים", 
                 price: 1890, 
                 category: "small_appliances", 
@@ -618,7 +736,9 @@
                 }
             },
             { 
-                id: "8", 
+                id: "8",
+                name_en: "27\" QHD 165Hz Gaming Monitor",
+                description_en: "Upgrade your gaming and work setup. Advanced 27-inch computer monitor with crisp QHD resolution, ultra-fast 165Hz refresh rate, and near-zero response time.",
                 name: "מסך מחשב 27\" QHD 165Hz", 
                 price: 1099, 
                 category: "computer_accessories", 
@@ -639,6 +759,8 @@
             },
             {
                 id: "9",
+                name_en: "Superlight Wireless Gaming Mouse",
+                description_en: "Featherlight professional gaming mouse with super-accurate optical sensor and zero wireless latency. Ideal for eSports players.",
                 name: "עכבר גיימינג אלחוטי סופר-קל",
                 price: 349,
                 category: "gaming",
@@ -653,6 +775,8 @@
             },
             {
                 id: "10",
+                name_en: "Compact TKL Mechanical Keyboard",
+                description_en: "Tenkeyless (TKL) mechanical gaming keyboard featuring quiet linear switches and per-key RGB backlighting.",
                 name: "מקלדת מכנית קומפקטית TKL",
                 price: 499,
                 category: "gaming",
@@ -667,6 +791,8 @@
             },
             {
                 id: "11",
+                name_en: "Premium 10.9-Inch Tablet",
+                description_en: "Powerful tablet with a large stunning display, smart stylus support, and all-day battery life. Perfect for studying, creative work, and streaming.",
                 name: "טאבלט פרימיום 10.9 אינץ'",
                 price: 2199,
                 category: "computers",
@@ -681,6 +807,8 @@
             },
             {
                 id: "12",
+                name_en: "Smart Speaker with Touchscreen",
+                description_en: "The hub of your smart home — high-quality speaker combined with a touchscreen display for recipes, video calls, and smart device control.",
                 name: "רמקול חכם עם מסך מגע",
                 price: 450,
                 category: "smart_home",
@@ -695,6 +823,8 @@
             },
             {
                 id: "13",
+                name_en: "Professional Smoothie Blender",
+                description_en: "Powerful high-speed blender designed to crush ice, frozen fruits, and nuts in seconds for smooth, perfect textures.",
                 name: "בלנדר מקצועי לעשיית שייקים",
                 price: 890,
                 category: "small_appliances",
@@ -709,6 +839,8 @@
             },
             {
                 id: "14",
+                name_en: "Smart Mesh Wi-Fi 6 Router",
+                description_en: "Seamless Wi-Fi coverage across your entire home without dead zones. Easy app setup with capacity to connect dozens of devices simultaneously.",
                 name: "ראוטר Mesh Wi-Fi 6 חכם",
                 price: 950,
                 category: "computer_accessories",
@@ -723,6 +855,8 @@
             },
             {
                 id: "15",
+                name_en: "Soundbar with Wireless Subwoofer",
+                description_en: "Significant audio upgrade for your TV with deep bass and immersive surround sound for a theater-like experience.",
                 name: "מקרן קול (סאונדבר) עם סאב אלחוטי",
                 price: 1350,
                 category: "tv_audio",
@@ -737,6 +871,8 @@
             },
             {
                 id: "16",
+                name_en: "4K Webcam for Computer",
+                description_en: "For video calls and Zoom meetings in top quality with fast autofocus and built-in light optimization sensor.",
                 name: "מצלמת רשת 4K למחשב",
                 price: 650,
                 category: "computer_accessories",
@@ -752,6 +888,8 @@
         
             ,{
                 id: "17",
+                name_en: "Samsung Galaxy S23 Ultra 256GB Smartphone",
+                description_en: "Flagship smartphone featuring an incredible 200MP camera system and uncompromised performance.",
                 name: "סמארטפון Samsung Galaxy S23 Ultra 256GB",
                 price: 4399,
                 category: "computers",
@@ -766,6 +904,8 @@
             },
             {
                 id: "18",
+                name_en: "Nespresso Vertuo Next Coffee Machine",
+                description_en: "Innovative coffee maker that crafts perfect single-serve coffee at the push of a button.",
                 name: "מכונת קפה Nespresso Vertuo Next",
                 price: 690,
                 category: "small_appliances",
@@ -780,6 +920,8 @@
             },
             {
                 id: "19",
+                name_en: "Apple Watch Series 8 Smartwatch",
+                description_en: "The ultimate smartwatch featuring advanced health sensors, temperature sensing, and Always-On display.",
                 name: "שעון חכם Apple Watch Series 8",
                 price: 1850,
                 category: "computers",
@@ -794,6 +936,8 @@
             },
             {
                 id: "20",
+                name_en: "Sony WH-1000XM5 Noise Canceling Headphones",
+                description_en: "Premium over-ear headphones with industry-leading active noise cancellation and crystal-clear calls.",
                 name: "אוזניות קשת Sony WH-1000XM5",
                 price: 1350,
                 category: "audio_accessories",
@@ -808,6 +952,8 @@
             },
             {
                 id: "21",
+                name_en: "TP-Link Deco X20 Mesh Wi-Fi System",
+                description_en: "Whole-home Mesh system providing seamless Wi-Fi 6 coverage for all your connected devices.",
                 name: "ראוטר Mesh TP-Link Deco X20",
                 price: 850,
                 category: "smart_home",
@@ -822,6 +968,8 @@
             },
             {
                 id: "22",
+                name_en: "Blue Yeti Condenser Microphone",
+                description_en: "The world's #1 USB microphone for podcasting, game streaming, YouTube videos, and music recording.",
                 name: "מיקרופון קונדנסר Blue Yeti",
                 price: 580,
                 category: "computer_accessories",
@@ -836,6 +984,8 @@
             },
             {
                 id: "23",
+                name_en: "Razer BlackWidow V3 Gaming Keyboard",
+                description_en: "Advanced mechanical gaming keyboard featuring tactile Razer Green switches and full Razer Chroma RGB.",
                 name: "מקלדת גיימינג Razer BlackWidow V3",
                 price: 490,
                 category: "gaming",
@@ -850,6 +1000,8 @@
             },
             {
                 id: "24",
+                name_en: "Xbox Series X Console",
+                description_en: "The fastest, most powerful Xbox ever built for true 4K gaming and high-framerate performance.",
                 name: "קונסולת Xbox Series X",
                 price: 2199,
                 category: "gaming",
@@ -864,6 +1016,8 @@
             },
             {
                 id: "25",
+                name_en: "Roborock S8 Robot Vacuum Cleaner",
+                description_en: "Advanced robot vacuum and mop featuring 6000Pa extreme suction and reactive 3D obstacle avoidance.",
                 name: "שואב אבק רובוטי Roborock S8",
                 price: 2490,
                 category: "smart_home",
@@ -878,6 +1032,8 @@
             },
             {
                 id: "26",
+                name_en: "KitchenAid Artisan Stand Mixer",
+                description_en: "Iconic, powerful stand mixer featuring 10 speeds and planetary mixing action in a classic retro design.",
                 name: "מיקסר KitchenAid Artisan",
                 price: 2350,
                 category: "small_appliances",
@@ -892,6 +1048,8 @@
             },
             {
                 id: "27",
+                name_en: "AirPods Pro (2nd Gen) In-Ear Headphones",
+                description_en: "Next-level Active Noise Cancellation, Adaptive Transparency, and personalized Spatial Audio powered by the H2 chip.",
                 name: "אוזניות In-Ear AirPods Pro 2",
                 price: 999,
                 category: "audio_accessories",
@@ -906,6 +1064,8 @@
             },
             {
                 id: "28",
+                name_en: "JBL Flip 6 Portable Bluetooth Speaker",
+                description_en: "Compact IP67 waterproof Bluetooth speaker delivering bold JBL Original Pro Sound with deep bass.",
                 name: "רמקול נייד JBL Flip 6",
                 price: 399,
                 category: "audio_accessories",
@@ -934,6 +1094,8 @@
             },
             {
                 id: "30",
+                name_en: "Ninja Auto-iQ Personal Blender",
+                description_en: "Powerful 1000W personal blender with intelligent Auto-iQ programs for effortless healthy smoothies.",
                 name: "בלנדר נינג'ה Ninja Auto-iQ",
                 price: 450,
                 category: "small_appliances",
