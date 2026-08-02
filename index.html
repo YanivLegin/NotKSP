@@ -4668,9 +4668,22 @@
                                 <div className="fixed inset-0 z-40" onClick={() => setAccOpen(false)}></div>
                                 <div className="absolute bottom-14 right-0 w-[calc(100vw-2rem)] max-w-xs sm:w-80 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 rounded-2xl shadow-premium-hover p-5 z-50 fade-in text-right">
                                     <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
-                                        <button onClick={resetAccessibility} className="text-sm bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold px-2 py-1 rounded-lg transition-colors cursor-pointer">אפס הגדרות</button>
-                                        <h3 className="font-heebo font-black text-slate-800 dark:text-white text-base flex items-center gap-1.5 justify-end">
-                                            נגישות אתר (IS 5568 AA) <Icon name={"accessibility"} className={"w-4 h-4 text-primary"} />
+                                        <div className="flex items-center gap-2">
+                                            <button 
+                                                onClick={() => setAccOpen(false)} 
+                                                className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                                                title={lang === 'en' ? 'Close' : 'סגור'}
+                                                aria-label={lang === 'en' ? 'Close' : 'סגור'}
+                                            >
+                                                <Icon name="x" className="w-5 h-5" />
+                                            </button>
+                                            <button onClick={resetAccessibility} className="text-xs bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold px-2.5 py-1 rounded-lg transition-colors cursor-pointer">
+                                                {lang === 'en' ? 'Reset' : 'אפס הגדרות'}
+                                            </button>
+                                        </div>
+                                        <h3 className="font-heebo font-black text-slate-800 dark:text-white text-base flex items-center gap-1.5">
+                                            <Icon name={"accessibility"} className={"w-4.5 h-4.5 text-primary dark:text-cta"} />
+                                            <span>{lang === 'en' ? 'Accessibility' : 'נגישות אתר'}</span>
                                         </h3>
                                     </div>
                                     
