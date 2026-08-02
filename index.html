@@ -2797,30 +2797,30 @@
                 <div className="flex flex-col min-h-screen">
                     {/* Header */}
                     <header className="sticky top-0 z-40 bg-primary text-white shadow-md">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-3 sm:gap-4 flex-nowrap">
                             
                             {/* Logo */}
-                            <a href="#" onClick={(e) => { e.preventDefault(); setView('home'); }} className="flex items-center gap-2 select-none group">
-                                <BrandLogo size="text-4xl" iconSize="w-12 h-12 sm:w-20 sm:h-20" />
+                            <a href="#" onClick={(e) => { e.preventDefault(); setView('home'); }} className="flex items-center gap-2 select-none group shrink-0">
+                                <BrandLogo size="text-2xl sm:text-3xl" iconSize="w-9 h-9 sm:w-11 sm:h-11" />
                             </a>
 
                             {/* Search bar */}
                             {view === 'home' && (
-                                <div className="order-3 w-full basis-full sm:order-none sm:w-auto sm:basis-auto flex-1 max-w-none sm:max-w-lg relative group">
-                                    <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-cta transition-colors">
-                                        <Icon name={"search"} className={"w-5 h-5"} />
+                                <div className="hidden sm:flex flex-1 max-w-xs md:max-w-sm lg:max-w-md relative group">
+                                    <div className={`absolute inset-y-0 ${lang === 'en' ? 'left-3' : 'right-3'} flex items-center pointer-events-none text-slate-400 group-focus-within:text-cta transition-colors`}>
+                                        <Icon name={"search"} className={"w-4 h-4"} />
                                     </div>
                                     <input 
                                         type="text" 
                                         placeholder={t('searchPlaceholder')} 
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pr-10 pl-4 py-2 bg-primary-light border border-slate-600 rounded-full text-white placeholder-slate-400 focus:outline-none focus:border-cta focus:ring-1 focus:ring-cta text-base transition-all shadow-inner"
+                                        className={`w-full ${lang === 'en' ? 'pl-9 pr-8' : 'pr-9 pl-8'} py-1.5 bg-primary-light border border-slate-600 rounded-full text-white placeholder-slate-400 focus:outline-none focus:border-cta focus:ring-1 focus:ring-cta text-sm transition-all shadow-inner`}
                                     />
                                     {searchQuery && (
                                         <button 
                                             onClick={() => setSearchQuery('')}
-                                            className="absolute inset-y-0 left-3 flex items-center text-slate-400 hover:text-white"
+                                            className={`absolute inset-y-0 ${lang === 'en' ? 'right-3' : 'left-3'} flex items-center text-slate-400 hover:text-white`}
                                         >
                                             <Icon name={"x"} className={"w-4 h-4"} />
                                         </button>
