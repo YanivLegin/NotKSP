@@ -266,17 +266,105 @@
 
         // Constants - Categories list
         const CATEGORIES = [
-            { id: 'all', name: 'כל המוצרים', icon: 'layout-grid' },
-            { id: 'computers', name: 'מחשבים', icon: 'laptop' },
-            { id: 'smartphones', name: 'סמארטפונים', icon: 'smartphone' },
-            { id: 'tv_audio', name: 'טלוויזיה ואודיו', icon: 'tv' },
-            { id: 'smart_home', name: 'בית חכם', icon: 'home' },
-            { id: 'audio_accessories', name: 'אודיו ואביזרים', icon: 'headphones' },
-            { id: 'gaming', name: 'גיימינג', icon: 'gamepad-2' },
-            { id: 'small_appliances', name: 'חשמל קטן למטבח', icon: 'coffee' },
-            { id: 'computer_accessories', name: 'אביזרי מחשב', icon: 'mouse' },
-            { id: 'wearables', name: 'שעונים חכמים', icon: 'watch' }
+            { id: 'all', name: 'כל המוצרים', name_en: 'All Products', icon: 'layout-grid' },
+            { id: 'computers', name: 'מחשבים', name_en: 'Computers & Laptops', icon: 'laptop' },
+            { id: 'smartphones', name: 'סמארטפונים', name_en: 'Smartphones', icon: 'smartphone' },
+            { id: 'tv_audio', name: 'טלוויזיה ואודיו', name_en: 'TV & Audio', icon: 'tv' },
+            { id: 'smart_home', name: 'בית חכם', name_en: 'Smart Home', icon: 'home' },
+            { id: 'audio_accessories', name: 'אודיו ואביזרים', name_en: 'Audio & Accessories', icon: 'headphones' },
+            { id: 'gaming', name: 'גיימינג', name_en: 'Gaming & Consoles', icon: 'gamepad-2' },
+            { id: 'small_appliances', name: 'חשמל קטן למטבח', name_en: 'Kitchen Appliances', icon: 'coffee' },
+            { id: 'computer_accessories', name: 'אביזרי מחשב', name_en: 'Computer Accessories', icon: 'mouse' },
+            { id: 'wearables', name: 'שעונים חכמים', name_en: 'Smartwatches', icon: 'watch' }
         ];
+
+        // Complete Bilingual Translation Dictionary (Hebrew <-> English)
+        const I18N = {
+            he: {
+                searchPlaceholder: "חפש מוצרים, מותגים, דגמים...",
+                cart: "סל קניות",
+                wishlist: "מועדפים",
+                branches: "סניפים",
+                admin: "אזור ניהול",
+                login: "התחברות",
+                register: "הרשמה",
+                profile: "אזור אישי",
+                logout: "התנתקות",
+                recentlyViewed: "מוצרים שצפית לאחרונה",
+                addToCart: "הוסף לסל",
+                inCart: "בסל הקניות",
+                outOfStock: "אזל מהמלאי",
+                requestProduct: "בקשת מוצר",
+                inStock: "במלאי",
+                price: "מחיר",
+                nis: "ש\"ח",
+                warranty: "אחריות יבואן רשמי",
+                expressDelivery: "משלוח מהיר עד הבית",
+                specifications: "מפרט טכני",
+                similarProducts: "מוצרים דומים שעשויים לעניין אותך",
+                backToCatalog: "חזרה לקטלוג",
+                checkoutTitle: "פרטי משלוח והזמנה",
+                checkoutSubtitle: "השלימו את הפרטים מטה כדי לאשר את ההזמנה המדומה שלכם.",
+                fullName: "שם מלא *",
+                phone: "מספר טלפון *",
+                email: "אימייל לאישור הזמנה",
+                city: "עיר / יישוב *",
+                street: "רחוב ומספר בית *",
+                placeOrder: "אישור והשלמת הזמנה",
+                orderSummary: "סיכום הזמנה",
+                subtotal: "סכום ביניים",
+                shipping: "משלוח",
+                free: "חינם",
+                total: "סה\"כ לתשלום",
+                thankYouTitle: "תודה רבה! ההזמנה נקלטה בהצלחה",
+                continueShopping: "המשך בקניות",
+                footerRights: "כל הזכויות שמורות ל-NotKSP © 2026",
+                guestBanner: "ממשיכים כאורח — אפשר לסיים את הרכישה גם בלי חשבון.",
+                loginBanner: "יש לך חשבון? להתחברות ←"
+            },
+            en: {
+                searchPlaceholder: "Search products, brands, models...",
+                cart: "Shopping Cart",
+                wishlist: "Wishlist",
+                branches: "Branches",
+                admin: "Admin Area",
+                login: "Sign In",
+                register: "Register",
+                profile: "My Account",
+                logout: "Sign Out",
+                recentlyViewed: "Recently Viewed Products",
+                addToCart: "Add to Cart",
+                inCart: "In Shopping Cart",
+                outOfStock: "Out of Stock",
+                requestProduct: "Request Product",
+                inStock: "In Stock",
+                price: "Price",
+                nis: "NIS",
+                warranty: "Official Importer Warranty",
+                expressDelivery: "Fast Home Delivery",
+                specifications: "Technical Specifications",
+                similarProducts: "Similar Products You Might Like",
+                backToCatalog: "Back to Catalog",
+                checkoutTitle: "Shipping & Order Details",
+                checkoutSubtitle: "Complete the details below to confirm your mock order.",
+                fullName: "Full Name *",
+                phone: "Phone Number *",
+                email: "Email for Order Confirmation",
+                city: "City / Settlement *",
+                street: "Street & House Number *",
+                placeOrder: "Confirm & Complete Order",
+                orderSummary: "Order Summary",
+                subtotal: "Subtotal",
+                shipping: "Shipping",
+                free: "Free",
+                total: "Total Amount",
+                thankYouTitle: "Thank You! Order Received Successfully",
+                continueShopping: "Continue Shopping",
+                footerRights: "All Rights Reserved to NotKSP © 2026",
+                guestBanner: "Continuing as Guest — You can complete purchase without an account.",
+                loginBanner: "Have an account? Sign in ←"
+            }
+        };
 
         // Constants - Product catalog with full specs as requested in the PRD
         
@@ -1539,6 +1627,21 @@
 
         function App() {
             // State
+            // Language & i18n State
+            const [lang, setLang] = useState(() => localStorage.getItem('notksp_lang') || 'he');
+
+            // Translation helper function
+            const t = useCallback((key) => {
+                return (I18N[lang] && I18N[lang][key]) || (I18N['he'] && I18N['he'][key]) || key;
+            }, [lang]);
+
+            // Sync layout direction (RTL for Hebrew, LTR for English)
+            useEffect(() => {
+                localStorage.setItem('notksp_lang', lang);
+                document.documentElement.dir = lang === 'en' ? 'ltr' : 'rtl';
+                document.documentElement.lang = lang;
+            }, [lang]);
+
             const [view, setView] = useState('home'); // 'home' | 'checkout' | 'thank-you'
             const [selectedCategory, setSelectedCategory] = useState('all');
             const [searchQuery, setSearchQuery] = useState('');
@@ -2514,8 +2617,6 @@
                             customer_phone: orderData.customerPhone,
                             customer_email: orderData.customerEmail,
                             customer_address: orderData.customerAddress,
-                            customer_city: orderData.customerCity,
-                            customer_street: orderData.customerStreet,
                             is_guest: orderData.isGuest,
                             items: orderData.items,
                             total: orderData.total
@@ -2601,7 +2702,7 @@
                                     </div>
                                     <input 
                                         type="text" 
-                                        placeholder="חפשו מוצרים, מותגים או תכונות..." 
+                                        placeholder={t('searchPlaceholder')} 
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         className="w-full pr-10 pl-4 py-2 bg-primary-light border border-slate-600 rounded-full text-white placeholder-slate-400 focus:outline-none focus:border-cta focus:ring-1 focus:ring-cta text-base transition-all shadow-inner"
@@ -2635,6 +2736,15 @@
                                 >
                                     <Icon name="map-pin" className="w-4 h-4" />
                                     סניפים
+                                </button>
+                                {/* Language Toggle Button (EN / HE) */}
+                                <button
+                                    onClick={() => setLang(l => l === 'he' ? 'en' : 'he')}
+                                    className="bg-cta hover:bg-cta-hover text-primary font-black text-xs px-2.5 py-1.5 rounded-full shadow-md transition-all flex items-center gap-1 border border-cta-dark transform active:scale-95"
+                                    title={lang === 'he' ? "Switch to English" : "החלף לעברית"}
+                                >
+                                    <span className="text-sm leading-none">🌐</span>
+                                    <span>{lang === 'he' ? 'EN' : 'HE'}</span>
                                 </button>
                                 {/* Dark Mode Toggle */}
                                 <button
@@ -2773,7 +2883,7 @@
                                             }`}
                                         >
                                             <CategoryIcon iconName={cat.icon} className="w-4 h-4" />
-                                            {cat.name}
+                                            {lang === 'en' ? (cat.name_en || cat.name) : cat.name}
                                         </button>
                                     ))}
                                 </div>
@@ -3413,24 +3523,24 @@
                                     {/* Checkout Form */}
                                     <div className="md:col-span-2 bg-white rounded-2xl p-6 border border-slate-100 shadow-premium space-y-6">
                                         <div className="border-b border-slate-100 pb-4">
-                                            <h2 className="text-2xl font-heebo font-black text-slate-900">פרטי משלוח והזמנה</h2>
-                                            <p className="text-sm text-slate-500 mt-1">השלימו את הפרטים מטה כדי לאשר את ההזמנה המדומה שלכם.</p>
+                                            <h2 className="text-2xl font-heebo font-black text-slate-900">{t('checkoutTitle')}</h2>
+                                            <p className="text-sm text-slate-500 mt-1">{t('checkoutSubtitle')}</p>
                                         </div>
 
-                                        {/* Guest / account banner (KSP / Ivory style — buy without an account) */}
+                                        {/* Guest / account banner */}
                                         {currentUser ? (
                                             <div className="bg-cta-light border border-cta/30 rounded-xl p-3 flex items-center gap-2.5 text-sm text-slate-700">
                                                 <Icon name={"user-check"} className={"w-4 h-4 text-cta-hover shrink-0"} />
-                                                מחובר/ת כ־<strong className="text-primary">{currentUser.name}</strong>. הפרטים מולאו עבורך אוטומטית.
+                                                {lang === 'en' ? `Signed in as ` : `מחובר/ת כ־`}<strong className="text-primary">{currentUser.name}</strong>
                                             </div>
                                         ) : (
                                             <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm">
                                                 <div className="flex items-center gap-2 text-slate-600">
                                                     <Icon name={"user-round"} className={"w-4 h-4 text-slate-400 shrink-0"} />
-                                                    ממשיכים כאורח — אפשר לסיים את הרכישה גם בלי חשבון.
+                                                    {t('guestBanner')}
                                                 </div>
                                                 <button type="button" onClick={() => { setAuthTab('login'); setAuthOpen(true); }} className="text-primary font-bold hover:underline whitespace-nowrap self-start sm:self-auto">
-                                                    יש לך חשבון? להתחברות ←
+                                                    {t('loginBanner')}
                                                 </button>
                                             </div>
                                         )}
@@ -3438,12 +3548,12 @@
                                         <form onSubmit={handlePlaceOrder} className="space-y-4">
                                             {/* Name */}
                                             <div className="space-y-1">
-                                                <label className="block text-sm font-bold text-slate-700">שם מלא *</label>
+                                                <label className="block text-sm font-bold text-slate-700">{t('fullName')}</label>
                                                 <input 
                                                     type="text"
                                                     value={formName}
                                                     onChange={(e) => setFormName(e.target.value)}
-                                                    placeholder="ישראל ישראלי"
+                                                    placeholder={lang === 'en' ? "John Doe" : "ישראל ישראלי"}
                                                     className={`w-full px-4 py-2.5 rounded-lg border text-base focus:outline-none focus:ring-2 ${
                                                         formErrors.name ? 'border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-primary focus:ring-primary/10'
                                                     }`}
@@ -3453,7 +3563,7 @@
 
                                             {/* Phone */}
                                             <div className="space-y-1">
-                                                <label className="block text-sm font-bold text-slate-700">מספר טלפון *</label>
+                                                <label className="block text-sm font-bold text-slate-700">{t('phone')}</label>
                                                 <input 
                                                     type="tel"
                                                     value={formPhone}
@@ -3467,9 +3577,9 @@
                                                 {formErrors.phone && <p className="text-red-500 text-sm font-semibold">{formErrors.phone}</p>}
                                             </div>
 
-                                            {/* Email (for order confirmation) */}
+                                            {/* Email */}
                                             <div className="space-y-1">
-                                                <label className="block text-sm font-bold text-slate-700">אימייל לאישור הזמנה</label>
+                                                <label className="block text-sm font-bold text-slate-700">{t('email')}</label>
                                                 <input 
                                                     type="email"
                                                     value={formEmail}
@@ -3483,13 +3593,13 @@
                                                 {formErrors.email && <p className="text-red-500 text-sm font-semibold">{formErrors.email}</p>}
                                             </div>
 
-                                            {/* City & Street Autocomplete powered by Data.gov.il */}
+                                            {/* City & Street Autocomplete */}
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 
                                                 {/* City / Settlement Autocomplete */}
                                                 <div className="space-y-1 relative">
                                                     <label className="block text-sm font-bold text-slate-700 dark:text-slate-200">
-                                                        עיר / יישוב *
+                                                        {t('city')}
                                                     </label>
                                                     <div className="relative">
                                                         <input 
@@ -3610,14 +3720,14 @@
                                                 className="w-full bg-cta hover:bg-cta-hover text-primary font-bold py-3 rounded-xl shadow-md transition-all text-base flex items-center justify-center gap-2 transform active:scale-[0.98]"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                                                אישור והשלמת הזמנה
+                                                {t('placeOrder')}
                                             </button>
                                         </form>
                                     </div>
 
                                     {/* Order Summary Sidebar */}
                                     <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-premium h-fit space-y-4">
-                                        <h3 className="font-heebo font-bold text-slate-800 border-b border-slate-100 pb-3">סיכום סל הקניות</h3>
+                                        <h3 className="font-heebo font-bold text-slate-800 border-b border-slate-100 pb-3">{t('orderSummary')}</h3>
                                         
                                         <div className="divide-y divide-slate-100 overflow-y-auto max-h-60 custom-scrollbar pr-1">
                                             {cart.map(item => (
